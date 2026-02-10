@@ -2,9 +2,13 @@
 const nextConfig = {
     output: 'standalone', // Optimized for Docker
     async rewrites() {
-        // If running in Docker, BACKEND_URL provided via env (e.g., http://backend:8000)
-        // If local dev, fallback to localhost:8000
-        const backendUrl = process.env.BACKEND_URL || 'http://127.0.0.1:8000';
+        // If running in Docker (production), default to backend service name if env is missing.
+        // If local dev, default to localhost.
+        const isDev = process.env.NODE_ENV !== 'production';
+        const backendUrl = process.env.BACKEND_URL || (isDev ? 'http://127.0.0.1:8000' : 'http://backend:8000');
+
+        console.log(`[Next.js] Proxying API requests to: ${backendUrl}`);
+
         return [
             {
                 source: '/api/:path*',

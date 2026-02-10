@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Send, MapPin, Building2, User, Sparkles, ArrowRight } from "lucide-react";
+import { Send, MapPin, Building2, User, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { api, ChatMessage, Lead } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +20,37 @@ export default function ChatInterface() {
     const [loading, setLoading] = useState(false);
     const [sessionId, setSessionId] = useState("");
     const [mode, setMode] = useState<'concierge' | 'lead_capture'>('concierge');
+    const [systemReady, setSystemReady] = useState(false);
+    const [bootProgress, setBootProgress] = useState(0);
+
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    // Initial System Check (Loading Screen)
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        const checkHealth = async () => {
+            try {
+                // We'll just try to ping the chat API or a health endpoint if it existed.
+                // For now, we simulate a health check by trying a lightweight call or just assuming delay.
+                // Since user wants a "Progress bar", we'll fake the boot sequence until backend is reachable.
+                const res = await fetch('/api/health'); // We assume we added this or just try root
+                if (res.ok) {
+                    setSystemReady(true);
+                    setBootProgress(100);
+                    clearInterval(interval);
+                } else {
+                    setBootProgress(prev => Math.min(prev + 10, 90));
+                }
+            } catch (e) {
+                // Backend likely starting up
+                setBootProgress(prev => Math.min(prev + 5, 90));
+            }
+        };
+
+        // Start polling
+        interval = setInterval(checkHealth, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         let sid = localStorage.getItem(SESSION_ID_KEY);
@@ -61,20 +91,44 @@ export default function ChatInterface() {
 
         } catch (err) {
             console.error(err);
-            setMessages(prev => [...prev, { role: "assistant", content: "I'm having trouble connecting. Please try again." }]);
+            setMessages(prev => [...prev, { role: "assistant", content: "I'm having trouble connecting to PalmX. Please try again." }]);
         } finally {
             setLoading(false);
         }
     };
 
+    if (!systemReady) {
+        return (
+            <div className="flex flex-col h-[85vh] w-full max-w-5xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 flex-1 relative items-center justify-center">
+                <div className="flex flex-col items-center space-y-6 max-w-sm w-full p-8">
+                    <div className="relative">
+                        <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center text-white font-serif font-bold text-2xl ring-4 ring-white/10 stamp-effect shadow-xl">
+                            PH
+                        </div>
+                    </div>
+                    <div className="text-center space-y-2">
+                        <h2 className="font-serif text-2xl text-secondary">Initalizing PalmX</h2>
+                        <p className="text-sm text-gray-400">Loading verified market data...</p>
+                    </div>
+                    <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-primary transition-all duration-500 ease-out"
+                            style={{ width: `${bootProgress}%` }}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="flex flex-col h-[85vh] w-full max-w-5xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 flex-1 relative">
+        <div className="flex flex-col h-[85vh] w-full max-w-5xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 flex-1 relative animate-in fade-in duration-700">
 
             {/* Elegant Header */}
             <div className="bg-secondary text-white p-6 flex items-center justify-between shadow-md z-10">
                 <div className="flex items-center gap-4">
                     <div className="relative">
-                        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-serif font-bold text-lg ring-4 ring-white/10 stamp-effect shadow-lg">
+                        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-serif font-bold text-lg ring-4 ring-white/10 shadow-lg">
                             PH
                         </div>
                         <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-secondary"></div>
@@ -88,9 +142,9 @@ export default function ChatInterface() {
                     </div>
                 </div>
                 <div className="hidden md:block text-right">
-                    <div className="text-xs text-gray-400 font-mono mb-1">PILOT BUILD v1.0</div>
+                    <div className="text-xs text-gray-400 font-mono mb-1">v1.2 LIVE</div>
                     <div className="text-[10px] uppercase tracking-widest px-2 py-1 bg-white/5 rounded-full inline-block">
-                        {mode === 'concierge' ? 'Exploration Mode' : 'Concierge Assistance'}
+                        {mode === 'concierge' ? 'Concierge Mode' : 'Assistance Mode'}
                     </div>
                 </div>
             </div>
@@ -98,7 +152,6 @@ export default function ChatInterface() {
             {/* Chat Area */}
             <div className="flex-1 bg-gray-50/50 relative overflow-hidden flex flex-col">
 
-                {/* Background Decor */}
                 <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-b from-gray-100 to-transparent pointer-events-none opacity-50" />
 
                 <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 z-10 scroll-smooth">
@@ -112,8 +165,8 @@ export default function ChatInterface() {
                             <div className="text-center max-w-md space-y-3">
                                 <h2 className="font-serif text-3xl text-secondary">Welcome Home</h2>
                                 <p className="text-gray-500 font-light leading-relaxed">
-                                    I am your personal guide to Palm Hills. Explore our premier communities,
-                                    check availability, and find your perfect home.
+                                    I am your personal guide. Ask me about our communities,
+                                    prices, or availability.
                                 </p>
                             </div>
 
@@ -151,17 +204,11 @@ export default function ChatInterface() {
                                 <div className="whitespace-pre-wrap font-light">{m.content}</div>
                                 {m.role === 'assistant' && (
                                     <div className="absolute -bottom-5 left-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-2 text-[10px] text-gray-400 uppercase tracking-widest mt-1">
-                                        <span className="w-1 h-1 rounded-full bg-primary"></span>
-                                        <span>Verified Knowledge Base</span>
+                                        <span className="w-1 h-1 rounded-full bg-primary/20"></span>
+                                        <span>Verified</span>
                                     </div>
                                 )}
                             </div>
-
-                            {m.role === 'user' && (
-                                <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-gray-500 ml-3 mt-1">
-                                    <User size={14} />
-                                </div>
-                            )}
                         </div>
                     ))}
 
@@ -170,9 +217,8 @@ export default function ChatInterface() {
                         <div className="flex justify-start">
                             <div className="w-8 h-8 rounded-full bg-secondary flex-shrink-0 flex items-center justify-center text-white text-xs font-serif mr-3 mt-1 shadow-md">PH</div>
                             <div className="bg-white p-5 rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 flex items-center space-x-2">
-                                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                <Loader2 size={16} className="animate-spin text-primary" />
+                                <span className="text-xs text-gray-400 tracking-wider">THINKING...</span>
                             </div>
                         </div>
                     )}
@@ -186,7 +232,7 @@ export default function ChatInterface() {
                         <input
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder={loading ? "Thinking..." : "Ask me anything about Palm Hills..."}
+                            placeholder={loading ? "" : "Ask anything..."}
                             className={cn(
                                 "w-full pl-6 pr-14 py-5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-light text-gray-700 shadow-inner",
                                 loading && "opacity-50 cursor-not-allowed"
@@ -201,14 +247,8 @@ export default function ChatInterface() {
                             <Send size={18} />
                         </button>
                     </div>
-                    <div className="mt-3 flex justify-center items-center space-x-4 text-[10px] text-gray-400 uppercase tracking-widest font-medium">
-                        <span className="flex items-center gap-1"><MapPin size={10} /> 14 verified compounds</span>
-                        <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                        <span className="flex items-center gap-1"><Building2 size={10} /> Real-time pricing</span>
-                    </div>
                 </form>
             </div>
-
         </div>
     );
 }

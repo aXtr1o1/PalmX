@@ -82,15 +82,14 @@ class RAGService:
         # 3. Apply Filters
         filtered = []
         for c in candidates:
-            p = c['project']
-            if filters:
-                # Basic exact match filtering
-                # Check region
-                if filters.get('region') and filters['region'].lower() not in (p.region or '').lower():
-                    continue
-                # Check status
-                if filters.get('project_status') and filters['project_status'].lower() not in (p.project_status or '').lower():
-                    continue
+            # Pilot Mode: Relaxed filtering. Let the LLM decide relevance from context.
+            # Only apply if strictly needed in future.
+            # p = c['project']
+            # if filters:
+            #     if filters.get('region') and filters['region'].lower() not in (p.region or '').lower():
+            #         continue
+            #     if filters.get('project_status') and filters['project_status'].lower() not in (p.project_status or '').lower():
+            #         continue
             filtered.append(c)
 
         # Return top k

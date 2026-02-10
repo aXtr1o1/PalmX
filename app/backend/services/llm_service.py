@@ -97,6 +97,9 @@ class LLMService:
             )
             content = response.choices[0].message.content
             data = json.loads(content)
+            # Ensure intent is present
+            if "intent" not in data:
+                data["intent"] = "project_query"
             return RouterOutput(**data)
         except Exception as e:
             logger.error(f"Router failed: {e}")
