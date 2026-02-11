@@ -81,12 +81,12 @@ class LLMService:
         {user_message}
         
         Intents:
-        - lead_capture: intent to buy, book, price inquiry, or contact sales.
-        - project_query: asking facts about project (location, amenities).
-        - list_projects: "show me villas", "what commercial projects are there".
-        - compare: "compare x and y".
-        - pricing: "how much is..." (if not buying intent yet).
-        - support_contact: "phone number", "complaint".
+        - lead_capture: Detect buying/renting intent (triggers: "book visit", "call me", "send prices", "interested", "budget", "schedule", "I want", "booking").
+        - project_query: asking facts about a specific project (location, amenities, units).
+        - list_projects: broad requests (e.g. "show me villas", "what commercial projects are there in West?").
+        - compare: "compare project X and Y".
+        - pricing: "how much is...", "what is the price of..." (if no explicit lead intent yet).
+        - support_contact: "phone number", "complaint", "direct contact".
         
         Output Strict JSON:
         - intent: matches one of the above.
