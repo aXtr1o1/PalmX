@@ -4,83 +4,85 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Strict Palm Hills Palette */
+    --background: 255 255 255;
+    /* #FFFFFF */
+    --foreground: 11 11 11;
+    /* #0B0B0B */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
- 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
- 
-    --primary: 346 72% 47%; /* #D32048 */
-    --primary-foreground: 210 40% 98%;
- 
-    --secondary: 0 0% 20%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
- 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
- 
+    --card: 255 255 255;
+    --card-foreground: 11 11 11;
+
+    --popover: 255 255 255;
+    --popover-foreground: 11 11 11;
+
+    --primary: 210 32 72;
+    /* #D22048 - Converted to RGB for Tailwind opacity util support if needed, but we used hex in config. Keeping strict. */
+    --primary-foreground: 255 255 255;
+
+    --secondary: 24 24 24;
+    /* #181818 */
+    --secondary-foreground: 255 255 255;
+
+    --muted: 245 245 245;
+    /* #F5F5F5 Surface */
+    --muted-foreground: 116 116 116;
+    /* #747474 */
+
+    --accent: 210 32 72;
+    /* #D22048 */
+    --accent-foreground: 255 255 255;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 346 72% 47%;
- 
+    --border: 230 230 230;
+    /* #E6E6E6 */
+    --input: 230 230 230;
+    --ring: 210 32 72;
+
     --radius: 0.5rem;
   }
- 
+
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
- 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
- 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
- 
-    --primary: 346 72% 47%;
-    --primary-foreground: 222.2 47.4% 11.2%;
- 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
- 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
- 
+    /* Dark mode is minimal/charcoal based - strictly mapped for "Dark Sections" */
+    --background: 24 24 24;
+    /* #181818 */
+    --foreground: 255 255 255;
+
+    --card: 24 24 24;
+    --card-foreground: 255 255 255;
+
+    --popover: 24 24 24;
+    --popover-foreground: 255 255 255;
+
+    --primary: 210 32 72;
+    --primary-foreground: 255 255 255;
+
+    --secondary: 255 255 255;
+    --secondary-foreground: 24 24 24;
+
+    --muted: 33 33 33;
+    --muted-foreground: 160 160 160;
+
+    --accent: 210 32 72;
+    --accent-foreground: 255 255 255;
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
- 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 346 72% 47%;
+
+    --border: 51 51 51;
+    --input: 51 51 51;
+    --ring: 210 32 72;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
-}
-
-.stamp-effect {
-    animation: stamp-pulse 2s infinite;
-}
-
-@keyframes stamp-pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 1; }
 }

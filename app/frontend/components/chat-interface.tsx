@@ -23,6 +23,7 @@ export default function ChatInterface() {
     const [mode, setMode] = useState<'concierge' | 'lead_capture'>('concierge');
     const [systemReady, setSystemReady] = useState(false);
     const [bootProgress, setBootProgress] = useState(0);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -147,63 +148,181 @@ export default function ChatInterface() {
     }
 
     return (
-        <div className="flex flex-col h-[85vh] w-full max-w-5xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 flex-1 relative animate-in fade-in duration-700">
+        <div className="flex flex-col h-screen w-full bg-white relative animate-in fade-in duration-700 font-sans text-foreground">
 
-            {/* Elegant Header */}
-            <div className="bg-secondary text-white p-6 flex items-center justify-between shadow-md z-10">
-                <div className="flex items-center gap-4">
-                    <div className="relative">
-                        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-serif font-bold text-lg ring-4 ring-white/10 shadow-lg">
-                            PH
-                        </div>
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-secondary"></div>
-                    </div>
-                    <div>
-                        <h1 className="font-serif text-xl tracking-wider font-medium">PALM HILLS</h1>
-                        <div className="flex items-center gap-2 opacity-80 text-xs tracking-widest uppercase">
-                            <Sparkles size={10} className="text-primary" />
-                            <span>Concierge AI</span>
+            {/* Palm Hills Global Shell */}
+            <header className="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-md z-50 h-[88px] flex items-center justify-between px-6 md:px-12 border-b border-gray-100 transition-all duration-300">
+                {/* Left: Menu */}
+                <div className="flex items-center gap-6">
+                    <button
+                        onClick={() => setMenuOpen(true)}
+                        className="group flex flex-col gap-1.5 w-8 hover:opacity-70 transition-opacity p-2 -ml-2"
+                    >
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                        <span className="w-5 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                    </button>
+                    {/* Search Bar Removed as per user request (useless) */}
+                </div>
+
+                {/* Center: Logo */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div className="flex flex-col items-center">
+                        <span className="font-serif text-2xl tracking-[0.25em] font-bold text-black border-b-2 border-transparent pb-1">PALM HILLS</span>
+                        <div className="flex items-center gap-2 mt-1">
+                            <span className="h-px w-4 bg-accent"></span>
+                            <span className="text-[10px] uppercase tracking-[0.3em] text-accent font-medium">PalmX AI</span>
+                            <span className="h-px w-4 bg-accent"></span>
                         </div>
                     </div>
                 </div>
-                <div className="hidden md:block text-right">
-                    <div className="text-xs text-gray-400 font-mono mb-1">v1.2 LIVE</div>
-                    <div className="text-[10px] uppercase tracking-widest px-2 py-1 bg-white/5 rounded-full inline-block">
-                        {mode === 'concierge' ? 'Concierge Mode' : 'Assistance Mode'}
+
+                {/* Right: Actions */}
+                <div className="flex items-center gap-8">
+                    <span className="hidden md:block font-sans text-xs font-bold tracking-widest text-black">19743</span>
+                    <span className="hidden md:block w-px h-4 bg-gray-200"></span>
+                    <span className="hidden md:block font-sans text-xs font-bold text-muted cursor-pointer hover:text-black tracking-widest">عربي</span>
+                    <button className="hidden lg:flex bg-black text-white px-8 py-3 rounded-full text-[10px] font-bold tracking-[0.2em] hover:bg-primary hover:scale-105 transition-all uppercase shadow-lg shadow-black/5">
+                        Request Sales Call
+                    </button>
+                </div>
+            </header>
+
+            {/* Menu Overlay */}
+            <div className={cn(
+                "fixed inset-0 bg-[#0B0B0B] z-[100] transition-all duration-700 ease-[cubic-bezier(0.87,0,0.13,1)] overflow-hidden",
+                menuOpen ? "translate-y-0 opacity-100 visible" : "-translate-y-full opacity-0 invisible pointer-events-none"
+            )}>
+                {/* Close Button */}
+                <div className="absolute top-6 right-6 md:top-8 md:right-12 z-[110]">
+                    <button onClick={() => setMenuOpen(false)} className="text-white hover:text-primary transition-colors p-4 group bg-white/5 rounded-full backdrop-blur-sm border border-white/10">
+                        <span className="sr-only">Close</span>
+                        <div className="relative w-6 h-6 flex items-center justify-center">
+                            <span className="absolute w-6 h-0.5 bg-current rotate-45 transform origin-center transition-transform duration-300 group-hover:rotate-90"></span>
+                            <span className="absolute w-6 h-0.5 bg-current -rotate-45 transform origin-center transition-transform duration-300 group-hover:rotate-0"></span>
+                        </div>
+                    </button>
+                </div>
+
+                {/* Palm Hills Logo in Overlay */}
+                <div className="absolute top-8 left-8 md:left-12 z-[110] opacity-0 animate-in fade-in slide-in-from-top-4 duration-1000 fill-mode-forwards" style={{ animationDelay: '200ms' }}>
+                    <div className="flex flex-col">
+                        <span className="font-serif text-2xl tracking-[0.2em] font-bold text-white">PALM HILLS</span>
+                        <span className="text-[9px] uppercase tracking-[0.4em] text-primary/80 font-medium mt-1">Developments</span>
                     </div>
                 </div>
+
+                <div className="h-full w-full max-w-[1400px] mx-auto px-6 md:px-12 flex flex-col md:flex-row relative z-10 pt-32 pb-12">
+
+                    {/* Left Column: Navigation */}
+                    <div className="flex-1 flex flex-col justify-center space-y-8 md:border-r border-white/10 md:pr-12">
+                        <nav className="flex flex-col space-y-6">
+                            {['Residential', 'Commercial', 'Resorts', 'About Us', 'Concierge'].map((item, i) => (
+                                <a
+                                    key={item}
+                                    href="#"
+                                    className="font-serif text-4xl md:text-6xl text-white/90 hover:text-primary transition-all duration-300 transform hover:translate-x-4 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards"
+                                    style={{ animationDelay: `${150 + (i * 100)}ms` }}
+                                >
+                                    {item}
+                                </a>
+                            ))}
+
+                            <div className="pt-8 mt-4 border-t border-white/10 w-24"></div>
+
+                            <a
+                                href="/data-sources"
+                                className="font-serif text-xl md:text-2xl text-white/60 hover:text-white transition-all duration-300 transform hover:translate-x-2 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards flex items-center gap-3 group"
+                                style={{ animationDelay: '600ms' }}
+                            >
+                                <span className="w-2 h-2 rounded-full bg-primary group-hover:scale-150 transition-transform"></span>
+                                Verified Data Base
+                            </a>
+                        </nav>
+                    </div>
+
+                    {/* Right Column: Information & Disclaimer */}
+                    <div className="flex-1 flex flex-col justify-center md:pl-16 space-y-12 text-white/80 mt-12 md:mt-0">
+
+                        <div className="space-y-6 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '600ms' }}>
+                            <div className="w-12 h-1 bg-primary mb-6"></div>
+                            <h3 className="text-xs font-bold tracking-[0.4em] uppercase text-white mb-2">The Concierge System</h3>
+                            <p className="font-light leading-relaxed text-lg max-w-md text-white/70">
+                                Experience a new standard of property discovery. Our AI Concierge is exclusively trained on the verified Palm Hills portfolio, ensuring accuracy, privacy, and seamless guidance.
+                            </p>
+                        </div>
+
+                        <div className="space-y-6 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '700ms' }}>
+                            <div className="grid grid-cols-2 gap-8">
+                                <div>
+                                    <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-2">Data Integrity</h4>
+                                    <p className="text-sm font-light text-white/50">
+                                        Sourced directly from official active listings.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-2">System Scope</h4>
+                                    <p className="text-sm font-light text-white/50">
+                                        Proof of Concept (POC) v1.0. <br /> Future: Voice & Real-time CRM.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="pt-12 border-t border-white/10 flex flex-col gap-2 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '800ms' }}>
+                            <p className="text-[10px] uppercase tracking-[0.25em] text-white/40">
+                                Crafted by <a href="https://cloudgate.ae/" target="_blank" className="text-white hover:text-primary transition-colors border-b border-white/20 pb-0.5 hover:border-primary">CloudGate</a>
+                            </p>
+                            <p className="text-[10px] uppercase tracking-[0.25em] text-white/20">
+                                © {new Date().getFullYear()} Palm Hills Developments.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                {/* Background Elements */}
+                <div className="absolute -bottom-[20%] -right-[10%] w-[90vh] h-[90vh] bg-primary/10 blur-[150px] rounded-full pointer-events-none mix-blend-screen"></div>
+                <div className="absolute top-0 left-0 w-full h-full bg-[url('/noise.png')] opacity-[0.03] pointer-events-none"></div>
             </div>
 
+            {/* Spacer */}
+            <div className="h-[88px] flex-shrink-0"></div>
+
             {/* Chat Area */}
-            <div className="flex-1 bg-gray-50/50 relative overflow-hidden flex flex-col">
+            <div className="flex-1 relative overflow-hidden flex flex-col max-w-[1400px] mx-auto w-full px-4 md:px-8">
 
-                <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-b from-gray-100 to-transparent pointer-events-none opacity-50" />
-
-                <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 z-10 scroll-smooth">
+                <div ref={scrollRef} className="flex-1 overflow-y-auto py-8 space-y-12 scroll-smooth no-scrollbar">
 
                     {/* Welcome State */}
                     {messages.length === 0 && (
-                        <div className="flex flex-col items-center justify-center h-full space-y-8 opacity-0 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-forwards" style={{ animationFillMode: 'forwards' }}>
-                            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
-                                <Building2 size={32} className="text-secondary opacity-20" />
+                        <div className="flex flex-col items-center justify-center h-[70vh] space-y-12 opacity-0 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
+                            {/* Premium Brand Glyph */}
+                            <div className="w-24 h-24 rounded-full border border-gray-100 flex items-center justify-center mb-4 bg-white shadow-xl shadow-gray-100/50">
+                                <span className="font-serif text-3xl text-black">PH</span>
                             </div>
-                            <div className="text-center max-w-md space-y-3">
-                                <h2 className="font-serif text-3xl text-secondary">Welcome Home</h2>
-                                <p className="text-gray-500 font-light leading-relaxed">
-                                    I am your personal guide. Ask me about our communities,
-                                    prices, or availability.
+
+                            <div className="text-center max-w-2xl space-y-6">
+                                <h2 className="font-serif text-5xl md:text-6xl text-black leading-tight tracking-tight">
+                                    The Art of Living
+                                </h2>
+                                <p className="text-muted font-light leading-relaxed text-lg md:text-xl max-w-lg mx-auto">
+                                    I am <span className="text-black font-medium">PalmX</span>. Your private concierge for Palm Hills.
+                                    Looking for a villa in the West or a chalet by the sea?
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-lg">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl mt-12 px-4">
                                 {QUICK_PROMPTS.map((p, i) => (
                                     <button
                                         key={i}
                                         onClick={() => handleSubmit(undefined, p)}
-                                        className="p-4 bg-white hover:bg-gray-50 border border-gray-200 hover:border-primary/30 rounded-xl text-left text-sm text-gray-600 transition-all shadow-sm hover:shadow-md group flex items-center justify-between"
+                                        className="px-8 py-5 bg-white border border-gray-100 hover:border-black rounded-xl text-center text-sm text-gray-600 transition-all hover:shadow-lg hover:-translate-y-1 group flex flex-col items-center justify-center gap-3 h-32"
                                     >
-                                        <span>{p}</span>
-                                        <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-primary" />
+                                        <span className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                            <ArrowRight size={12} />
+                                        </span>
+                                        <span className="font-medium tracking-wide uppercase text-xs">{p}</span>
                                     </button>
                                 ))}
                             </div>
@@ -212,46 +331,46 @@ export default function ChatInterface() {
 
                     {/* Messages */}
                     {messages.map((m, i) => (
-                        <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} group`}>
+                        <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} group max-w-5xl mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-500`}>
 
                             {m.role === 'assistant' && (
-                                <div className="w-8 h-8 rounded-full bg-secondary flex-shrink-0 flex items-center justify-center text-white text-xs font-serif mr-3 mt-1 shadow-md">
+                                <div className="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center text-black text-[10px] font-serif mr-4 mt-1 border border-gray-100 shadow-sm">
                                     PH
                                 </div>
                             )}
 
                             <div className={cn(
-                                "max-w-[85%] md:max-w-[75%] p-5 text-sm md:text-base leading-relaxed shadow-sm transition-all relative group-hover:shadow-md",
+                                "max-w-[85%] md:max-w-[70%] px-8 py-6 text-base leading-7 relative shadow-sm",
                                 m.role === 'user'
-                                    ? "bg-secondary text-white rounded-2xl rounded-tr-sm"
-                                    : "bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-tl-sm ring-1 ring-gray-100/50"
+                                    ? "bg-charcoal text-white rounded-3xl rounded-tr-sm"
+                                    : "bg-white text-gray-800 border border-gray-50 rounded-3xl rounded-tl-sm shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)]"
                             )}>
                                 {m.role === 'user' ? (
-                                    <div className="whitespace-pre-wrap font-light">{m.content}</div>
+                                    <div className="whitespace-pre-wrap font-light tracking-wide">{m.content}</div>
                                 ) : (
-                                    <div className="font-light">
+                                    <div className="font-light tracking-wide text-[15px]">
                                         <ReactMarkdown
                                             components={{
                                                 h3: ({ node, ...props }: any) => (
-                                                    <h3 className="font-serif text-lg text-secondary border-b border-primary/10 pb-1 mt-4 first:mt-0 mb-3" {...props} />
+                                                    <h3 className="font-serif text-xl text-black mt-8 mb-4 tracking-wide border-b border-gray-100 pb-2" {...props} />
                                                 ),
                                                 p: ({ node, ...props }: any) => (
-                                                    <p className="leading-relaxed mb-4 last:mb-0" {...props} />
+                                                    <p className="leading-7 mb-4 last:mb-0 text-gray-600" {...props} />
                                                 ),
                                                 ul: ({ node, ...props }: any) => (
-                                                    <ul className="space-y-3 mb-6 mt-2 list-none" {...props} />
+                                                    <ul className="space-y-3 mb-6 mt-4" {...props} />
                                                 ),
                                                 li: ({ node, ...props }: any) => (
-                                                    <li className="flex items-start gap-3 text-gray-700" {...props}>
-                                                        <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-primary mt-2.5" />
-                                                        <span>{props.children}</span>
+                                                    <li className="flex items-start gap-3" {...props}>
+                                                        <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-accent mt-2.5" />
+                                                        <span className="text-gray-700">{props.children}</span>
                                                     </li>
                                                 ),
                                                 strong: ({ node, ...props }: any) => (
-                                                    <strong className="font-semibold text-secondary" {...props} />
+                                                    <strong className="font-semibold text-black" {...props} />
                                                 ),
                                                 a: ({ node, ...props }: any) => (
-                                                    <a className="text-primary hover:underline underline-offset-4 decoration-primary/30 transition-all font-medium" {...props} target="_blank" rel="noopener noreferrer" />
+                                                    <a className="text-accent hover:text-black border-b border-accent/20 hover:border-black transition-all pb-0.5 font-medium" {...props} target="_blank" rel="noopener noreferrer" />
                                                 )
                                             }}
                                         >
@@ -260,9 +379,8 @@ export default function ChatInterface() {
                                     </div>
                                 )}
                                 {m.role === 'assistant' && (
-                                    <div className="absolute -bottom-5 left-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-2 text-[10px] text-gray-400 uppercase tracking-widest mt-1">
-                                        <span className="w-1 h-1 rounded-full bg-primary/20"></span>
-                                        <span>Verified</span>
+                                    <div className="absolute -bottom-6 left-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-2 text-[9px] text-muted uppercase tracking-[0.2em] mt-2 ml-1">
+                                        <span>PalmX AI</span>
                                     </div>
                                 )}
                             </div>
@@ -271,60 +389,53 @@ export default function ChatInterface() {
 
                     {/* Loading Indicator */}
                     {loading && (
-                        <div className="flex justify-start">
-                            <div className="w-8 h-8 rounded-full bg-secondary flex-shrink-0 flex items-center justify-center text-white text-xs font-serif mr-3 mt-1 shadow-md">PH</div>
-                            <div className="bg-white p-5 rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 flex items-center space-x-2">
-                                <Loader2 size={16} className="animate-spin text-primary" />
-                                <span className="text-xs text-gray-400 tracking-wider">THINKING...</span>
+                        <div className="flex justify-start max-w-5xl mx-auto w-full">
+                            <div className="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center text-black text-[10px] font-serif mr-4 mt-1 border border-gray-100">PH</div>
+                            <div className="bg-white px-8 py-5 rounded-3xl rounded-tl-sm flex items-center space-x-3 shadow-sm border border-gray-50">
+                                <span className="text-xs uppercase tracking-widest text-gray-400 mr-2">Concierge Thinking</span>
+                                <div className="flex space-x-1">
+                                    <div className="w-1 h-1 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                    <div className="w-1 h-1 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                    <div className="w-1 h-1 bg-black rounded-full animate-bounce"></div>
+                                </div>
                             </div>
                         </div>
                     )}
+
+                    <div className="h-4"></div>
                 </div>
             </div>
 
             {/* Input Area */}
-            <div className="bg-white p-4 md:p-6 border-t border-gray-100 z-20">
-                <form onSubmit={(e) => e.preventDefault()} className="relative max-w-4xl mx-auto">
+            <div className="bg-white/90 backdrop-blur-md p-6 border-t border-gray-100 z-20">
+                <form onSubmit={(e) => e.preventDefault()} className="relative max-w-3xl mx-auto">
                     <div className="relative group">
-                        <textarea
+                        <div className="absolute top-1/2 -translate-y-1/2 left-4 text-xs font-bold tracking-widest text-accent uppercase pointer-events-none">
+                            {mode === 'concierge' ? 'Concierge' : 'Assistance'}
+                        </div>
+                        <input
                             id="chat-input"
                             value={input}
-                            onChange={(e) => {
-                                setInput(e.target.value);
-                                e.target.style.height = 'auto';
-                                e.target.style.height = `${Math.min(e.target.scrollHeight, 160)}px`;
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    if (!loading && input.trim()) {
-                                        handleSubmit(e);
-                                    }
-                                }
-                            }}
-                            placeholder="Ask anything..."
-                            className="w-full pl-6 pr-14 py-5 bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-light text-gray-700 shadow-sm resize-none overflow-hidden"
-                            rows={1}
-                            style={{ minHeight: '3.5rem', maxHeight: '10rem' }}
+                            onChange={(e) => setInput(e.target.value)}
+                            autoComplete="off"
+                            placeholder={mode === 'concierge' ? "Ask about availability and prices..." : "Please enter your details..."}
+                            className="w-full pl-32 pr-12 py-4 bg-surface border border-transparent focus:border-gray-200 rounded-full focus:ring-0 focus:outline-none transition-all font-sans text-charcoal placeholder:text-muted/50 shadow-sm"
                         />
                         <button
                             type="button"
                             onClick={(e) => handleSubmit(e)}
                             disabled={!input.trim() || loading}
                             className={cn(
-                                "absolute right-3 top-1/2 -translate-y-1/2 p-3 rounded-xl transition-all shadow-sm",
+                                "absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all",
                                 input.trim() && !loading
-                                    ? "bg-primary text-white hover:bg-primary-dark hover:shadow-md hover:scale-105"
+                                    ? "bg-black text-white hover:bg-primary"
                                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                             )}
                         >
-                            {loading ? <Loader2 size={20} className="animate-spin text-gray-500" /> : <Send size={20} />}
+                            {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
                         </button>
                     </div>
                 </form>
-                <div className="text-center mt-3">
-                    <span className="text-[10px] text-gray-300 tracking-wider uppercase">Powered by PalmX AI</span>
-                </div>
             </div>
         </div>
     );

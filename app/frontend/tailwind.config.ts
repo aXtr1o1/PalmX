@@ -9,40 +9,37 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        background: "#FFFFFF",
+        foreground: "#0B0B0B", // Primary Ink
+        muted: "#747474",      // Secondary Text
+        border: "#E6E6E6",     // Hairlines
+        surface: "#F5F5F5",    // Light Fill
+        charcoal: "#181818",   // Dark Sections
         primary: {
-          DEFAULT: "#D32048", // Palm Hills Magenta
+          DEFAULT: "#D22048",  // Palm Hills Accent
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#333333", // Charcoal
+          DEFAULT: "#181818",  // Charcoal
           foreground: "#FFFFFF",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "0.75rem",    // 12px
+        md: "0.5rem",     // 8px
+        sm: "0.25rem",    // 4px
+        pill: "9999px",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "sans-serif"],
-        serif: ["var(--font-serif)", "serif"],
+        sans: ["var(--font-sans)", "sans-serif"], // Inter acting as Helvetica proxy
+        serif: ["var(--font-serif)", "serif"],     // Playfair for headings if needed, or remove if strict sans
+      },
+      container: {
+        center: true,
+        padding: "2rem",
+        screens: {
+          "2xl": "1400px",
+        },
       },
     },
   },
