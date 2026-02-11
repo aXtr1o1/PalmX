@@ -80,16 +80,40 @@ export default function ChatInterface() {
 
         try {
             const history = [...messages, userMsg];
-            const response = await api.chat(sessionId, history);
+            let firstToken = true;
 
-            setMessages(prev => [...prev, { role: "assistant", content: response.message }]);
-
-            if (response.mode === 'lead_capture' && mode !== 'lead_capture') {
-                setMode('lead_capture');
-            } else {
-                setMode(response.mode);
-            }
-
+            await api.chatStream(
+                sessionId,
+                history,
+                // onToken — insert message on first token, then append
+                (token: string) => {
+                    if (firstToken) {
+                        firstToken = false;
+                        setLoading(false); // Hide THINKING as soon as first token arrives
+                        setMessages(prev => [...prev, { role: "assistant", content: token }]);
+                    } else {
+                        setMessages(prev => {
+                            const updated = [...prev];
+                            const lastMsg = updated[updated.length - 1];
+                            if (lastMsg && lastMsg.role === "assistant") {
+                                updated[updated.length - 1] = {
+                                    ...lastMsg,
+                                    content: lastMsg.content + token
+                                };
+                            }
+                            return updated;
+                        });
+                    }
+                },
+                // onDone — set mode
+                (data) => {
+                    if (data.mode === 'lead_capture' && mode !== 'lead_capture') {
+                        setMode('lead_capture');
+                    } else {
+                        setMode(data.mode);
+                    }
+                }
+            );
         } catch (err) {
             console.error(err);
             setMessages(prev => [...prev, { role: "assistant", content: "I'm having trouble connecting to PalmX. Please try again." }]);

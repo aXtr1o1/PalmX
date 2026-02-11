@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Generator
 from openai import AzureOpenAI, OpenAI
 from app.backend.config import Config
 from app.backend.models import RouterOutput, Message
@@ -62,12 +62,12 @@ class LLMService:
             logger.error(f"Embedding failed: {e}")
             return [0.0] * 1536
 
-    def router_completion(self, user_message: str, history: List[Message] = []) -> RouterOutput:
+    def router_completion(self, user_message: str, history: List[Message] = None) -> RouterOutput:
         """
         Determines user intent and extracts entities strictly, using history for context.
         """
         history_str = ""
-        if history:
+        if history is not None and len(history) > 0:
             history_str = "\n".join([f"{m.role}: {m.content}" for m in history])
 
         system_prompt = f"""
@@ -163,5 +163,66 @@ class LLMService:
         except Exception as e:
             logger.error(f"Answer completion failed: {e}")
             return "I apologize, but I am having trouble connecting. Please try again."
+
+    def stream_answer_completion(
+        self, 
+        system_msg: str, 
+        history: List[Message], 
+        tools: Optional[List[Dict]] = None
+    ) -> Generator[str, None, None]:
+        """
+        Streams answer tokens as they arrive from OpenAI.
+        Yields text chunks for SSE streaming to the frontend.
+        If a tool call is detected, yields the full tool call as JSON at the end.
+        """
+        final_messages = [{"role": "system", "content": system_msg}]
+        for m in history:
+            final_messages.append({"role": m.role, "content": m.content})
+            
+        try:
+            response = self.client.chat.completions.create(
+                model=self.deployment,
+                messages=final_messages,
+                temperature=0.3,
+                tools=tools,
+                tool_choice="auto" if tools else None,
+                stream=True
+            )
+            
+            tool_calls_buffer = {}  # Accumulate tool call chunks
+            
+            for chunk in response:
+                delta = chunk.choices[0].delta if chunk.choices else None
+                if not delta:
+                    continue
+                    
+                # Text content
+                if delta.content:
+                    yield delta.content
+                
+                # Tool call chunks (accumulated)
+                if delta.tool_calls:
+                    for tc in delta.tool_calls:
+                        idx = tc.index
+                        if idx not in tool_calls_buffer:
+                            tool_calls_buffer[idx] = {
+                                "id": tc.id or "",
+                                "function": {"name": "", "arguments": ""}
+                            }
+                        if tc.id:
+                            tool_calls_buffer[idx]["id"] = tc.id
+                        if tc.function:
+                            if tc.function.name:
+                                tool_calls_buffer[idx]["function"]["name"] = tc.function.name
+                            if tc.function.arguments:
+                                tool_calls_buffer[idx]["function"]["arguments"] += tc.function.arguments
+            
+            # If tool calls were accumulated, yield them as a special marker
+            if tool_calls_buffer:
+                yield f"\n__TOOL_CALLS__{json.dumps(list(tool_calls_buffer.values()))}"
+                
+        except Exception as e:
+            logger.error(f"Stream answer completion failed: {e}")
+            yield "I apologize, but I am having trouble connecting. Please try again."
 
 llm_service = LLMService()

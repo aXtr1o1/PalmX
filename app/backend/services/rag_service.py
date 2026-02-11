@@ -1,5 +1,6 @@
 import os
 import json
+import hashlib
 import logging
 import numpy as np
 import faiss
@@ -18,6 +19,43 @@ class RAGService:
         self.metadata = [] # List of dicts matching index order
         self.is_ready = False
         self._load_index()
+
+    def _compute_kb_hash(self) -> str:
+        """SHA-256 of the KB CSV file — if this changes, the index is stale."""
+        h = hashlib.sha256()
+        try:
+            with open(Config.KB_CSV_PATH, 'rb') as f:
+                for chunk in iter(lambda: f.read(8192), b''):
+                    h.update(chunk)
+        except FileNotFoundError:
+            return "no_kb_file"
+        return h.hexdigest()[:16]
+
+    def build_index_if_needed(self):
+        """Only build if index is missing OR KB data changed. Saves API calls."""
+        hash_path = os.path.join(os.path.dirname(Config.INDEX_PATH), "kb_hash.txt")
+        current_hash = self._compute_kb_hash()
+
+        # Check existing index + hash
+        if (os.path.exists(Config.INDEX_PATH) and 
+            os.path.exists(Config.META_PATH) and
+            os.path.exists(hash_path)):
+            with open(hash_path, 'r') as f:
+                stored_hash = f.read().strip()
+            if stored_hash == current_hash:
+                logger.info(f"✅ Index up-to-date (hash={current_hash}). Skipping rebuild — zero API calls.")
+                if not self.is_ready:
+                    self._load_index()
+                return
+
+        # KB changed or first time → rebuild
+        logger.info(f"🔨 KB changed or first run (hash={current_hash}). Building index...")
+        self.build_index()
+
+        # Persist the hash
+        with open(hash_path, 'w') as f:
+            f.write(current_hash)
+        logger.info(f"✅ Index hash saved. Future restarts will skip rebuild.")
 
     def _load_index(self):
         if os.path.exists(Config.INDEX_PATH) and os.path.exists(Config.META_PATH):
