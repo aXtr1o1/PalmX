@@ -43,9 +43,21 @@ Guidelines:
 4. **Availability**: If sold out, suggest similar alternatives if known, or offer to check resale.
 5. **Next Steps**: Always end with an engaging closing, such as "Would you like to see floor plans?" or "Shall I check availability for you?".
 
-Lead Capture:
-- If the user seems interested (asks for price, booking, visit), gently ask for their Name and Phone number to better assist them.
-- Call `save_lead` only when you have these details.
+Lead Capture Rules:
+1. **Initial Interest**: If user asks to buy/book/visit, ask for Name and Phone.
+2. **Deep Discovery** (Crucial): Once you have Name/Phone, say "Thanks [Name]. To help me find the best match for you, could you share a bit more?"
+   - Ask for: **Preferred Region** (e.g. East/West Cairo), **Unit Type** (Villa/Apt), **Budget Range**, **Purpose** (Investment/Home), and **Timeline**.
+   - Do NOT interrogate. Ask conversational questions like "Are you looking for a villa or apartment?" or "Do you have a specific budget in mind?"
+3. **Saving**: ONLY call `save_lead` when you have Name, Phone, AND at least 2-3 other details (Region, Budget, etc.) OR if the user refuses to share more.
+   - If user gives only Name/Phone, acknowledge and ASK for the rest.
+   - After saving, confirm with "Thanks, I've noted your [details]. A consultant will call you shortly."
+6. **Data Integrity**: When calling `save_lead`, you must pass ALL gathered information (`budget_min`, `timeline`, `purpose`, etc.) in the tool arguments. Do not summarize them in the `lead_summary` only. Populate the specific fields.
+7. **Argument Formatting**:
+   - `budget_min` / `budget_max`: Extract numbers (e.g. "1M USD" -> "1,000,000").
+   - `timeline`: Extract absolute texts like "May 2026" or "Immediate".
+   - `purpose`: Map "own business" -> "Business Use".
+   - `lead_summary`: "Client wants office in West Cairo for own business, budget ~1M, moving May."
+   - `interest_projects`: Comma-joined list if multiple.
 """
 
 @app.get("/api/health")
@@ -66,8 +78,15 @@ TOOLS = [
                     "name": {"type": "string"},
                     "phone": {"type": "string"},
                     "interest_projects": {"type": "string"},
-                    "budget": {"type": "string"},
-                    "intent": {"type": "string", "enum": ["buy", "rent", "invest", "visit"]}
+                    "preferred_region": {"type": "string"},
+                    "unit_type": {"type": "string"},
+                    "budget_min": {"type": "string"},
+                    "budget_max": {"type": "string"},
+                    "purpose": {"type": "string", "enum": ["Investment", "Primary Home", "Vacation", "Business Use", "Other"]},
+                    "timeline": {"type": "string"},
+                    "next_step": {"type": "string"},
+                    "lead_summary": {"type": "string", "description": "Concise summary of user needs"},
+                    "tags": {"type": "string", "description": "Comma separated tags like 'High Value', 'Urgent'"}
                 },
                 "required": ["name", "phone"]
             }
@@ -120,16 +139,21 @@ async def chat_endpoint(request: ChatRequest):
             for tool_call in response_data:
                 if tool_call.function.name == "save_lead":
                     args = json.loads(tool_call.function.arguments)
+                    logger.info(f"Tool Call 'save_lead' Args: {args}")
+                    
                     lead = Lead(
                         name=args.get('name'),
                         phone=args.get('phone'),
-                        interest_projects=[args.get('interest_projects', '')],
-                        unit_type='',
-                        budget=args.get('budget', ''),
-                        intent=args.get('intent', 'buy'),
-                        timeline='',
-                        region='',
-                        next_step='callback',
+                        interest_projects=args.get('interest_projects', '').split(',') if args.get('interest_projects') else [],
+                        preferred_region=args.get('preferred_region'),
+                        unit_type=args.get('unit_type'),
+                        budget_min=args.get('budget_min'),
+                        budget_max=args.get('budget_max'),
+                        purpose=args.get('purpose'),
+                        timeline=args.get('timeline'),
+                        next_step=args.get('next_step'),
+                        lead_summary=args.get('lead_summary'),
+                        tags=args.get('tags', '').split(',') if args.get('tags') else [],
                         session_id=session_id
                     )
                     leads_service.save_lead(lead)

@@ -227,27 +227,47 @@ export default function ChatInterface() {
 
             {/* Input Area */}
             <div className="bg-white p-4 md:p-6 border-t border-gray-100 z-20">
-                <form onSubmit={(e) => handleSubmit(e)} className="relative max-w-4xl mx-auto">
+                <form onSubmit={(e) => e.preventDefault()} className="relative max-w-4xl mx-auto">
                     <div className="relative group">
-                        <input
+                        <textarea
                             value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            placeholder={loading ? "" : "Ask anything..."}
-                            className={cn(
-                                "w-full pl-6 pr-14 py-5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-light text-gray-700 shadow-inner",
-                                loading && "opacity-50 cursor-not-allowed"
-                            )}
-                            disabled={loading}
+                            onChange={(e) => {
+                                setInput(e.target.value);
+                                e.target.style.height = 'auto';
+                                e.target.style.height = `${Math.min(e.target.scrollHeight, 160)}px`;
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    if (!loading && input.trim()) {
+                                        handleSubmit(e);
+                                    }
+                                }
+                            }}
+                            placeholder="Ask anything..."
+                            className="w-full pl-6 pr-14 py-5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-light text-gray-700 shadow-inner resize-none overflow-hidden"
+                            disabled={false}
+                            rows={1}
+                            style={{ minHeight: '3.5rem', maxHeight: '10rem' }}
                         />
                         <button
-                            type="submit"
-                            disabled={loading || !input.trim()}
-                            className="absolute right-3 top-3 p-2 bg-primary text-white rounded-xl shadow-lg hover:bg-primary/90 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all duration-300"
+                            type="button"
+                            onClick={(e) => handleSubmit(e)}
+                            disabled={!input.trim() || loading}
+                            className={cn(
+                                "absolute right-3 top-1/2 -translate-y-1/2 p-3 rounded-xl transition-all shadow-sm",
+                                input.trim() && !loading
+                                    ? "bg-primary text-white hover:bg-primary-dark hover:shadow-md hover:scale-105"
+                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            )}
                         >
-                            <Send size={18} />
+                            {loading ? <Loader2 size={20} className="animate-spin text-gray-500" /> : <Send size={20} />}
                         </button>
                     </div>
                 </form>
+                <div className="text-center mt-3">
+                    <span className="text-[10px] text-gray-300 tracking-wider uppercase">Powered by PalmX AI</span>
+                </div>
             </div>
         </div>
     );

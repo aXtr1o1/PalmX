@@ -19,9 +19,10 @@ class LeadsService:
             with open(Config.LEADS_PATH, 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 writer.writerow([
-                    "timestamp", "session_id", "name", "phone", "email", 
-                    "interest_projects", "unit_type", "budget", "intent", 
-                    "timeline", "region", "next_step"
+                    "timestamp", "session_id", "name", "phone", 
+                    "interest_projects", "preferred_region", "unit_type", 
+                    "budget_min", "budget_max", "purpose", "timeline", 
+                    "next_step", "lead_summary", "tags", "kb_version_hash"
                 ])
         
         # Audit CSV
@@ -39,14 +40,17 @@ class LeadsService:
             lead.session_id,
             lead.name,
             lead.phone,
-            lead.email or "",
             ",".join(lead.interest_projects),
+            lead.preferred_region or "",
             lead.unit_type or "",
-            lead.budget or "",
-            lead.intent or "",
+            lead.budget_min or "",
+            lead.budget_max or "",
+            lead.purpose or "",
             lead.timeline or "",
-            lead.region or "",
-            lead.next_step or ""
+            lead.next_step or "",
+            lead.lead_summary or "",
+            ",".join(lead.tags),
+            lead.kb_version_hash or "v1.0"
         ]
         
         try:

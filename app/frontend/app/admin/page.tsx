@@ -8,10 +8,15 @@ type Lead = {
     timestamp: string;
     name: string;
     phone: string;
-    email: string;
-    intent: string;
     interest_projects: string;
-    budget: string;
+    preferred_region: string;
+    unit_type: string;
+    budget_min: string;
+    budget_max: string;
+    purpose: string;
+    timeline: string;
+    lead_summary: string;
+    tags: string;
 };
 
 export default function AdminPage() {
@@ -103,37 +108,40 @@ export default function AdminPage() {
                                     <th className="p-4 font-semibold text-gray-600">Time</th>
                                     <th className="p-4 font-semibold text-gray-600">Name</th>
                                     <th className="p-4 font-semibold text-gray-600">Contact</th>
-                                    <th className="p-4 font-semibold text-gray-600">Intent</th>
-                                    <th className="p-4 font-semibold text-gray-600">Interest</th>
-                                    <th className="p-4 font-semibold text-gray-600">Budget</th>
+                                    <th className="p-4 font-semibold text-gray-600">Summary</th>
+                                    <th className="p-4 font-semibold text-gray-600">Projects</th>
+                                    <th className="p-4 font-semibold text-gray-600">Details</th>
+                                    <th className="p-4 font-semibold text-gray-600">Timeline</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {leads.map((l, i) => (
                                     <tr key={i} className="hover:bg-gray-50 transition-colors">
-                                        <td className="p-4 text-gray-500 font-mono text-xs">{new Date(l.timestamp).toLocaleString()}</td>
+                                        <td className="p-4 text-gray-500 font-mono text-xs whitespace-nowrap">{new Date(l.timestamp).toLocaleString()}</td>
                                         <td className="p-4 font-medium text-gray-900">{l.name}</td>
                                         <td className="p-4">
-                                            <div className="text-gray-900">{l.phone}</div>
-                                            <div className="text-xs text-gray-400">{l.email}</div>
+                                            <div className="text-gray-900 font-mono">{l.phone}</div>
                                         </td>
-                                        <td className="p-4">
-                                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${l.intent?.toLowerCase().includes('buy') ? 'bg-blue-100 text-blue-700' :
-                                                    l.intent?.toLowerCase().includes('invest') ? 'bg-purple-100 text-purple-700' :
-                                                        'bg-gray-100 text-gray-600'
-                                                }`}>
-                                                {l.intent || 'Unknown'}
-                                            </span>
+                                        <td className="p-4 max-w-xs truncate text-gray-600" title={l.lead_summary}>
+                                            {l.lead_summary || '-'}
                                         </td>
                                         <td className="p-4 text-gray-600 max-w-xs truncate" title={l.interest_projects}>
                                             {l.interest_projects}
+                                            {l.preferred_region && <div className="text-xs text-gray-400">{l.preferred_region}</div>}
                                         </td>
-                                        <td className="p-4 text-gray-600">{l.budget}</td>
+                                        <td className="p-4 text-xs space-y-1">
+                                            <div><span className="font-semibold">Unit:</span> {l.unit_type || '-'}</div>
+                                            <div><span className="font-semibold">Budget:</span> {l.budget_min && l.budget_max ? `${l.budget_min} - ${l.budget_max}` : (l.budget_min || l.budget_max || '-')}</div>
+                                            <div><span className="font-semibold">Purpose:</span> {l.purpose || '-'}</div>
+                                        </td>
+                                        <td className="p-4 text-gray-600 text-xs">
+                                            {l.timeline || '-'}
+                                        </td>
                                     </tr>
                                 ))}
                                 {leads.length === 0 && (
                                     <tr>
-                                        <td colSpan={6} className="p-12 text-center text-gray-400">
+                                        <td colSpan={7} className="p-12 text-center text-gray-400">
                                             No leads captured yet. Start a chat session to generate data.
                                         </td>
                                     </tr>

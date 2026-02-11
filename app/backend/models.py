@@ -48,12 +48,15 @@ class ChatResponse(BaseModel):
 class Lead(BaseModel):
     name: str
     phone: str
-    email: Optional[str] = None
-    interest_projects: List[str] = []
-    unit_type: Optional[str] = None
-    budget: Optional[str] = None
-    intent: Optional[str] = None # buy | rent | invest
-    timeline: Optional[str] = None
-    region: Optional[str] = None
-    next_step: Optional[str] = None # call | visit
+    interest_projects: List[str] = Field(default_factory=list) # Renamed to match request if needed, but keeping list
+    preferred_region: Optional[str] = None
+    unit_type: Optional[str] = None # Apartment, Villa, etc.
+    budget_min: Optional[str] = None
+    budget_max: Optional[str] = None
+    purpose: Optional[str] = None # Investment, Primary Home
+    timeline: Optional[str] = None # Immediate, 6 months
+    next_step: Optional[str] = None # Call, Visit
+    lead_summary: Optional[str] = None # Conversation summary
+    tags: List[str] = Field(default_factory=list) # e.g. "High Value", "Urgent"
+    kb_version_hash: Optional[str] = "v1.0"
     session_id: str
