@@ -29,8 +29,9 @@ ui/node_modules/
 # PalmX specific
 .env
 *.env
-runtime/**
+# runtime/**
 *.index
 *.jsonl
 leads*.csv
 *.xlsx
+

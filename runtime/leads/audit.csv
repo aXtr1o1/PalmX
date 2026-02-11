@@ -1,0 +1,174 @@
+timestamp,session_id,user_message,router_intent,retrieved_projects,similarity_scores,kb_version,fields_used
+2026-02-10T20:28:23.536701,1n6f4r,hi,project_query,"[""hacienda_heneish"", ""jirian_palm_hills"", ""ritz_carlton_residences_cairo_palm_hills""]",[],v1.0,all
+2026-02-10T20:28:42.480079,1n6f4r,Am looking for Properties in Cairo,list_projects,[],[],v1.0,all
+2026-02-10T20:29:19.365649,1n6f4r,what are the Available properties ?,list_projects,[],[],v1.0,all
+2026-02-10T20:32:54.309634,1n6f4r,hi,project_query,"[""hacienda_heneish"", ""jirian_palm_hills"", ""ritz_carlton_residences_cairo_palm_hills""]",[],v1.0,all
+2026-02-10T20:33:11.375533,1n6f4r,List me down all all all Properties that you have ,list_projects,"[""hacienda_heneish"", ""hacienda_waters"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-10T20:33:40.887703,1n6f4r,how many properties that you have ?,list_projects,"[""hacienda_blue"", ""hacienda_waters"", ""st_88""]",[],v1.0,all
+2026-02-10T20:34:12.176309,1n6f4r,is taht all you have in palm Hills ?!?!,list_projects,"[""palm_hills_alexandria"", ""palm_hills_new_cairo"", ""palm_hills_katameya_1""]",[],v1.0,all
+2026-02-10T20:40:37.392867,1n6f4r,hi,support_contact,[],[],v1.0,all
+2026-02-10T20:40:54.044267,1n6f4r,List me down all properties in Cairo,project_query,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-10T20:41:16.177003,1n6f4r,Am looking for Commercial ,list_projects,"[""st_88"", ""golf_central"", ""palm_central""]",[],v1.0,all
+2026-02-10T20:41:36.601622,1n6f4r,yes,lead_capture,"[""jirian_palm_hills"", ""st_88"", ""palm_hills_alexandria""]",[],v1.0,all
+2026-02-10T20:42:18.334433,1n6f4r,yepp,project_query,"[""st_88"", ""p_x"", ""bamboo_iii""]",[],v1.0,all
+2026-02-10T20:42:25.219071,1n6f4r,Dave,support_contact,[],[],v1.0,all
+2026-02-10T20:42:35.231089,1n6f4r,87263963747,support_contact,[],[],v1.0,all
+2026-02-10T20:42:42.711293,1n6f4r,alright,support_contact,[],[],v1.0,all
+2026-02-10T20:42:51.742665,1n6f4r,cool,project_query,"[""st_88"", ""golf_central"", ""palm_central""]",[],v1.0,all
+2026-02-11T03:32:52.522416,1n6f4r,hi,project_query,"[""hacienda_heneish"", ""jirian_palm_hills"", ""ritz_carlton_residences_cairo_palm_hills""]",[],v1.0,all
+2026-02-11T03:33:12.315468,1n6f4r,Am looking for a Commercial property,list_projects,"[""st_88"", ""crown_central"", ""golf_central""]",[],v1.0,all
+2026-02-11T03:33:28.955659,1n6f4r,"West Cairo, ",list_projects,"[""p_x"", ""bamboo_iii"", ""the_crown_extension""]",[],v1.0,all
+2026-02-11T03:33:58.555837,1n6f4r,The Crown Extension maybe,project_query,"[""the_crown_extension"", ""the_crown"", ""crown_central""]",[],v1.0,all
+2026-02-11T03:34:19.597790,1n6f4r,connect me with a sales consultant ,lead_capture,"[""st_88"", ""village_gate_mall"", ""golf_central""]",[],v1.0,all
+2026-02-11T03:34:34.817926,1n6f4r,Dave & 9994566311,lead_capture,"[""badya"", ""97_hills"", ""hacienda_heneish""]",[],v1.0,all
+2026-02-11T03:39:38.333240,1n6f4r,hi,support_contact,[],[],v1.0,all
+2026-02-11T03:39:51.618214,1n6f4r,Am looking to buy a Property,lead_capture,"[""jirian_palm_hills"", ""hacienda_heneish"", ""hacienda_blue""]",[],v1.0,all
+2026-02-11T03:40:10.399829,1n6f4r,Am looking for a Commercial property,list_projects,"[""st_88"", ""crown_central"", ""golf_central""]",[],v1.0,all
+2026-02-11T03:40:29.229720,1n6f4r,Crown Central** in West Cairo  would work,project_query,"[""crown_central"", ""the_crown_extension"", ""the_crown""]",[],v1.0,all
+2026-02-11T03:40:40.663699,1n6f4r,Am Dave,support_contact,[],[],v1.0,all
+2026-02-11T03:40:56.505964,1n6f4r,9994566311,support_contact,[],[],v1.0,all
+2026-02-11T03:41:15.415224,1n6f4r,maybe a Million USD,pricing,"[""hacienda_west"", ""hacienda_bay"", ""97_hills""]",[],v1.0,all
+2026-02-11T03:42:17.153475,1n6f4r,own business and immediate,lead_capture,"[""st_88"", ""lakeyard"", ""hacienda_heneish""]",[],v1.0,all
+2026-02-11T03:44:36.004769,1n6f4r,hi,project_query,"[""hacienda_heneish"", ""jirian_palm_hills"", ""ritz_carlton_residences_cairo_palm_hills""]",[],v1.0,all
+2026-02-11T03:44:54.780642,1n6f4r,am looking for Commercial property,list_projects,"[""st_88"", ""crown_central"", ""golf_central""]",[],v1.0,all
+2026-02-11T03:45:11.139039,1n6f4r,for an office space,list_projects,"[""palmet_new_cairo"", ""crown_central"", ""st_88""]",[],v1.0,all
+2026-02-11T03:46:31.561928,1n6f4r,"Crown Central** - Situated in West Cairo (6th of October),",project_query,"[""crown_central"", ""the_crown_extension"", ""the_crown""]",[],v1.0,all
+2026-02-11T03:46:47.198973,1n6f4r,am dave,support_contact,[],[],v1.0,all
+2026-02-11T03:46:59.438530,1n6f4r,87266737587,support_contact,[],[],v1.0,all
+2026-02-11T03:47:15.001553,1n6f4r,A million USD maybe,pricing,"[""hacienda_west"", ""hacienda_blue"", ""97_hills""]",[],v1.0,all
+2026-02-11T03:47:52.332100,1n6f4r,own business,lead_capture,"[""st_88"", ""palm_central"", ""lakeyard""]",[],v1.0,all
+2026-02-11T03:48:12.616971,1n6f4r,maybe coming may,lead_capture,"[""palmet_october"", ""bamboo"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-11T03:51:55.914460,1n6f4r,hi,project_query,"[""hacienda_heneish"", ""jirian_palm_hills"", ""ritz_carlton_residences_cairo_palm_hills""]",[],v1.0,all
+2026-02-11T03:53:06.825247,1n6f4r,looking for a commercial property,list_projects,"[""st_88"", ""crown_central"", ""golf_central""]",[],v1.0,all
+2026-02-11T03:53:19.068949,1n6f4r,office space,list_projects,"[""st_88"", ""palmet_new_cairo"", ""crown_central""]",[],v1.0,all
+2026-02-11T03:53:30.553395,1n6f4r,Palmet New Cairo**: Located in East Cairo (New Cairo),project_query,"[""palmet_new_cairo"", ""palm_hills_new_cairo"", ""palmet_october""]",[],v1.0,all
+2026-02-11T03:53:45.451512,1n6f4r,am million dollars maybe,lead_capture,"[""hacienda_blue"", ""hacienda_west"", ""hacienda_waters""]",[],v1.0,all
+2026-02-11T03:54:18.065574,1n6f4r,am Dave & 9726836877,lead_capture,"[""st_88"", ""jirian_palm_hills"", ""97_hills""]",[],v1.0,all
+2026-02-11T03:54:39.873873,1n6f4r,immediate & for own business,lead_capture,"[""st_88"", ""golf_central"", ""palm_central""]",[],v1.0,all
+2026-02-11T03:57:28.324233,1n6f4r,hi,project_query,"[""hacienda_heneish"", ""jirian_palm_hills"", ""ritz_carlton_residences_cairo_palm_hills""]",[],v1.0,all
+2026-02-11T03:57:45.207501,1n6f4r,"am Dave
+
+looking for a Commercial property",list_projects,"[""st_88"", ""crown_central"", ""golf_central""]",[],v1.0,all
+2026-02-11T03:57:57.391607,1n6f4r,Golf Central** in West Cairo ,project_query,"[""golf_central"", ""golf_extension"", ""golf_views""]",[],v1.0,all
+2026-02-11T03:58:06.749045,1n6f4r,office space,list_projects,"[""palmet_new_cairo"", ""crown_central"", ""st_88""]",[],v1.0,all
+2026-02-11T03:58:22.263773,1n6f4r,62376517265,support_contact,[],[],v1.0,all
+2026-02-11T03:58:48.353296,1n6f4r,"a million DOllars USD maybe
+
+for own business",lead_capture,"[""hacienda_blue"", ""hacienda_heneish"", ""hacienda_bay""]",[],v1.0,all
+2026-02-11T04:00:04.985900,1n6f4r,immediate,lead_capture,"[""st_88"", ""p_x"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-11T04:10:02.421916,test_sess_sarah,My budget is 500k USD and I want to move in immediately.,lead_capture,"[""new_capital_gardens"", ""hacienda_bay"", ""hacienda_west""]",[],v1.0,all
+2026-02-11T04:10:42.521257,test_sess_mike,My budget is $2 million and I need to start operations by June 2026.,lead_capture,"[""st_88"", ""lakeyard"", ""hacienda_blue""]",[],v1.0,all
+2026-02-11T04:12:29.839825,1n6f4r,hi,project_query,"[""hacienda_heneish"", ""jirian_palm_hills"", ""ritz_carlton_residences_cairo_palm_hills""]",[],v1.0,all
+2026-02-11T04:12:44.609309,1n6f4r,am looking for commercial property,list_projects,"[""st_88"", ""crown_central"", ""golf_central""]",[],v1.0,all
+2026-02-11T04:13:31.736078,1n6f4r,West Cairo,list_projects,"[""p_x"", ""bamboo_iii"", ""the_crown_extension""]",[],v1.0,all
+2026-02-11T04:13:46.643412,1n6f4r,dave,support_contact,[],[],v1.0,all
+2026-02-11T04:14:01.977527,1n6f4r,7625376285,support_contact,[],[],v1.0,all
+2026-02-11T04:14:30.714236,1n6f4r,"office space & immediate
+
+a Million Dollars USD",lead_capture,"[""crown_central"", ""st_88"", ""palmet_new_cairo""]",[],v1.0,all
+2026-02-11T04:22:50.154067,1n6f4r,Hi,support_contact,[],[],v1.0,all
+2026-02-11T04:23:04.607576,1n6f4r,Looking for commercial property,list_projects,"[""st_88"", ""lakeyard"", ""palm_central""]",[],v1.0,all
+2026-02-11T04:23:20.234675,1n6f4r,in west Cairo,list_projects,"[""crown_central"", ""palmet_october"", ""hale_town""]",[],v1.0,all
+2026-02-11T04:23:49.756192,1n6f4r,crown central,project_query,"[""crown_central"", ""golf_central"", ""palm_central""]",[],v1.0,all
+2026-02-11T04:23:59.425908,1n6f4r,"office space, immediately",lead_capture,[],[],v1.0,all
+2026-02-11T04:24:11.834459,1n6f4r,andrew,lead_capture,"[""crown_central"", ""golf_central""]",[],v1.0,all
+2026-02-11T04:24:26.947154,1n6f4r,"99278367678
+
+a million USD",lead_capture,"[""crown_central"", ""golf_central"", ""hale_town""]",[],v1.0,all
+2026-02-11T04:24:38.474707,1n6f4r,yep ,lead_capture,"[""crown_central"", ""golf_central""]",[],v1.0,all
+2026-02-11T04:28:18.201665,quality_1770784093,How many bedrooms are in the villas at Crown Central?,project_query,"[""the_crown"", ""crown_central"", ""the_crown_extension""]",[],v1.0,all
+2026-02-11T04:28:21.246437,quality_1770784093,I want to book a visit for a commercial unit in West Cairo.,lead_capture,"[""crown_central"", ""palmet_october"", ""golf_central""]",[],v1.0,all
+2026-02-11T04:28:24.839473,quality_1770784093,My name is Sid.,lead_capture,"[""crown_central"", ""palmet_october"", ""hale_town""]",[],v1.0,all
+2026-02-11T04:28:28.782399,quality_1770784093,My whatsapp is +20123456789.,lead_capture,"[""crown_central"", ""palmet_october"", ""golf_central""]",[],v1.0,all
+2026-02-11T04:28:31.875633,quality_1770784093,"Budget 10m to 20m, buying for investment, next month.",lead_capture,"[""palmet_october"", ""crown_central"", ""hale_town""]",[],v1.0,all
+2026-02-11T04:28:35.566548,quality_1770784093,"Yes, confirm to submit.",lead_capture,"[""palmet_october"", ""crown_central"", ""hale_town""]",[],v1.0,all
+2026-02-11T04:28:56.388569,quality_1770784132,How many bedrooms are in the villas at Crown Central?,project_query,"[""the_crown"", ""crown_central"", ""the_crown_extension""]",[],v1.0,all
+2026-02-11T04:29:00.128503,quality_1770784132,I want to book a visit for a commercial unit in West Cairo.,lead_capture,"[""crown_central"", ""palmet_october"", ""golf_central""]",[],v1.0,all
+2026-02-11T04:29:03.292471,quality_1770784132,My name is Sid.,lead_capture,"[""crown_central"", ""palmet_october"", ""the_lane""]",[],v1.0,all
+2026-02-11T04:29:06.899419,quality_1770784132,My whatsapp is +20123456789.,lead_capture,"[""crown_central"", ""palmet_october"", ""hale_town""]",[],v1.0,all
+2026-02-11T04:29:10.529269,quality_1770784132,I'll go with Crown Central.,lead_capture,"[""crown_central"", ""golf_central"", ""hale_town""]",[],v1.0,all
+2026-02-11T04:29:14.609771,quality_1770784132,"Budget 10m to 20m, buying for investment, timeline next month, next step site visit.",lead_capture,"[""crown_central"", ""golf_central"", ""palmet_october""]",[],v1.0,all
+2026-02-11T04:29:19.547376,quality_1770784132,"Yes, I confirm these details. Go ahead.",lead_capture,"[""crown_central"", ""golf_central"", ""hale_town""]",[],v1.0,all
+2026-02-11T04:31:10.408091,1n6f4r,hi,support_contact,[],[],v1.0,all
+2026-02-11T04:31:23.608803,1n6f4r,Am looking for a Commercial property,list_projects,"[""st_88"", ""lakeyard"", ""palm_central""]",[],v1.0,all
+2026-02-11T04:31:32.119641,1n6f4r,buying,lead_capture,"[""st_88"", ""crown_central"", ""lakeyard""]",[],v1.0,all
+2026-02-11T04:31:43.280207,1n6f4r,Crown Central**: Located in West Cairo (6th of October),project_query,[],[],v1.0,all
+2026-02-11T04:31:57.493740,1n6f4r,yepp,lead_capture,[],[],v1.0,all
+2026-02-11T04:32:11.969501,1n6f4r,hatson,lead_capture,[],[],v1.0,all
+2026-02-11T04:32:21.967564,1n6f4r,76276378258,lead_capture,[],[],v1.0,all
+2026-02-11T04:32:35.699381,1n6f4r,confirm,lead_capture,[],[],v1.0,all
+2026-02-11T04:32:49.601343,1n6f4r,a million dallar USD,lead_capture,[],[],v1.0,all
+2026-02-11T04:33:00.091654,1n6f4r,business use,lead_capture,[],[],v1.0,all
+2026-02-11T04:33:08.221669,1n6f4r,immediate,lead_capture,[],[],v1.0,all
+2026-02-11T04:33:21.877372,1n6f4r,yep ,lead_capture,[],[],v1.0,all
+2026-02-11T04:34:13.543847,1n6f4r,what all properties you have,list_projects,"[""st_88"", ""jirian_palm_hills"", ""hacienda_heneish""]",[],v1.0,all
+2026-02-11T04:34:29.662196,1n6f4r,list me all all down,list_projects,"[""st_88"", ""golf_extension"", ""golf_views""]",[],v1.0,all
+2026-02-11T04:39:44.578963,refinement_1770784779,what all properties you have,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-02-11T04:39:49.109991,refinement_1770784779,list me all residential ones down,list_projects,"[""village_de_la_capitale"", ""village_avenue"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-11T04:39:52.553869,refinement_1770784779,I want to visit one of these villas.,lead_capture,"[""jirian_palm_hills"", ""village_de_la_capitale"", ""hacienda_heneish""]",[],v1.0,all
+2026-02-11T04:43:15.937607,1n6f4r,What all properties you have,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-02-11T04:43:30.734997,1n6f4r,residencial,list_projects,"[""village_de_la_capitale"", ""p_x"", ""the_village""]",[],v1.0,all
+2026-02-11T04:49:03.052675,4zldnb,what all properties you have,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-02-11T04:49:16.878644,4zldnb,list me all residential ones down,list_projects,"[""village_de_la_capitale"", ""village_avenue"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-11T04:51:35.082733,4zldnb,list me all residential properties,list_projects,"[""village_de_la_capitale"", ""village_avenue"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-11T04:52:45.993498,4zldnb,list me all residential properties,list_projects,"[""village_de_la_capitale"", ""village_avenue"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-11T04:53:08.248643,4zldnb,All regions,list_projects,[],[],v1.0,all
+2026-02-11T04:57:33.325212,4zldnb,list me all residential properties,list_projects,[],[],v1.0,all
+2026-02-11T04:57:51.666551,4zldnb,I want a site visit to Palm Hills October,lead_capture,"[""palm_hills_october"", ""jirian_palm_hills"", ""palm_valley""]",[],v1.0,all
+2026-02-11T04:58:21.993207,4zldnb,"John Doe, 0123456789, Tomorrow at 10 AM",lead_capture,"[""palm_hills_october"", ""palm_valley"", ""palm_parks""]",[],v1.0,all
+2026-02-11T05:03:17.259737,4zldnb,Villa in Badya starting 10M,pricing,[],[],v1.0,all
+2026-02-11T05:04:45.970001,4zldnb,list me all residential properties,list_projects,"[""village_de_la_capitale"", ""village_avenue"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-11T05:05:25.023754,4zldnb,All,list_projects,[],[],v1.0,all
+2026-02-11T05:07:24.284062,1n6f4r,Hi,support_contact,[],[],v1.0,all
+2026-02-11T05:07:40.204935,1n6f4r,what all properties you have,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-02-11T05:07:48.851932,1n6f4r,Looking for residential property,list_projects,"[""village_de_la_capitale"", ""p_x"", ""the_village""]",[],v1.0,all
+2026-02-11T05:07:56.196821,1n6f4r,list me all all you have,list_projects,"[""village_de_la_capitale"", ""village_avenue"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-11T05:08:25.055794,1n6f4r,"is that all you have
+
+I heard you have about 45 projects ?",list_projects,"[""village_de_la_capitale"", ""the_village"", ""village_avenue""]",[],v1.0,all
+2026-02-11T05:10:51.425322,4zldnb,tell me about Village de la Capitale pricing,pricing,[],[],v1.0,all
+2026-02-11T05:11:16.816409,4zldnb,what residential projects do you have in the New Administrative Capital?,list_projects,[],[],v1.0,all
+2026-02-11T05:11:36.833270,4zldnb,tell me about Village de la Capitale in the New Administrative Capital,project_query,[],[],v1.0,all
+2026-02-11T05:11:55.595437,4zldnb,list all residential projects you have across all regions,list_projects,[],[],v1.0,all
+2026-02-11T05:12:10.248187,4zldnb,do you have any information on Village de la Capitale?,project_query,[],[],v1.0,all
+2026-02-11T05:12:26.022650,4zldnb,tell me about Village Avenue pricing,pricing,[],[],v1.0,all
+2026-02-11T05:12:47.801393,4zldnb,tell me about Village Gardens Katameya pricing,pricing,[],[],v1.0,all
+2026-02-11T05:13:06.916810,4zldnb,tell me about Village Avenue pricing,pricing,[],[],v1.0,all
+2026-02-11T05:13:26.539356,4zldnb,tell me about Jirian Palm Hills pricing,pricing,[],[],v1.0,all
+2026-02-11T05:13:45.001545,4zldnb,what projects have 'Village' in their name?,list_projects,[],[],v1.0,all
+2026-02-11T05:14:04.607642,4zldnb,tell me about Village de la Capitale,project_query,[],[],v1.0,all
+2026-02-11T05:14:24.334436,4zldnb,list me all all you have,list_projects,[],[],v1.0,all
+2026-02-11T05:14:40.285656,4zldnb,do you have any commercial projects called Village de la Capitale?,project_query,[],[],v1.0,all
+2026-02-11T05:14:57.044693,4zldnb,tell me about Capital Gardens pricing,pricing,[],[],v1.0,all
+2026-02-11T05:15:13.264346,4zldnb,what are all the projects in the New Administrative Capital?,list_projects,[],[],v1.0,all
+2026-02-11T05:15:31.288486,4zldnb,tell me about Village de la Capitale pricing,pricing,[],[],v1.0,all
+2026-02-11T05:16:01.532005,4zldnb,tell me about Capital Gardens pricing,pricing,[],[],v1.0,all
+2026-02-11T05:23:55.911832,4zldnb,Tell me about villas in Badya,project_query,[],[],v1.0,all
+2026-02-11T05:24:42.829064,4zldnb,Tell me about villas in Badya,project_query,[],[],v1.0,all
+2026-02-11T05:26:20.141570,4zldnb,Tell me about villas in Badya,project_query,[],[],v1.0,all
+2026-02-11T06:04:32.696568,1n6f4r,hi,support_contact,[],[],v1.0,all
+2026-02-11T06:04:46.280399,1n6f4r,what all properties do you have,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-02-11T06:05:02.949723,1n6f4r,residential,list_projects,"[""village_de_la_capitale"", ""p_x"", ""the_village""]",[],v1.0,all
+2026-02-11T06:06:45.036053,1n6f4r,is taht all you have ?,list_projects,"[""village_de_la_capitale"", ""village_avenue"", ""jirian_palm_hills""]",[],v1.0,all
+2026-02-11T06:07:04.298043,1n6f4r,"I want Jirian Palm Hills
+
+Location: 6th of October / West Cairo",lead_capture,[],[],v1.0,all
+2026-02-11T06:07:22.131587,1n6f4r,yep ,lead_capture,[],[],v1.0,all
+2026-02-11T06:08:13.188907,1n6f4r,andrea,lead_capture,[],[],v1.0,all
+2026-02-11T06:08:24.863991,1n6f4r,72653733286,lead_capture,[],[],v1.0,all
+2026-02-11T06:08:37.172738,1n6f4r,callback,lead_capture,[],[],v1.0,all
+2026-02-11T06:12:15.639694,1n6f4r,yepp,lead_capture,[],[],v1.0,all
+2026-02-11T06:18:03.052135,1n6f4r,Hi,support_contact,[],[],v1.0,all
+2026-02-11T06:18:18.026395,1n6f4r,what are all properties that you have],list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-02-11T06:18:28.432190,1n6f4r,residential,list_projects,"[""village_de_la_capitale"", ""p_x"", ""the_village""]",[],v1.0,all
+2026-02-11T06:18:55.124694,1n6f4r,tell me in P/X,project_query,[],[],v1.0,all
+2026-02-11T06:19:12.234832,1n6f4r,list me all,list_projects,[],[],v1.0,all
+2026-02-11T06:19:30.120744,1n6f4r,is all the property ups have now >??,list_projects,[],[],v1.0,all
+2026-02-11T06:19:40.546420,1n6f4r,is that it ?,list_projects,[],[],v1.0,all
+2026-02-11T06:19:52.835459,1n6f4r,"I wnat 6th of October, West Cairo",lead_capture,[],[],v1.0,all
+2026-02-11T06:20:08.244306,1n6f4r,yep,lead_capture,[],[],v1.0,all
+2026-02-11T06:20:25.930254,1n6f4r,villa & a Millon USD,lead_capture,[],[],v1.0,all
+2026-02-11T06:20:40.381187,1n6f4r,call back,lead_capture,[],[],v1.0,all
+2026-02-11T06:20:52.397673,1n6f4r,steve,lead_capture,[],[],v1.0,all
+2026-02-11T06:21:07.584872,1n6f4r,72566372873,lead_capture,[],[],v1.0,all
+2026-02-11T06:21:19.486869,1n6f4r,yes,lead_capture,[],[],v1.0,all
