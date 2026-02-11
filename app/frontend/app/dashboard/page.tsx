@@ -18,7 +18,7 @@ export default function Dashboard() {
         setLoading(true);
         setError('');
         try {
-            const res = await fetch('http://localhost:8000/admin/leads', {
+            const res = await fetch('http://20.224.153.225:8000/admin/leads', {
                 headers: { 'x-admin-password': pwd }
             });
             if (res.status === 401) {
@@ -53,7 +53,7 @@ export default function Dashboard() {
     };
 
     const handleExport = () => {
-        window.open(`http://localhost:8000/admin/leads/export.xlsx?x-admin-password=${password}`, '_blank');
+        window.open(`http://20.224.153.225:8000/admin/leads/export.xlsx?x-admin-password=${password}`, '_blank');
     };
 
     const filteredLeads = leads.filter(l => {
