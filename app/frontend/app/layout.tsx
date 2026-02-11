@@ -11,9 +11,7 @@ export const metadata: Metadata = {
   title: "PalmX | Palm Hills Property Concierge",
   description: "AI-powered property concierge for Palm Hills Developments",
   icons: {
-    icon: "/logo.svg", // Fallback to logo or standard icon
-    // In a real app we'd map this to a specific ico/png. 
-    // For now I'm ensuring the title is branded.
+    icon: "/favicon.ico",
   }
 };
 

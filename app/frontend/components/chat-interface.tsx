@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { Send, MapPin, Building2, User, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { api, ChatMessage, Lead } from "@/lib/api";
@@ -125,20 +127,22 @@ export default function ChatInterface() {
 
     if (!systemReady) {
         return (
-            <div className="flex flex-col h-[85vh] w-full max-w-5xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 flex-1 relative items-center justify-center">
-                <div className="flex flex-col items-center space-y-6 max-w-sm w-full p-8">
-                    <div className="relative">
-                        <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center text-white font-serif font-bold text-2xl ring-4 ring-white/10 stamp-effect shadow-xl">
-                            PH
-                        </div>
-                    </div>
+            <div className="flex flex-col h-screen w-full bg-white relative items-center justify-center">
+                <div className="flex flex-col items-center space-y-8 max-w-sm w-full p-8">
+                    <Image
+                        src="/brand/palmHills-BlockLogo.png"
+                        alt="Palm Hills"
+                        width={80}
+                        height={80}
+                        className="opacity-80"
+                    />
                     <div className="text-center space-y-2">
-                        <h2 className="font-serif text-2xl text-secondary">Initalizing PalmX</h2>
-                        <p className="text-sm text-gray-400">Loading verified market data...</p>
+                        <h2 className="font-serif text-2xl text-[#0B0B0B] tracking-tight">Initializing PalmX</h2>
+                        <p className="text-sm text-[#5A5A5A] font-light">Loading verified market data...</p>
                     </div>
-                    <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="w-full h-1 bg-[#E9E9E9] rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-primary transition-all duration-500 ease-out"
+                            className="h-full bg-[#D22048] transition-all duration-500 ease-out rounded-full"
                             style={{ width: `${bootProgress}%` }}
                         />
                     </div>
@@ -217,27 +221,39 @@ export default function ChatInterface() {
                     {/* Left Column: Navigation */}
                     <div className="flex-1 flex flex-col justify-center space-y-8 md:border-r border-white/10 md:pr-12">
                         <nav className="flex flex-col space-y-6">
-                            {['Residential', 'Commercial', 'Resorts', 'About Us', 'Concierge'].map((item, i) => (
-                                <a
-                                    key={item}
-                                    href="#"
+                            {[
+                                { label: 'Concierge', href: '/' },
+                                { label: 'Dashboard', href: '/dashboard' },
+                            ].map((item, i) => (
+                                <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    onClick={() => setMenuOpen(false)}
                                     className="font-serif text-4xl md:text-6xl text-white/90 hover:text-primary transition-all duration-300 transform hover:translate-x-4 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards"
                                     style={{ animationDelay: `${150 + (i * 100)}ms` }}
                                 >
-                                    {item}
-                                </a>
+                                    {item.label}
+                                </Link>
                             ))}
 
                             <div className="pt-8 mt-4 border-t border-white/10 w-24"></div>
 
-                            <a
-                                href="/data-sources"
-                                className="font-serif text-xl md:text-2xl text-white/60 hover:text-white transition-all duration-300 transform hover:translate-x-2 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards flex items-center gap-3 group"
-                                style={{ animationDelay: '600ms' }}
-                            >
-                                <span className="w-2 h-2 rounded-full bg-primary group-hover:scale-150 transition-transform"></span>
-                                Verified Data Base
-                            </a>
+                            <div className="space-y-5 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '450ms' }}>
+                                <h4 className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/60">POC Scope</h4>
+                                <ul className="space-y-3">
+                                    {[
+                                        'AI concierge trained on verified Palm Hills portfolio',
+                                        'Lead capture with structured buyer-intent data',
+                                        'Real-time analytics dashboard with export',
+                                        'RAG-powered retrieval from official listings',
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-start gap-3">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-primary/60 mt-2 flex-shrink-0" />
+                                            <span className="text-sm font-light text-white/50">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </nav>
                     </div>
 

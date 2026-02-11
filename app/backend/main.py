@@ -13,12 +13,16 @@ from app.backend.services.llm_service import llm_service
 from app.backend.services.rag_service import rag_service
 from app.backend.services.leads_service import leads_service
 from app.backend.services.kb_service import kb_service
+from app.backend.routes.admin_routes import router as admin_router
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PalmX-API")
 
 app = FastAPI(title="PalmX Pilot API", version="1.0.0")
+
+# Mount admin routes
+app.include_router(admin_router)
 
 # CORS
 app.add_middleware(
