@@ -201,7 +201,7 @@ export default function ChatInterface() {
             )}>
                 {/* Close Button */}
                 <div className="absolute top-6 right-6 md:top-8 md:right-12 z-[110]">
-                    <button onClick={() => setMenuOpen(false)} className="text-white hover:text-primary transition-colors p-4 group bg-white/5 rounded-full backdrop-blur-sm border border-white/10">
+                    <button onClick={() => setMenuOpen(false)} className="text-white hover:text-primary transition-colors p-2 group">
                         <span className="sr-only">Close</span>
                         <div className="relative w-6 h-6 flex items-center justify-center">
                             <span className="absolute w-6 h-0.5 bg-current rotate-45 transform origin-center transition-transform duration-300 group-hover:rotate-90"></span>
@@ -211,7 +211,10 @@ export default function ChatInterface() {
                 </div>
 
                 {/* Palm Hills Logo in Overlay */}
-                <div className="absolute top-8 left-8 md:left-12 z-[110] opacity-0 animate-in fade-in slide-in-from-top-4 duration-1000 fill-mode-forwards" style={{ animationDelay: '200ms' }}>
+                <div className={cn(
+                    "absolute top-8 left-8 md:left-12 z-[110] transition-all duration-1000 delay-200",
+                    menuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+                )}>
                     <div className="flex flex-col">
                         <span className="font-serif text-2xl tracking-[0.2em] font-bold text-white">PALM HILLS</span>
                         <span className="text-[9px] uppercase tracking-[0.4em] text-primary/80 font-medium mt-1">Developments</span>
@@ -226,13 +229,17 @@ export default function ChatInterface() {
                             {[
                                 { label: 'Concierge', href: '/' },
                                 { label: 'Dashboard', href: '/dashboard' },
+                                { label: 'Data Sources', href: '/data-sources' },
                             ].map((item, i) => (
                                 <Link
                                     key={item.label}
                                     href={item.href}
                                     onClick={() => setMenuOpen(false)}
-                                    className="font-serif text-4xl md:text-6xl text-white/90 hover:text-primary transition-all duration-300 transform hover:translate-x-4 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards"
-                                    style={{ animationDelay: `${150 + (i * 100)}ms` }}
+                                    className={cn(
+                                        "font-serif text-4xl md:text-6xl text-white/90 hover:text-primary transition-all duration-500 transform hover:translate-x-4",
+                                        menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                                    )}
+                                    style={{ transitionDelay: `${150 + (i * 100)}ms` }}
                                 >
                                     {item.label}
                                 </Link>
@@ -240,7 +247,10 @@ export default function ChatInterface() {
 
                             <div className="pt-8 mt-4 border-t border-white/10 w-24"></div>
 
-                            <div className="space-y-5 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '450ms' }}>
+                            <div className={cn(
+                                "space-y-5 transition-all duration-700 delay-[450ms]",
+                                menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                            )}>
                                 <h4 className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/60">POC Scope</h4>
                                 <ul className="space-y-3">
                                     {[
@@ -262,7 +272,10 @@ export default function ChatInterface() {
                     {/* Right Column: Information & Disclaimer */}
                     <div className="flex-1 flex flex-col justify-center md:pl-16 space-y-12 text-white/80 mt-12 md:mt-0">
 
-                        <div className="space-y-6 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '600ms' }}>
+                        <div className={cn(
+                            "space-y-6 transition-all duration-700 delay-[600ms]",
+                            menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                        )}>
                             <div className="w-12 h-1 bg-primary mb-6"></div>
                             <h3 className="text-xs font-bold tracking-[0.4em] uppercase text-white mb-2">The Concierge System</h3>
                             <p className="font-light leading-relaxed text-lg max-w-md text-white/70">
@@ -270,7 +283,10 @@ export default function ChatInterface() {
                             </p>
                         </div>
 
-                        <div className="space-y-6 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '700ms' }}>
+                        <div className={cn(
+                            "space-y-6 transition-all duration-700 delay-[700ms]",
+                            menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                        )}>
                             <div className="grid grid-cols-2 gap-8">
                                 <div>
                                     <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-2">Data Integrity</h4>
@@ -287,7 +303,10 @@ export default function ChatInterface() {
                             </div>
                         </div>
 
-                        <div className="pt-12 border-t border-white/10 flex flex-col gap-2 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '800ms' }}>
+                        <div className={cn(
+                            "pt-12 border-t border-white/10 flex flex-col gap-2 transition-all duration-700 delay-[800ms]",
+                            menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                        )}>
                             <p className="text-[10px] uppercase tracking-[0.25em] text-white/40">
                                 Crafted by <a href="https://cloudgate.ae/" target="_blank" className="text-white hover:text-primary transition-colors border-b border-white/20 pb-0.5 hover:border-primary">CloudGate</a>
                             </p>
