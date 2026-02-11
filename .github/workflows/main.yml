@@ -1,4 +1,4 @@
-name: Deploy to Azure VM
+name: Deploy PalmX Backend
 
 on:
   push:
@@ -6,13 +6,25 @@ on:
       - main
 
 jobs:
-  build:
+  deploy:
     runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Run script
+      - name: Copy project to production folder
         run: |
-          echo "Running on Azure VM"
-          hostname
+          rsync -av --delete ./ /var/app/PalmX/
+
+      - name: Install dependencies
+        run: |
+          cd /var/app/PalmX
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install gunicorn
+
+      - name: Restart Backend Service
+        run: sudo systemctl restart palmx-backend
