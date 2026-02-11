@@ -83,7 +83,7 @@ class LLMService:
         Intents:
         - lead_capture: Detect buying/renting intent (triggers: "book visit", "call me", "send prices", "interested", "budget", "schedule", "I want", "booking").
         - project_query: asking facts about a specific project (location, amenities, units).
-        - list_projects: broad requests (e.g. "show me villas", "what commercial projects are there in West?").
+        - list_projects: Broad queries (e.g., "what properties do you have?", "list all projects", "show me villas").
         - compare: "compare project X and Y".
         - pricing: "how much is...", "what is the price of..." (if no explicit lead intent yet).
         - support_contact: "phone number", "complaint", "direct contact".
@@ -94,7 +94,8 @@ class LLMService:
         - filters: {{project_type, project_status, region}}. 
           (Maintain filters from history if not overridden. e.g. if user previously said 'commercial', project_type should be 'commercial').
         - query_rewrite: clean, standalone search query that incorporates context from history if needed. 
-          (e.g. if history shows 'commercial properties' and current message is 'West Cairo', rewrite to 'commercial properties in West Cairo').
+          (e.g., if history shows 'commercial properties' and current message is 'West Cairo', rewrite to 'commercial properties in West Cairo').
+          (If the message is broad like 'list all', keep the rewrite broad e.g. 'all properties').
         """
         
         try:

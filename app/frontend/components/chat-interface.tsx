@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Send, MapPin, Building2, User, Sparkles, ArrowRight, Loader2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { api, ChatMessage, Lead } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -201,7 +202,39 @@ export default function ChatInterface() {
                                     ? "bg-secondary text-white rounded-2xl rounded-tr-sm"
                                     : "bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-tl-sm ring-1 ring-gray-100/50"
                             )}>
-                                <div className="whitespace-pre-wrap font-light">{m.content}</div>
+                                {m.role === 'user' ? (
+                                    <div className="whitespace-pre-wrap font-light">{m.content}</div>
+                                ) : (
+                                    <div className="font-light">
+                                        <ReactMarkdown
+                                            components={{
+                                                h3: ({ node, ...props }: any) => (
+                                                    <h3 className="font-serif text-lg text-secondary border-b border-primary/10 pb-1 mt-4 first:mt-0 mb-3" {...props} />
+                                                ),
+                                                p: ({ node, ...props }: any) => (
+                                                    <p className="leading-relaxed mb-4 last:mb-0" {...props} />
+                                                ),
+                                                ul: ({ node, ...props }: any) => (
+                                                    <ul className="space-y-3 mb-6 mt-2 list-none" {...props} />
+                                                ),
+                                                li: ({ node, ...props }: any) => (
+                                                    <li className="flex items-start gap-3 text-gray-700" {...props}>
+                                                        <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-primary mt-2.5" />
+                                                        <span>{props.children}</span>
+                                                    </li>
+                                                ),
+                                                strong: ({ node, ...props }: any) => (
+                                                    <strong className="font-semibold text-secondary" {...props} />
+                                                ),
+                                                a: ({ node, ...props }: any) => (
+                                                    <a className="text-primary hover:underline underline-offset-4 decoration-primary/30 transition-all font-medium" {...props} target="_blank" rel="noopener noreferrer" />
+                                                )
+                                            }}
+                                        >
+                                            {m.content}
+                                        </ReactMarkdown>
+                                    </div>
+                                )}
                                 {m.role === 'assistant' && (
                                     <div className="absolute -bottom-5 left-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-2 text-[10px] text-gray-400 uppercase tracking-widest mt-1">
                                         <span className="w-1 h-1 rounded-full bg-primary/20"></span>
