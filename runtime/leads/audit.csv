@@ -184,3 +184,19 @@ Location: 6th of October / West Cairo",lead_capture,[],[],v1.0,all
 2026-02-11T07:35:55.798377,1n6f4r,what all properties you have list me,list_projects,[],[],v1.0,all
 2026-02-11T07:36:23.040483,1n6f4r,list me hat else you have,list_projects,[],[],v1.0,all
 2026-02-11T16:37:13.474284,1n6f4r,hi,support_contact,[],[],v1.0,all
+2026-02-11T18:51:14.895134,1n6f4r,Hi,support_contact,[],[],v1.0,all
+2026-02-11T18:51:40.695453,1n6f4r,Am looking for properties,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-02-11T18:51:57.727456,1n6f4r,East Cairo maybe,list_projects,"[""village_gardens_katameya"", ""97_hills"", ""the_village""]",[],v1.0,all
+2026-02-11T18:52:20.174870,1n6f4r, I want commercial property,list_projects,"[""palmet_new_cairo"", ""village_gate_mall""]",[],v1.0,all
+2026-02-11T18:52:46.369378,1n6f4r,office space,list_projects,[],[],v1.0,all
+2026-02-11T19:05:23.281464,1n6f4r,hi,support_contact,[],[],v1.0,all
+2026-02-11T19:05:50.925116,1n6f4r,List me all the Commercial Properties you have,list_projects,"[""st_88"", ""lakeyard"", ""crown_central""]",[],v1.0,all
+2026-02-11T19:11:46.518708,1n6f4r,AM looking for the commercial properties,list_projects,"[""st_88"", ""lakeyard"", ""palm_central""]",[],v1.0,all
+2026-02-11T19:22:18.527674,1n6f4r,hi,support_contact,[],[],v1.0,all
+2026-02-11T19:22:37.968162,1n6f4r,list me Commercial Properties ,list_projects,"[""st_88"", ""lakeyard"", ""palm_central""]",[],v1.0,all
+2026-02-11T19:29:11.204415,1n6f4r,hi,support_contact,[],[],v1.0,all
+2026-02-11T19:29:38.437766,1n6f4r,list me all all all the Commercial properties you have,list_projects,"[""st_88"", ""lakeyard"", ""palm_central""]",[],v1.0,all
+2026-02-11T19:34:55.156952,1n6f4r,hi,support_contact,[],[],v1.0,all
+2026-02-11T19:35:18.623389,1n6f4r,"List me all all the Commercial properties you have 
+
+and Am from India",list_projects,"[""st_88""]",[],v1.0,all

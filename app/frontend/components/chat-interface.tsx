@@ -170,14 +170,16 @@ export default function ChatInterface() {
                 </div>
 
                 {/* Center: Logo */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mt-1">
                     <div className="flex flex-col items-center">
-                        <span className="font-serif text-2xl tracking-[0.25em] font-bold text-black border-b-2 border-transparent pb-1">PALM HILLS</span>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="h-px w-4 bg-accent"></span>
-                            <span className="text-[10px] uppercase tracking-[0.3em] text-accent font-medium">PalmX AI</span>
-                            <span className="h-px w-4 bg-accent"></span>
-                        </div>
+                        <Image
+                            src="/brand/PalmHills-Logo.png"
+                            alt="Palm Hills"
+                            width={160}
+                            height={42}
+                            className="object-contain mb-1"
+                        />
+                        <span className="text-[9px] uppercase tracking-[0.3em] text-[#5A5A5A] font-medium">PALMX AI</span>
                     </div>
                 </div>
 
@@ -314,8 +316,14 @@ export default function ChatInterface() {
                     {messages.length === 0 && (
                         <div className="flex flex-col items-center justify-center h-[70vh] space-y-12 opacity-0 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
                             {/* Premium Brand Glyph */}
-                            <div className="w-24 h-24 rounded-full border border-gray-100 flex items-center justify-center mb-4 bg-white shadow-xl shadow-gray-100/50">
-                                <span className="font-serif text-3xl text-black">PH</span>
+                            <div className="w-24 h-24 rounded-full border border-gray-100 flex items-center justify-center mb-4 bg-white shadow-xl shadow-gray-100/50 overflow-hidden p-4">
+                                <Image
+                                    src="/brand/palmHills-BlockLogo.png"
+                                    alt="PalmX"
+                                    width={80}
+                                    height={80}
+                                    className="object-contain"
+                                />
                             </div>
 
                             <div className="text-center max-w-2xl space-y-6">
@@ -350,15 +358,21 @@ export default function ChatInterface() {
                         <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} group max-w-5xl mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-500`}>
 
                             {m.role === 'assistant' && (
-                                <div className="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center text-black text-[10px] font-serif mr-4 mt-1 border border-gray-100 shadow-sm">
-                                    PH
+                                <div className="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center mr-4 mt-1 border border-gray-100 shadow-sm overflow-hidden p-1.5">
+                                    <Image
+                                        src="/brand/palmHills-BlockLogo.png"
+                                        alt="PalmX"
+                                        width={40}
+                                        height={40}
+                                        className="object-contain opacity-90"
+                                    />
                                 </div>
                             )}
 
                             <div className={cn(
                                 "max-w-[85%] md:max-w-[70%] px-8 py-6 text-base leading-7 relative shadow-sm",
                                 m.role === 'user'
-                                    ? "bg-charcoal text-white rounded-3xl rounded-tr-sm"
+                                    ? "bg-[#D22048] text-white rounded-3xl rounded-tr-sm"
                                     : "bg-white text-gray-800 border border-gray-50 rounded-3xl rounded-tl-sm shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)]"
                             )}>
                                 {m.role === 'user' ? (
@@ -367,8 +381,17 @@ export default function ChatInterface() {
                                     <div className="font-light tracking-wide text-[15px]">
                                         <ReactMarkdown
                                             components={{
+                                                h1: ({ node, ...props }: any) => (
+                                                    <h1 className="font-serif text-3xl text-[#5A5A5A] mt-8 mb-4 tracking-wide" {...props} />
+                                                ),
+                                                h2: ({ node, ...props }: any) => (
+                                                    <h2 className="font-serif text-2xl text-[#5A5A5A] mt-8 mb-4 tracking-wide" {...props} />
+                                                ),
                                                 h3: ({ node, ...props }: any) => (
-                                                    <h3 className="font-serif text-xl text-black mt-8 mb-4 tracking-wide border-b border-gray-100 pb-2" {...props} />
+                                                    <h3 className="font-serif text-xl text-[#5A5A5A] mt-8 mb-4 tracking-wide border-b border-gray-100 pb-2" {...props} />
+                                                ),
+                                                h4: ({ node, ...props }: any) => (
+                                                    <h4 className="font-serif text-lg text-[#5A5A5A] mt-6 mb-3 tracking-wide" {...props} />
                                                 ),
                                                 p: ({ node, ...props }: any) => (
                                                     <p className="leading-7 mb-4 last:mb-0 text-gray-600" {...props} />
@@ -383,7 +406,7 @@ export default function ChatInterface() {
                                                     </li>
                                                 ),
                                                 strong: ({ node, ...props }: any) => (
-                                                    <strong className="font-semibold text-black" {...props} />
+                                                    <strong className="font-semibold text-[#D22048]" {...props} />
                                                 ),
                                                 a: ({ node, ...props }: any) => (
                                                     <a className="text-accent hover:text-black border-b border-accent/20 hover:border-black transition-all pb-0.5 font-medium" {...props} target="_blank" rel="noopener noreferrer" />
@@ -406,7 +429,15 @@ export default function ChatInterface() {
                     {/* Loading Indicator */}
                     {loading && (
                         <div className="flex justify-start max-w-5xl mx-auto w-full">
-                            <div className="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center text-black text-[10px] font-serif mr-4 mt-1 border border-gray-100">PH</div>
+                            <div className="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center mr-4 mt-1 border border-gray-100 overflow-hidden p-1.5">
+                                <Image
+                                    src="/brand/palmHills-BlockLogo.png"
+                                    alt="PalmX"
+                                    width={40}
+                                    height={40}
+                                    className="object-contain opacity-90"
+                                />
+                            </div>
                             <div className="bg-white px-8 py-5 rounded-3xl rounded-tl-sm flex items-center space-x-3 shadow-sm border border-gray-50">
                                 <span className="text-xs uppercase tracking-widest text-gray-400 mr-2">Concierge Thinking</span>
                                 <div className="flex space-x-1">
@@ -429,13 +460,27 @@ export default function ChatInterface() {
                         <div className="absolute top-1/2 -translate-y-1/2 left-4 text-xs font-bold tracking-widest text-accent uppercase pointer-events-none">
                             {mode === 'concierge' ? 'Concierge' : 'Assistance'}
                         </div>
-                        <input
+
+                        <textarea
                             id="chat-input"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSubmit(e);
+                                }
+                            }}
                             autoComplete="off"
                             placeholder={mode === 'concierge' ? "Ask about availability and prices..." : "Please enter your details..."}
-                            className="w-full pl-32 pr-12 py-4 bg-surface border border-transparent focus:border-gray-200 rounded-full focus:ring-0 focus:outline-none transition-all font-sans text-charcoal placeholder:text-muted/50 shadow-sm"
+                            className="w-full pl-32 pr-12 py-4 bg-surface border border-transparent focus:border-gray-200 rounded-2xl focus:ring-0 focus:outline-none transition-all font-sans text-charcoal placeholder:text-muted/50 shadow-sm resize-none overflow-hidden min-h-[56px] max-h-[200px]"
+                            rows={1}
+                            style={{ height: 'auto', minHeight: '56px' }}
+                            onInput={(e) => {
+                                const target = e.target as HTMLTextAreaElement;
+                                target.style.height = 'auto';
+                                target.style.height = `${Math.min(target.scrollHeight, 200)}px`;
+                            }}
                         />
                         <button
                             type="button"
@@ -452,7 +497,7 @@ export default function ChatInterface() {
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

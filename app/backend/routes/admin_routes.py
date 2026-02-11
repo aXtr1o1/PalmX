@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Optional, Any
 from collections import Counter, defaultdict
 
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Response
 from fastapi.responses import StreamingResponse, FileResponse
 import pandas as pd
 
@@ -184,29 +184,35 @@ async def download_sheet(
 # 4) GET /admin/leads — normalized leads from a sheet
 # ---------------------------------------------------------------------------
 # Column name mapping — handle messy/variant column names
+# Column name mapping — handle messy/variant column names
 _COL_MAP = {
-    "timestamp": ["timestamp", "created_at", "date", "time"],
-    "name": ["name", "full_name", "client_name", "buyer_name"],
-    "contact": ["phone", "contact", "mobile", "whatsapp", "phone_number"],
-    "summary": ["lead_summary", "summary", "notes", "description"],
-    "projects": ["interest_projects", "projects", "project", "interested_projects"],
+    "timestamp": ["timestamp", "created_at", "date", "time", "submission_time", "datetime"],
+    "name": ["name", "full_name", "client_name", "buyer_name", "customer_name", "lead_name"],
+    "contact": ["phone", "contact", "mobile", "whatsapp", "phone_number", "mobile_number", "cell", "tel"],
+    "summary": ["lead_summary", "summary", "notes", "description", "details", "remarks"],
+    "projects": ["interest_projects", "projects", "project", "interested_projects", "compound", "compounds", "interest"],
     "project_primary": ["project_primary", "primary_project", "main_project"],
-    "region": ["preferred_region", "region", "location", "area"],
-    "unit_type": ["unit_type", "type", "property_type", "unit"],
-    "purpose": ["purpose", "intent", "buy_rent_invest", "objective"],
-    "budget_min": ["budget_min", "min_budget", "budget_from"],
-    "budget_max": ["budget_max", "max_budget", "budget_to"],
-    "timeline": ["timeline", "purchase_timeline", "delivery_timeline", "timeframe"],
-    "tags": ["tags", "labels", "keywords"],
+    "region": ["preferred_region", "region", "location", "area", "zone", "district"],
+    "unit_type": ["unit_type", "type", "property_type", "unit", "asset_type"],
+    "purpose": ["purpose", "intent", "buy_rent_invest", "objective", "usage", "buy_reason"],
+    "budget_min": ["budget_min", "min_budget", "budget_from", "price_min"],
+    "budget_max": ["budget_max", "max_budget", "budget_to", "price_max"],
+    "timeline": ["timeline", "purchase_timeline", "delivery_timeline", "timeframe", "expected_delivery"],
+    "tags": ["tags", "labels", "keywords", "flags"],
 }
 
 
 def _find_col(df_cols: list[str], candidates: list[str]) -> Optional[str]:
     """Find the first matching column from candidates list."""
-    lower_map = {c.lower().strip(): c for c in df_cols}
+    # Normalize: lower, strip whitespace, strip BOM, strip quotes
+    def normalize(s):
+        return s.lower().strip().replace('\ufeff', '').strip('"').strip("'")
+
+    lower_map = {normalize(c): c for c in df_cols}
     for cand in candidates:
-        if cand.lower() in lower_map:
-            return lower_map[cand.lower()]
+        n_cand = normalize(cand)
+        if n_cand in lower_map:
+            return lower_map[n_cand]
     return None
 
 
@@ -235,49 +241,59 @@ def _parse_num(val: Any) -> Optional[float]:
 
 
 @router.get("/leads")
-async def get_leads(sheet: str = Query("leads.csv")):
-    filepath = _resolve_sheet(sheet)
-    df = _read_sheet(filepath)
-    cols = list(df.columns)
+async def get_leads(response: Response, sheet: str = Query("leads.csv")):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    try:
+        filepath = _resolve_sheet(sheet)
+        logger.info(f"Reading leads from: {filepath}")
+        
+        df = _read_sheet(filepath)
+        cols = list(df.columns)
+        logger.info(f"Columns found in {sheet}: {cols}")
 
-    # Map columns
-    col_ts = _find_col(cols, _COL_MAP["timestamp"])
-    col_name = _find_col(cols, _COL_MAP["name"])
-    col_contact = _find_col(cols, _COL_MAP["contact"])
-    col_summary = _find_col(cols, _COL_MAP["summary"])
-    col_projects = _find_col(cols, _COL_MAP["projects"])
-    col_primary = _find_col(cols, _COL_MAP["project_primary"])
-    col_region = _find_col(cols, _COL_MAP["region"])
-    col_unit = _find_col(cols, _COL_MAP["unit_type"])
-    col_purpose = _find_col(cols, _COL_MAP["purpose"])
-    col_bmin = _find_col(cols, _COL_MAP["budget_min"])
-    col_bmax = _find_col(cols, _COL_MAP["budget_max"])
-    col_timeline = _find_col(cols, _COL_MAP["timeline"])
-    col_tags = _find_col(cols, _COL_MAP["tags"])
+        # Map columns
+        col_ts = _find_col(cols, _COL_MAP["timestamp"])
+        col_name = _find_col(cols, _COL_MAP["name"])
+        col_contact = _find_col(cols, _COL_MAP["contact"])
+        col_summary = _find_col(cols, _COL_MAP["summary"])
+        col_projects = _find_col(cols, _COL_MAP["projects"])
+        col_primary = _find_col(cols, _COL_MAP["project_primary"])
+        col_region = _find_col(cols, _COL_MAP["region"])
+        col_unit = _find_col(cols, _COL_MAP["unit_type"])
+        col_purpose = _find_col(cols, _COL_MAP["purpose"])
+        col_bmin = _find_col(cols, _COL_MAP["budget_min"])
+        col_bmax = _find_col(cols, _COL_MAP["budget_max"])
+        col_timeline = _find_col(cols, _COL_MAP["timeline"])
+        col_tags = _find_col(cols, _COL_MAP["tags"])
 
-    results = []
-    for _, row in df.iterrows():
-        raw = row.to_dict()
-        projects = _parse_list(raw.get(col_projects, "")) if col_projects else []
-        tags = _parse_list(raw.get(col_tags, "")) if col_tags else []
+        logger.info(f"Mapping results for {sheet}: Contact='{col_contact}', Projects='{col_projects}', Summary='{col_summary}'")
 
-        results.append({
-            "timestamp": raw.get(col_ts, "") if col_ts else "",
-            "name": raw.get(col_name, "") if col_name else "",
-            "contact": raw.get(col_contact, "") if col_contact else "",
-            "summary": raw.get(col_summary, "") if col_summary else "",
-            "projects": projects,
-            "project_primary": raw.get(col_primary, "") if col_primary else (projects[0] if projects else None),
-            "region": raw.get(col_region, "") if col_region else None,
-            "unit_type": raw.get(col_unit, "") if col_unit else None,
-            "purpose": raw.get(col_purpose, "") if col_purpose else None,
-            "budget_min": _parse_num(raw.get(col_bmin, "")) if col_bmin else None,
-            "budget_max": _parse_num(raw.get(col_bmax, "")) if col_bmax else None,
-            "timeline": raw.get(col_timeline, "") if col_timeline else None,
-            "tags": tags,
-            "raw": raw,
-        })
-    return results
+        results = []
+        for _, row in df.iterrows():
+            raw = row.to_dict()
+            projects = _parse_list(raw.get(col_projects, "")) if col_projects else []
+            tags = _parse_list(raw.get(col_tags, "")) if col_tags else []
+
+            results.append({
+                "timestamp": raw.get(col_ts, "") if col_ts else "",
+                "name": raw.get(col_name, "") if col_name else "",
+                "contact": raw.get(col_contact, "") if col_contact else "",
+                "summary": raw.get(col_summary, "") if col_summary else "",
+                "projects": projects,
+                "project_primary": raw.get(col_primary, "") if col_primary else (projects[0] if projects else None),
+                "region": raw.get(col_region, "") if col_region else None,
+                "unit_type": raw.get(col_unit, "") if col_unit else None,
+                "purpose": raw.get(col_purpose, "") if col_purpose else None,
+                "budget_min": _parse_num(raw.get(col_bmin, "")) if col_bmin else None,
+                "budget_max": _parse_num(raw.get(col_bmax, "")) if col_bmax else None,
+                "timeline": raw.get(col_timeline, "") if col_timeline else None,
+                "tags": tags,
+                "raw": raw,
+            })
+        return results
+    except Exception as e:
+        logger.error(f"Error serving leads from {sheet}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to process leads: {e}")
 
 
 # ---------------------------------------------------------------------------

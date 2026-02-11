@@ -7,16 +7,18 @@ import { api } from "@/lib/api";
 type Lead = {
     timestamp: string;
     name: string;
-    phone: string;
-    interest_projects: string;
-    preferred_region: string;
-    unit_type: string;
-    budget_min: string;
-    budget_max: string;
-    purpose: string;
-    timeline: string;
-    lead_summary: string;
-    tags: string;
+    contact: string;
+    summary: string;
+    projects: string[];
+    project_primary: string | null;
+    region: string | null;
+    unit_type: string | null;
+    purpose: string | null;
+    budget_min: number | null;
+    budget_max: number | null;
+    timeline: string | null;
+    tags: string[];
+    raw: any;
 };
 
 export default function AdminPage() {
@@ -38,23 +40,9 @@ export default function AdminPage() {
     };
 
     const downloadExcel = () => {
-        fetch('/admin-api/leads/export.xlsx', {
-            headers: { 'x-admin-password': password }
-        })
-            .then(resp => {
-                if (!resp.ok) throw new Error('Export failed');
-                return resp.blob();
-            })
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `leads_export_${new Date().toISOString().split('T')[0]}.xlsx`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            })
-            .catch(err => alert("Download failed"));
+        // Use the new download endpoint
+        const url = `/admin-api/sheets/download?sheet=leads.csv&format=xlsx`;
+        window.open(url, '_blank');
     };
 
     if (!authenticated) {
@@ -88,7 +76,7 @@ export default function AdminPage() {
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">PalmX Leads Dashboard</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">PalmX Leads Sheet</h1>
                         <p className="text-sm text-gray-500">Real-time lead capture monitoring</p>
                     </div>
                     <button
@@ -120,18 +108,29 @@ export default function AdminPage() {
                                         <td className="p-4 text-gray-500 font-mono text-xs whitespace-nowrap">{new Date(l.timestamp).toLocaleString()}</td>
                                         <td className="p-4 font-medium text-gray-900">{l.name}</td>
                                         <td className="p-4">
-                                            <div className="text-gray-900 font-mono">{l.phone}</div>
+                                            <div className="text-gray-900 font-mono">{l.contact || '-'}</div>
                                         </td>
-                                        <td className="p-4 max-w-xs truncate text-gray-600" title={l.lead_summary}>
-                                            {l.lead_summary || '-'}
+                                        <td className="p-4 max-w-xs truncate text-gray-600" title={l.summary}>
+                                            {l.summary || '-'}
                                         </td>
-                                        <td className="p-4 text-gray-600 max-w-xs truncate" title={l.interest_projects}>
-                                            {l.interest_projects}
-                                            {l.preferred_region && <div className="text-xs text-gray-400">{l.preferred_region}</div>}
+                                        <td className="p-4 text-gray-600 max-w-xs truncate">
+                                            {Array.isArray(l.projects) && l.projects.length > 0 ? (
+                                                <div>
+                                                    {l.projects.join(", ")}
+                                                    {l.region && <div className="text-xs text-gray-400">{l.region}</div>}
+                                                </div>
+                                            ) : (
+                                                '-'
+                                            )}
                                         </td>
                                         <td className="p-4 text-xs space-y-1">
                                             <div><span className="font-semibold">Unit:</span> {l.unit_type || '-'}</div>
-                                            <div><span className="font-semibold">Budget:</span> {l.budget_min && l.budget_max ? `${l.budget_min} - ${l.budget_max}` : (l.budget_min || l.budget_max || '-')}</div>
+                                            <div>
+                                                <span className="font-semibold">Budget:</span>{' '}
+                                                {l.budget_min && l.budget_max
+                                                    ? `${l.budget_min.toLocaleString()} - ${l.budget_max.toLocaleString()}`
+                                                    : (l.budget_min?.toLocaleString() || l.budget_max?.toLocaleString() || '-')}
+                                            </div>
                                             <div><span className="font-semibold">Purpose:</span> {l.purpose || '-'}</div>
                                         </td>
                                         <td className="p-4 text-gray-600 text-xs">
@@ -142,7 +141,7 @@ export default function AdminPage() {
                                 {leads.length === 0 && (
                                     <tr>
                                         <td colSpan={7} className="p-12 text-center text-gray-400">
-                                            No leads captured yet. Start a chat session to generate data.
+                                            No leads captured yet. Start a chat session or check backend connectivity.
                                         </td>
                                     </tr>
                                 )}
