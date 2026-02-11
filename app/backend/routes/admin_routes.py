@@ -235,8 +235,15 @@ def _parse_num(val: Any) -> Optional[float]:
         return None
     try:
         s = str(val).replace(",", "").strip()
-        return float(s) if s else None
+        # Try direct float conversion first
+        return float(s)
     except (ValueError, TypeError):
+        # Fallback: extract first numeric sequence (e.g. "30.8M EGP" -> 30.8)
+        # Note: This is simplistic (ignores M/K multipliers), but better than None
+        import re
+        match = re.search(r"(\d+(\.\d+)?)", str(val).replace(",", ""))
+        if match:
+            return float(match.group(1))
         return None
 
 

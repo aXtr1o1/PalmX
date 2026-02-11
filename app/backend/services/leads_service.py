@@ -75,6 +75,8 @@ class LeadsService:
                 portalocker.lock(f, portalocker.LOCK_EX)
                 writer = csv.writer(f)
                 writer.writerow(row)
+                f.flush()
+                os.fsync(f.fileno())
                 portalocker.unlock(f)
             return True
         except Exception as e:
