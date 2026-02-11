@@ -579,8 +579,8 @@ export default function Dashboard() {
                                 key={r}
                                 onClick={() => handleRangeChange(r)}
                                 className={`px-3 py-1.5 rounded-md text-[10px] font-bold tracking-wider uppercase transition-all ${timeRange === r
-                                        ? "bg-white text-[#0B0B0B] shadow-sm"
-                                        : "text-[#5A5A5A] hover:text-[#0B0B0B]"
+                                    ? "bg-white text-[#0B0B0B] shadow-sm"
+                                    : "text-[#5A5A5A] hover:text-[#0B0B0B]"
                                     }`}
                             >
                                 {r}
@@ -886,8 +886,8 @@ export default function Dashboard() {
                                     key={r}
                                     onClick={() => setRegionFilter(r)}
                                     className={`px-3 py-1.5 rounded-md text-[10px] font-bold tracking-wider uppercase transition-all ${regionFilter === r
-                                            ? "bg-[#FAFAFA] text-[#0B0B0B] shadow-sm"
-                                            : "text-[#5A5A5A] hover:text-[#0B0B0B]"
+                                        ? "bg-[#FAFAFA] text-[#0B0B0B] shadow-sm"
+                                        : "text-[#5A5A5A] hover:text-[#0B0B0B]"
                                         }`}
                                 >
                                     {r}
