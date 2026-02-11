@@ -46,7 +46,7 @@ Guidelines:
 Lead Capture Rules:
 1. **Initial Interest**: If user asks to buy/book/visit, ask for Name and Phone.
 2. **Deep Discovery** (Crucial): Once you have Name/Phone, say "Thanks [Name]. To help me find the best match for you, could you share a bit more?"
-   - Ask for: **Preferred Region** (e.g. East/West Cairo), **Unit Type** (Villa/Apt), **Budget Range**, **Purpose** (Investment/Home), and **Timeline**.
+   - Ask for: **Preferred Region** (e.g. East/West Cairo), **Unit Type** (Villa/Apt), **Budget Range**, **Purpose** (Investment/Home/Business), and **Timeline**.
    - Do NOT interrogate. Ask conversational questions like "Are you looking for a villa or apartment?" or "Do you have a specific budget in mind?"
 3. **Saving**: ONLY call `save_lead` when you have Name, Phone, AND at least 2-3 other details (Region, Budget, etc.) OR if the user refuses to share more.
    - If user gives only Name/Phone, acknowledge and ASK for the rest.
@@ -55,7 +55,7 @@ Lead Capture Rules:
 7. **Argument Formatting**:
    - `budget_min` / `budget_max`: Extract numbers (e.g. "1M USD" -> "1,000,000").
    - `timeline`: Extract absolute texts like "May 2026" or "Immediate".
-   - `purpose`: Map "own business" -> "Business Use".
+    - `purpose`: MUST be one of ["Investment", "Primary Home", "Vacation", "Business Use", "Other"]. Map "own business" or "work" -> "Business Use", "investment" -> "Investment", "home" -> "Primary Home".
    - `lead_summary`: "Client wants office in West Cairo for own business, budget ~1M, moving May."
    - `interest_projects`: Comma-joined list if multiple.
 """
@@ -84,9 +84,10 @@ TOOLS = [
                     "budget_max": {"type": "string"},
                     "purpose": {"type": "string", "enum": ["Investment", "Primary Home", "Vacation", "Business Use", "Other"]},
                     "timeline": {"type": "string"},
-                    "next_step": {"type": "string"},
+                    "next_step": {"type": "string", "description": "e.g. Call back, Visit booked"},
                     "lead_summary": {"type": "string", "description": "Concise summary of user needs"},
-                    "tags": {"type": "string", "description": "Comma separated tags like 'High Value', 'Urgent'"}
+                    "tags": {"type": "string", "description": "Comma separated tags like 'High Value', 'Urgent'"},
+                    "kb_version_hash": {"type": "string", "description": "Version of KB used, e.g. v1.0"}
                 },
                 "required": ["name", "phone"]
             }
@@ -103,8 +104,10 @@ async def chat_endpoint(request: ChatRequest):
         session_id = request.session_id
         
         # 1. Router (Lightweight check for RAG need)
-        router_out = llm_service.router_completion(user_msg)
-        logger.info(f"Router intent: {router_out.intent}")
+        # Pass history (everything except the latest user message) to the router for context
+        history = request.messages[:-1]
+        router_out = llm_service.router_completion(user_msg, history=history)
+        logger.info(f"Router intent: {router_out.intent} | Filters: {router_out.filters}")
 
         # 2. Retrieval (Skip if simple lead capture chat like "My name is John")
         # Heuristic: If router says lead_capture AND query is short/entity-less, maybe skip RAG?
@@ -141,7 +144,9 @@ async def chat_endpoint(request: ChatRequest):
                     args = json.loads(tool_call.function.arguments)
                     logger.info(f"Tool Call 'save_lead' Args: {args}")
                     
+                    # Enhanced Lead extraction
                     lead = Lead(
+                        session_id=session_id,
                         name=args.get('name'),
                         phone=args.get('phone'),
                         interest_projects=args.get('interest_projects', '').split(',') if args.get('interest_projects') else [],
@@ -154,7 +159,7 @@ async def chat_endpoint(request: ChatRequest):
                         next_step=args.get('next_step'),
                         lead_summary=args.get('lead_summary'),
                         tags=args.get('tags', '').split(',') if args.get('tags') else [],
-                        session_id=session_id
+                        kb_version_hash=args.get('kb_version_hash', 'v1.0')
                     )
                     leads_service.save_lead(lead)
                     final_text = f"Thank you {lead.name}. Your details have been saved. A sales representative will contact you at {lead.phone} shortly."

@@ -10,6 +10,7 @@ services:
     volumes:
       - ./runtime:/code/runtime
       - ./engine-KB:/code/engine-KB
+      - ./app:/code/app
     env_file:
       - .env
 

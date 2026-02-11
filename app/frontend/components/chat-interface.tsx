@@ -230,6 +230,7 @@ export default function ChatInterface() {
                 <form onSubmit={(e) => e.preventDefault()} className="relative max-w-4xl mx-auto">
                     <div className="relative group">
                         <textarea
+                            id="chat-input"
                             value={input}
                             onChange={(e) => {
                                 setInput(e.target.value);
@@ -245,8 +246,7 @@ export default function ChatInterface() {
                                 }
                             }}
                             placeholder="Ask anything..."
-                            className="w-full pl-6 pr-14 py-5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-light text-gray-700 shadow-inner resize-none overflow-hidden"
-                            disabled={false}
+                            className="w-full pl-6 pr-14 py-5 bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-light text-gray-700 shadow-sm resize-none overflow-hidden"
                             rows={1}
                             style={{ minHeight: '3.5rem', maxHeight: '10rem' }}
                         />

@@ -82,14 +82,32 @@ class RAGService:
         # 3. Apply Filters
         filtered = []
         for c in candidates:
-            # Pilot Mode: Relaxed filtering. Let the LLM decide relevance from context.
-            # Only apply if strictly needed in future.
-            # p = c['project']
-            # if filters:
-            #     if filters.get('region') and filters['region'].lower() not in (p.region or '').lower():
-            #         continue
-            #     if filters.get('project_status') and filters['project_status'].lower() not in (p.project_status or '').lower():
-            #         continue
+            p = c['project']
+            if filters:
+                # Region Filter (Check both region and city_area)
+                if filters.get('region'):
+                    region_val = (p.region or '').lower()
+                    city_val = (p.city_area or '').lower()
+                    target_region = filters['region'].lower()
+                    if target_region not in region_val and target_region not in city_val and region_val not in target_region:
+                        continue
+                
+                # Project Type Filter
+                if filters.get('project_type'):
+                    p_type = (p.project_type or '').lower()
+                    target_type = filters['project_type'].lower()
+                    if target_type == 'commercial' and p_type != 'commercial':
+                        continue
+                    if target_type == 'residential' and p_type != 'residential':
+                        continue
+
+                # Project Status Filter
+                if filters.get('project_status'):
+                    status_val = (p.project_status or '').lower()
+                    target_status = filters['project_status'].lower()
+                    if target_status not in status_val:
+                        continue
+
             filtered.append(c)
 
         # Return top k

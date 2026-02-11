@@ -62,27 +62,39 @@ class LLMService:
             logger.error(f"Embedding failed: {e}")
             return [0.0] * 1536
 
-    def router_completion(self, user_message: str) -> RouterOutput:
+    def router_completion(self, user_message: str, history: List[Message] = []) -> RouterOutput:
         """
-        Determines user intent and extracts entities strictly.
+        Determines user intent and extracts entities strictly, using history for context.
         """
-        system_prompt = """
+        history_str = ""
+        if history:
+            history_str = "\n".join([f"{m.role}: {m.content}" for m in history])
+
+        system_prompt = f"""
         You are the Router for PalmX.
-        Classify user query.
+        Classify user intent and extract filters based on the conversation history and current message.
+
+        CONVERSATION HISTORY:
+        {history_str}
+
+        CURRENT MESSAGE:
+        {user_message}
         
         Intents:
-        - lead_capture: "i want to buy", "call me", "book visit", "price of unit", "interested". 
-          (Any intent to purchase or engage sales is lead_capture).
+        - lead_capture: intent to buy, book, price inquiry, or contact sales.
         - project_query: asking facts about project (location, amenities).
-        - list_projects: "show me villas".
+        - list_projects: "show me villas", "what commercial projects are there".
         - compare: "compare x and y".
         - pricing: "how much is..." (if not buying intent yet).
         - support_contact: "phone number", "complaint".
         
-        Output Strict JSON.
+        Output Strict JSON:
+        - intent: matches one of the above.
         - needs: list of fields user is asking for.
-        - filters: {project_type, project_status, region}.
-        - query_rewrite: clean, standalone search query.
+        - filters: {{project_type, project_status, region}}. 
+          (Maintain filters from history if not overridden. e.g. if user previously said 'commercial', project_type should be 'commercial').
+        - query_rewrite: clean, standalone search query that incorporates context from history if needed. 
+          (e.g. if history shows 'commercial properties' and current message is 'West Cairo', rewrite to 'commercial properties in West Cairo').
         """
         
         try:
@@ -90,7 +102,7 @@ class LLMService:
                 model=self.deployment,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_message}
+                    {"role": "user", "content": f"Contextualize: {user_message}"}
                 ],
                 temperature=0,
                 response_format={"type": "json_object"}
