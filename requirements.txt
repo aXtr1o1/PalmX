@@ -14,7 +14,7 @@ httpx==0.28.1
 idna==3.11
 jiter==0.13.0
 numpy==2.4.2
-openai==2.20.0
+openai>=1.0.0
 openpyxl==3.1.5
 packaging==26.0
 portalocker==3.2.0
