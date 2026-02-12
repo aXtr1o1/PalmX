@@ -784,22 +784,50 @@ export default function Dashboard() {
                                             nameKey="label"
                                             cx="50%"
                                             cy="50%"
-                                            outerRadius={90}
+                                            outerRadius={70}
                                             innerRadius={50}
-                                            strokeWidth={2}
+                                            strokeWidth={1}
                                             stroke="#fff"
+                                            paddingAngle={2}
+                                            labelLine={{ stroke: "#E9E9E9", strokeWidth: 1 }}
+                                            label={({
+                                                cx,
+                                                cy,
+                                                midAngle = 0,
+                                                innerRadius,
+                                                outerRadius,
+                                                percent,
+                                                index,
+                                                name,
+                                                value,
+                                            }) => {
+                                                const RADIAN = Math.PI / 180;
+                                                const radius = outerRadius * 1.35;
+                                                const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                                const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                                                const color = CHART_ACCENT[index % CHART_ACCENT.length];
+
+                                                return (
+                                                    <text
+                                                        x={x}
+                                                        y={y}
+                                                        fill={color}
+                                                        textAnchor={x > cx ? "start" : "end"}
+                                                        dominantBaseline="central"
+                                                        className="text-[10px] font-bold uppercase tracking-wider"
+                                                    >
+                                                        {`${name} ${value}`}
+                                                    </text>
+                                                );
+                                            }}
                                         >
                                             {analytics.breakdowns.by_unit_type.map((_, i) => (
-                                                <Cell key={i} fill={CHART_ACCENT[i % CHART_ACCENT.length]} />
+                                                <Cell
+                                                    key={i}
+                                                    fill={CHART_ACCENT[i % CHART_ACCENT.length]}
+                                                />
                                             ))}
                                         </Pie>
-                                        <Tooltip
-                                            contentStyle={{
-                                                fontSize: 12,
-                                                borderRadius: 12,
-                                                border: "1px solid #E9E9E9",
-                                            }}
-                                        />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </ChartCard>
