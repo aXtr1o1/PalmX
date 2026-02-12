@@ -19,6 +19,7 @@ openpyxl==3.1.5
 packaging==26.0
 portalocker==3.2.0
 pydantic==2.12.5
+pandas
 pydantic_core==2.41.5
 python-dotenv==1.2.1
 RapidFuzz==3.14.3
