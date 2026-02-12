@@ -162,9 +162,9 @@ export default function ChatInterface() {
                         onClick={() => setMenuOpen(true)}
                         className="group flex flex-col gap-1.5 w-8 hover:opacity-70 transition-opacity p-2 -ml-2"
                     >
-                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
-                        <span className="w-5 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
-                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-[#D22048] transition-colors"></span>
+                        <span className="w-5 h-0.5 bg-black group-hover:bg-[#D22048] transition-colors"></span>
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-[#D22048] transition-colors"></span>
                     </button>
                     {/* Search Bar Removed as per user request (useless) */}
                 </div>
@@ -175,22 +175,29 @@ export default function ChatInterface() {
                         <Image
                             src="/brand/PalmHills-Logo.png"
                             alt="Palm Hills"
-                            width={160}
-                            height={42}
+                            width={200}
+                            height={52}
                             className="object-contain mb-1"
                         />
-                        <span className="text-[9px] uppercase tracking-[0.3em] text-[#5A5A5A] font-medium">PALMX AI</span>
+                        <span className="text-[10px] uppercase tracking-[0.3em] text-[#D22048] font-bold">PALM AI</span>
                     </div>
                 </div>
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-8">
-                    <span className="hidden md:block font-sans text-xs font-bold tracking-widest text-black">19743</span>
+                    <span className="hidden md:block font-sans text-sm font-bold tracking-widest text-black">19743</span>
                     <span className="hidden md:block w-px h-4 bg-gray-200"></span>
                     <span className="hidden md:block font-sans text-xs font-bold text-muted cursor-pointer hover:text-black tracking-widest">عربي</span>
-                    <button className="hidden lg:flex bg-black text-white px-8 py-3 rounded-full text-[10px] font-bold tracking-[0.2em] hover:bg-primary hover:scale-105 transition-all uppercase shadow-lg shadow-black/5">
-                        Request Sales Call
-                    </button>
+                    <div className="hidden lg:flex">
+                        <a
+                            href="https://www.palmhillsdevelopments.com/en-us/interestedIn"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-black text-white px-8 py-3 rounded-full text-[11px] font-bold tracking-[0.2em] hover:bg-[#D22048] hover:scale-105 transition-all uppercase shadow-lg shadow-black/5"
+                        >
+                            Request a Sales Call
+                        </a>
+                    </div>
                 </div>
             </header>
 
@@ -226,6 +233,7 @@ export default function ChatInterface() {
                     {/* Left Column: Navigation */}
                     <div className="flex-1 flex flex-col justify-center space-y-8 md:border-r border-white/10 md:pr-12">
                         <nav className="flex flex-col space-y-6">
+                            <h4 className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/40 mb-2">System Routes</h4>
                             {[
                                 { label: 'Concierge', href: '/' },
                                 { label: 'Dashboard', href: '/dashboard' },
@@ -309,6 +317,9 @@ export default function ChatInterface() {
                         )}>
                             <p className="text-[10px] uppercase tracking-[0.25em] text-white/40">
                                 Crafted by <a href="https://cloudgate.ae/" target="_blank" className="text-white hover:text-primary transition-colors border-b border-white/20 pb-0.5 hover:border-primary">CloudGate</a>
+                            </p>
+                            <p className="text-[10px] uppercase tracking-[0.25em] text-white/60 mt-1">
+                                CTA <span className="text-white">(091) 99945 66311</span>
                             </p>
                             <p className="text-[10px] uppercase tracking-[0.25em] text-white/20">
                                 © {new Date().getFullYear()} Palm Hills Developments.
@@ -488,8 +499,8 @@ export default function ChatInterface() {
                                 }
                             }}
                             autoComplete="off"
-                            placeholder={mode === 'concierge' ? "Start typing..." : "Please enter your details..."}
-                            className="w-full pl-5 pr-12 py-3.5 bg-[#F3F4F6] border-0 focus:ring-1 focus:ring-gray-200 rounded-[24px] focus:outline-none transition-all font-sans text-[15px] text-[#0B0B0B] placeholder:text-gray-400 resize-none overflow-hidden min-h-[52px] max-h-[160px] leading-relaxed"
+                            placeholder={mode === 'concierge' ? "The journey to your dream starts here..." : "Please enter your details..."}
+                            className="w-full pl-5 pr-14 py-3.5 bg-[#F3F4F6] border-0 focus:ring-1 focus:ring-gray-200 rounded-[24px] focus:outline-none transition-all font-sans text-[15px] text-[#0B0B0B] placeholder:text-gray-400 resize-none overflow-hidden min-h-[52px] max-h-[160px] leading-relaxed"
                             rows={1}
                             style={{ height: 'auto', minHeight: '52px' }}
                             onInput={(e) => {
@@ -498,19 +509,19 @@ export default function ChatInterface() {
                                 target.style.height = `${Math.min(target.scrollHeight, 160)}px`;
                             }}
                         />
-                        <div className="absolute right-2 bottom-2">
+                        <div className="absolute right-2 bottom-[6px]">
                             <button
                                 type="button"
                                 onClick={(e) => handleSubmit(e)}
                                 disabled={!input.trim() || loading}
                                 className={cn(
-                                    "w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 shadow-sm",
+                                    "w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 shadow-sm",
                                     input.trim() && !loading
                                         ? "bg-[#0B0B0B] text-white hover:bg-[#D22048] hover:scale-105 active:scale-95"
                                         : "bg-gray-200 text-gray-400 cursor-not-allowed"
                                 )}
                             >
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={16} />}
+                                {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={18} />}
                             </button>
                         </div>
                     </div>
