@@ -1,7 +1,7 @@
 import requests
 import json
 
-base_url = "http://localhost:8000"
+base_url = "http://20.224.153.225:8000"
 session_id = "test_sess_mapping"
 
 messages = [
