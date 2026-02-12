@@ -184,22 +184,18 @@ export default function ChatInterface() {
                 </div>
 
                 {/* Right: Actions */}
-                <div className="flex items-center gap-4 md:gap-8">
-                    <span className="hidden md:block font-sans text-lg font-medium tracking-tight text-[#0B0B0B]">19743</span>
+                <div className="flex items-center gap-8">
+                    <span className="hidden md:block font-arge text-sm font-bold tracking-widest text-black">19743</span>
                     <span className="hidden md:block w-px h-4 bg-gray-200"></span>
                     <span className="hidden md:block font-sans text-xs font-bold text-muted cursor-pointer hover:text-black tracking-widest">عربي</span>
-                    <span className="hidden md:block text-[#0B0B0B] text-[8px] opacity-30">◆</span>
-                    <div className="hidden lg:flex items-center">
+                    <div className="hidden lg:flex">
                         <a
                             href="https://www.palmhillsdevelopments.com/en-us/interestedIn"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-3 text-black hover:text-[#D22048] transition-all group"
+                            className="bg-black text-white px-8 py-3 rounded-full text-[11px] font-bold tracking-[0.2em] font-arge hover:bg-[#D22048] hover:scale-105 transition-all uppercase shadow-lg shadow-black/5"
                         >
-                            <div className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-[#D22048] transition-colors">
-                                <div className="w-2 h-2 rounded-full bg-black group-hover:bg-[#D22048]"></div>
-                            </div>
-                            <span className="text-[11px] font-black tracking-[0.25em] uppercase">Request a Sales Call</span>
+                            Request a Sales Call
                         </a>
                     </div>
                 </div>

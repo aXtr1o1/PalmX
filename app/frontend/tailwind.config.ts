@@ -33,6 +33,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-sans)", "sans-serif"], // Inter acting as Helvetica proxy
         serif: ["var(--font-serif)", "serif"],     // Playfair for headings if needed, or remove if strict sans
+        arge: ["arGE", "sans-serif"],
       },
       container: {
         center: true,
