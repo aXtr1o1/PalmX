@@ -6,6 +6,7 @@ from typing import Optional, List, Dict, Any
 import json
 import logging
 import os
+from datetime import datetime
 
 from app.backend.config import Config
 from app.backend.models import ChatRequest, ChatResponse, Lead, Message
@@ -37,6 +38,12 @@ CONCIERGE_SYSTEM_PROMPT = """
 You are PalmX Concierge, the Senior Sales Executive for Palm Hills.
 Your goal is to convert inquiries into site visits or calls by being intelligent, human, and persuasive.
 You are NOT a support bot. You are a "closer" with a discreet, luxurious, and sharp commercial brain.
+
+### 8. Temporal Logic (STRICT)
+- **TODAY IS**: {current_date}.
+- **Year Inference**: If the user mentions a month (e.g., "March") or a relative time (e.g., "this month", "next month"), you MUST calculate the year relative to TODAY.
+- **2024 REGRESSION PREVENTION**: Never output "2024" for future timelines. If it is currently February 2026, then "March" refers to March 2026.
+- **Format**: In the confirmation summary (Stage 6), you MUST always explicitly include the year in the Timeline field (e.g., "Timeline: March 2026").
 
 ### 1. The Core Objective
 - **Qualify** in ≤ 60 seconds (Need, Budget, Timeline).
@@ -78,7 +85,7 @@ You are NOT a support bot. You are a "closer" with a discreet, luxurious, and sh
   - **Name**: [Name]
   - **Interest**: [Project/Type] 
   - **Budget**: [Range] (If user gave USD/AED, show EGP equivalent here)
-  - **Timeline**: [Date]
+  - **Timeline**: [Date] (Always include year, e.g., March 2026)
   - **Phone**: [Number]
   Is this correct?"
 - **Action**: Only call `save_lead` tool AFTER they say "Yes".
@@ -160,13 +167,12 @@ async def chat_endpoint(request: ChatRequest):
         user_msg = request.messages[-1].content
         session_id = request.session_id
         
-        # 1. Router (Lightweight check for RAG need)
-        # Pass history (everything except the latest user message) to the router for context
+        # 1. Router
         history = request.messages[:-1]
         router_out = llm_service.router_completion(user_msg, history=history)
         logger.info(f"Router intent: {router_out.intent} | Filters: {router_out.filters}")
 
-        # 2. Retrieval (Skip for lead_capture — user is giving name/phone, no need to search 45 projects)
+        # 2. Retrieval
         retrieved_docs = []
         if router_out.intent not in ("support_contact", "lead_capture"):
             results = rag_service.search(
@@ -181,25 +187,25 @@ async def chat_endpoint(request: ChatRequest):
         for p in retrieved_docs:
             context_text += f"---\n{kb_service.build_project_card(p)}\n"
             
-        full_system_msg = f"{CONCIERGE_SYSTEM_PROMPT}\n\nCONTEXT:\n{context_text}"
+        current_date = datetime.now().strftime("%B %d, %Y")
+        full_system_msg = CONCIERGE_SYSTEM_PROMPT.format(current_date=current_date) + f"\n\nCONTEXT:\n{context_text}"
         
-        # 4. Answer Generation (Pass Full History + Tools)
+        # 4. Answer Generation
         response_data = llm_service.answer_completion(
             full_system_msg, 
-            request.messages, # Pass full history
+            request.messages,
             tools=TOOLS
         )
         
         final_text = ""
         
         # 5. Handle Tool Calls
-        if isinstance(response_data, list): # List of tool calls
+        if isinstance(response_data, list):
             for tool_call in response_data:
                 if tool_call.function.name == "save_lead":
                     args = json.loads(tool_call.function.arguments)
                     logger.info(f"Tool Call 'save_lead' Args: {args}")
                     
-                    # Enhanced Lead extraction
                     lead = Lead(
                         session_id=session_id,
                         name=args.get('name'),
@@ -238,7 +244,6 @@ async def chat_endpoint(request: ChatRequest):
 
     except Exception as e:
         logger.error(f"Chat error: {e}")
-        # Return fallback friendly message
         return ChatResponse(
             message="I apologize, but I'm encountering a temporary issue. Please try again.",
             retrieved_projects=[],
@@ -247,7 +252,6 @@ async def chat_endpoint(request: ChatRequest):
 
 @app.post("/api/chat/stream")
 async def chat_stream_endpoint(request: ChatRequest):
-    """Streaming chat endpoint — tokens arrive word-by-word for instant feel."""
     try:
         user_msg = request.messages[-1].content
         session_id = request.session_id
@@ -257,7 +261,7 @@ async def chat_stream_endpoint(request: ChatRequest):
         router_out = llm_service.router_completion(user_msg, history=history)
         logger.info(f"[Stream] Router intent: {router_out.intent}")
 
-        # 2. Retrieval (skip for lead_capture)
+        # 2. Retrieval
         retrieved_docs = []
         if router_out.intent not in ("support_contact", "lead_capture"):
             results = rag_service.search(
@@ -269,7 +273,9 @@ async def chat_stream_endpoint(request: ChatRequest):
         context_text = ""
         for p in retrieved_docs:
             context_text += f"---\n{kb_service.build_project_card(p)}\n"
-        full_system_msg = f"{CONCIERGE_SYSTEM_PROMPT}\n\nCONTEXT:\n{context_text}"
+        
+        current_date = datetime.now().strftime("%B %d, %Y")
+        full_system_msg = CONCIERGE_SYSTEM_PROMPT.format(current_date=current_date) + f"\n\nCONTEXT:\n{context_text}"
 
         # 4. Stream tokens
         def generate():
@@ -277,7 +283,6 @@ async def chat_stream_endpoint(request: ChatRequest):
             for chunk in llm_service.stream_answer_completion(
                 full_system_msg, request.messages, tools=TOOLS
             ):
-                # Check if this is a tool call marker
                 if "__TOOL_CALLS__" in chunk:
                     tc_json = chunk.split("__TOOL_CALLS__")[1]
                     tool_calls = json.loads(tc_json)
@@ -307,10 +312,8 @@ async def chat_stream_endpoint(request: ChatRequest):
                     full_response += chunk
                     yield f"data: {json.dumps({'token': chunk})}\n\n"
             
-            # Final event
             yield f"data: {json.dumps({'done': True, 'retrieved_projects': [p.project_name for p in retrieved_docs], 'mode': 'lead_capture' if router_out.intent == 'lead_capture' else 'concierge'})}\n\n"
             
-            # Audit (after stream completes)
             leads_service.log_audit(
                 session_id, user_msg, router_out.intent,
                 [p.project_id for p in retrieved_docs], []

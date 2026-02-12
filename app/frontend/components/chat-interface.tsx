@@ -179,7 +179,7 @@ export default function ChatInterface() {
                             height={62}
                             className="object-contain mb-1"
                         />
-                        <span className="text-[10px] uppercase tracking-[0.3em] text-[#D22048] font-bold">PALM AI</span>
+                        <span className="text-[10px] uppercase tracking-[0.3em] text-[#D22048] font-bold">PALMX AI</span>
                     </div>
                 </div>
 
