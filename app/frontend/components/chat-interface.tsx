@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { Send, MapPin, Building2, User, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { api, ChatMessage, Lead } from "@/lib/api";
@@ -125,20 +127,22 @@ export default function ChatInterface() {
 
     if (!systemReady) {
         return (
-            <div className="flex flex-col h-[85vh] w-full max-w-5xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100 flex-1 relative items-center justify-center">
-                <div className="flex flex-col items-center space-y-6 max-w-sm w-full p-8">
-                    <div className="relative">
-                        <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center text-white font-serif font-bold text-2xl ring-4 ring-white/10 stamp-effect shadow-xl">
-                            PH
-                        </div>
-                    </div>
+            <div className="flex flex-col h-screen w-full bg-white relative items-center justify-center">
+                <div className="flex flex-col items-center space-y-8 max-w-sm w-full p-8">
+                    <Image
+                        src="/brand/palmHills-BlockLogo.png"
+                        alt="Palm Hills"
+                        width={80}
+                        height={80}
+                        className="opacity-80"
+                    />
                     <div className="text-center space-y-2">
-                        <h2 className="font-serif text-2xl text-secondary">Initalizing PalmX</h2>
-                        <p className="text-sm text-gray-400">Loading verified market data...</p>
+                        <h2 className="font-serif text-2xl text-[#0B0B0B] tracking-tight">Initializing PalmX</h2>
+                        <p className="text-sm text-[#5A5A5A] font-light">Loading verified market data...</p>
                     </div>
-                    <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="w-full h-1 bg-[#E9E9E9] rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-primary transition-all duration-500 ease-out"
+                            className="h-full bg-[#D22048] transition-all duration-500 ease-out rounded-full"
                             style={{ width: `${bootProgress}%` }}
                         />
                     </div>
@@ -166,14 +170,16 @@ export default function ChatInterface() {
                 </div>
 
                 {/* Center: Logo */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mt-1">
                     <div className="flex flex-col items-center">
-                        <span className="font-serif text-2xl tracking-[0.25em] font-bold text-black border-b-2 border-transparent pb-1">PALM HILLS</span>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="h-px w-4 bg-accent"></span>
-                            <span className="text-[10px] uppercase tracking-[0.3em] text-accent font-medium">PalmX AI</span>
-                            <span className="h-px w-4 bg-accent"></span>
-                        </div>
+                        <Image
+                            src="/brand/PalmHills-Logo.png"
+                            alt="Palm Hills"
+                            width={160}
+                            height={42}
+                            className="object-contain mb-1"
+                        />
+                        <span className="text-[9px] uppercase tracking-[0.3em] text-[#5A5A5A] font-medium">PALMX AI</span>
                     </div>
                 </div>
 
@@ -195,7 +201,7 @@ export default function ChatInterface() {
             )}>
                 {/* Close Button */}
                 <div className="absolute top-6 right-6 md:top-8 md:right-12 z-[110]">
-                    <button onClick={() => setMenuOpen(false)} className="text-white hover:text-primary transition-colors p-4 group bg-white/5 rounded-full backdrop-blur-sm border border-white/10">
+                    <button onClick={() => setMenuOpen(false)} className="text-white hover:text-primary transition-colors p-2 group">
                         <span className="sr-only">Close</span>
                         <div className="relative w-6 h-6 flex items-center justify-center">
                             <span className="absolute w-6 h-0.5 bg-current rotate-45 transform origin-center transition-transform duration-300 group-hover:rotate-90"></span>
@@ -205,7 +211,10 @@ export default function ChatInterface() {
                 </div>
 
                 {/* Palm Hills Logo in Overlay */}
-                <div className="absolute top-8 left-8 md:left-12 z-[110] opacity-0 animate-in fade-in slide-in-from-top-4 duration-1000 fill-mode-forwards" style={{ animationDelay: '200ms' }}>
+                <div className={cn(
+                    "absolute top-8 left-8 md:left-12 z-[110] transition-all duration-1000 delay-200",
+                    menuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+                )}>
                     <div className="flex flex-col">
                         <span className="font-serif text-2xl tracking-[0.2em] font-bold text-white">PALM HILLS</span>
                         <span className="text-[9px] uppercase tracking-[0.4em] text-primary/80 font-medium mt-1">Developments</span>
@@ -217,34 +226,56 @@ export default function ChatInterface() {
                     {/* Left Column: Navigation */}
                     <div className="flex-1 flex flex-col justify-center space-y-8 md:border-r border-white/10 md:pr-12">
                         <nav className="flex flex-col space-y-6">
-                            {['Residential', 'Commercial', 'Resorts', 'About Us', 'Concierge'].map((item, i) => (
-                                <a
-                                    key={item}
-                                    href="#"
-                                    className="font-serif text-4xl md:text-6xl text-white/90 hover:text-primary transition-all duration-300 transform hover:translate-x-4 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards"
-                                    style={{ animationDelay: `${150 + (i * 100)}ms` }}
+                            {[
+                                { label: 'Concierge', href: '/' },
+                                { label: 'Dashboard', href: '/dashboard' },
+                                { label: 'Data Sources', href: '/data-sources' },
+                            ].map((item, i) => (
+                                <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    onClick={() => setMenuOpen(false)}
+                                    className={cn(
+                                        "font-serif text-4xl md:text-6xl text-white/90 hover:text-primary transition-all duration-500 transform hover:translate-x-4",
+                                        menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                                    )}
+                                    style={{ transitionDelay: `${150 + (i * 100)}ms` }}
                                 >
-                                    {item}
-                                </a>
+                                    {item.label}
+                                </Link>
                             ))}
 
                             <div className="pt-8 mt-4 border-t border-white/10 w-24"></div>
 
-                            <a
-                                href="/data-sources"
-                                className="font-serif text-xl md:text-2xl text-white/60 hover:text-white transition-all duration-300 transform hover:translate-x-2 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards flex items-center gap-3 group"
-                                style={{ animationDelay: '600ms' }}
-                            >
-                                <span className="w-2 h-2 rounded-full bg-primary group-hover:scale-150 transition-transform"></span>
-                                Verified Data Base
-                            </a>
+                            <div className={cn(
+                                "space-y-5 transition-all duration-700 delay-[450ms]",
+                                menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                            )}>
+                                <h4 className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/60">POC Scope</h4>
+                                <ul className="space-y-3">
+                                    {[
+                                        'AI concierge trained on verified Palm Hills portfolio',
+                                        'Lead capture with structured buyer-intent data',
+                                        'Real-time analytics dashboard with export',
+                                        'RAG-powered retrieval from official listings',
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-start gap-3">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-primary/60 mt-2 flex-shrink-0" />
+                                            <span className="text-sm font-light text-white/50">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </nav>
                     </div>
 
                     {/* Right Column: Information & Disclaimer */}
                     <div className="flex-1 flex flex-col justify-center md:pl-16 space-y-12 text-white/80 mt-12 md:mt-0">
 
-                        <div className="space-y-6 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '600ms' }}>
+                        <div className={cn(
+                            "space-y-6 transition-all duration-700 delay-[600ms]",
+                            menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                        )}>
                             <div className="w-12 h-1 bg-primary mb-6"></div>
                             <h3 className="text-xs font-bold tracking-[0.4em] uppercase text-white mb-2">The Concierge System</h3>
                             <p className="font-light leading-relaxed text-lg max-w-md text-white/70">
@@ -252,7 +283,10 @@ export default function ChatInterface() {
                             </p>
                         </div>
 
-                        <div className="space-y-6 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '700ms' }}>
+                        <div className={cn(
+                            "space-y-6 transition-all duration-700 delay-[700ms]",
+                            menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                        )}>
                             <div className="grid grid-cols-2 gap-8">
                                 <div>
                                     <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-2">Data Integrity</h4>
@@ -269,7 +303,10 @@ export default function ChatInterface() {
                             </div>
                         </div>
 
-                        <div className="pt-12 border-t border-white/10 flex flex-col gap-2 opacity-0 animate-in fade-in slide-in-from-bottom-8 fill-mode-forwards" style={{ animationDelay: '800ms' }}>
+                        <div className={cn(
+                            "pt-12 border-t border-white/10 flex flex-col gap-2 transition-all duration-700 delay-[800ms]",
+                            menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                        )}>
                             <p className="text-[10px] uppercase tracking-[0.25em] text-white/40">
                                 Crafted by <a href="https://cloudgate.ae/" target="_blank" className="text-white hover:text-primary transition-colors border-b border-white/20 pb-0.5 hover:border-primary">CloudGate</a>
                             </p>
@@ -298,8 +335,14 @@ export default function ChatInterface() {
                     {messages.length === 0 && (
                         <div className="flex flex-col items-center justify-center h-[70vh] space-y-12 opacity-0 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
                             {/* Premium Brand Glyph */}
-                            <div className="w-24 h-24 rounded-full border border-gray-100 flex items-center justify-center mb-4 bg-white shadow-xl shadow-gray-100/50">
-                                <span className="font-serif text-3xl text-black">PH</span>
+                            <div className="w-24 h-24 rounded-full border border-gray-100 flex items-center justify-center mb-4 bg-white shadow-xl shadow-gray-100/50 overflow-hidden p-4">
+                                <Image
+                                    src="/brand/palmHills-BlockLogo.png"
+                                    alt="PalmX"
+                                    width={80}
+                                    height={80}
+                                    className="object-contain"
+                                />
                             </div>
 
                             <div className="text-center max-w-2xl space-y-6">
@@ -334,15 +377,21 @@ export default function ChatInterface() {
                         <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} group max-w-5xl mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-500`}>
 
                             {m.role === 'assistant' && (
-                                <div className="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center text-black text-[10px] font-serif mr-4 mt-1 border border-gray-100 shadow-sm">
-                                    PH
+                                <div className="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center mr-4 mt-1 border border-gray-100 shadow-sm overflow-hidden p-1.5">
+                                    <Image
+                                        src="/brand/palmHills-BlockLogo.png"
+                                        alt="PalmX"
+                                        width={40}
+                                        height={40}
+                                        className="object-contain opacity-90"
+                                    />
                                 </div>
                             )}
 
                             <div className={cn(
                                 "max-w-[85%] md:max-w-[70%] px-8 py-6 text-base leading-7 relative shadow-sm",
                                 m.role === 'user'
-                                    ? "bg-charcoal text-white rounded-3xl rounded-tr-sm"
+                                    ? "bg-[#D22048] text-white rounded-3xl rounded-tr-sm"
                                     : "bg-white text-gray-800 border border-gray-50 rounded-3xl rounded-tl-sm shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)]"
                             )}>
                                 {m.role === 'user' ? (
@@ -351,8 +400,17 @@ export default function ChatInterface() {
                                     <div className="font-light tracking-wide text-[15px]">
                                         <ReactMarkdown
                                             components={{
+                                                h1: ({ node, ...props }: any) => (
+                                                    <h1 className="font-serif text-3xl text-[#5A5A5A] mt-8 mb-4 tracking-wide" {...props} />
+                                                ),
+                                                h2: ({ node, ...props }: any) => (
+                                                    <h2 className="font-serif text-2xl text-[#5A5A5A] mt-8 mb-4 tracking-wide" {...props} />
+                                                ),
                                                 h3: ({ node, ...props }: any) => (
-                                                    <h3 className="font-serif text-xl text-black mt-8 mb-4 tracking-wide border-b border-gray-100 pb-2" {...props} />
+                                                    <h3 className="font-serif text-xl text-[#5A5A5A] mt-8 mb-4 tracking-wide border-b border-gray-100 pb-2" {...props} />
+                                                ),
+                                                h4: ({ node, ...props }: any) => (
+                                                    <h4 className="font-serif text-lg text-[#5A5A5A] mt-6 mb-3 tracking-wide" {...props} />
                                                 ),
                                                 p: ({ node, ...props }: any) => (
                                                     <p className="leading-7 mb-4 last:mb-0 text-gray-600" {...props} />
@@ -367,7 +425,7 @@ export default function ChatInterface() {
                                                     </li>
                                                 ),
                                                 strong: ({ node, ...props }: any) => (
-                                                    <strong className="font-semibold text-black" {...props} />
+                                                    <strong className="font-semibold text-[#D22048]" {...props} />
                                                 ),
                                                 a: ({ node, ...props }: any) => (
                                                     <a className="text-accent hover:text-black border-b border-accent/20 hover:border-black transition-all pb-0.5 font-medium" {...props} target="_blank" rel="noopener noreferrer" />
@@ -390,7 +448,15 @@ export default function ChatInterface() {
                     {/* Loading Indicator */}
                     {loading && (
                         <div className="flex justify-start max-w-5xl mx-auto w-full">
-                            <div className="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center text-black text-[10px] font-serif mr-4 mt-1 border border-gray-100">PH</div>
+                            <div className="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center mr-4 mt-1 border border-gray-100 overflow-hidden p-1.5">
+                                <Image
+                                    src="/brand/palmHills-BlockLogo.png"
+                                    alt="PalmX"
+                                    width={40}
+                                    height={40}
+                                    className="object-contain opacity-90"
+                                />
+                            </div>
                             <div className="bg-white px-8 py-5 rounded-3xl rounded-tl-sm flex items-center space-x-3 shadow-sm border border-gray-50">
                                 <span className="text-xs uppercase tracking-widest text-gray-400 mr-2">Concierge Thinking</span>
                                 <div className="flex space-x-1">
@@ -413,13 +479,27 @@ export default function ChatInterface() {
                         <div className="absolute top-1/2 -translate-y-1/2 left-4 text-xs font-bold tracking-widest text-accent uppercase pointer-events-none">
                             {mode === 'concierge' ? 'Concierge' : 'Assistance'}
                         </div>
-                        <input
+
+                        <textarea
                             id="chat-input"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSubmit(e);
+                                }
+                            }}
                             autoComplete="off"
                             placeholder={mode === 'concierge' ? "Ask about availability and prices..." : "Please enter your details..."}
-                            className="w-full pl-32 pr-12 py-4 bg-surface border border-transparent focus:border-gray-200 rounded-full focus:ring-0 focus:outline-none transition-all font-sans text-charcoal placeholder:text-muted/50 shadow-sm"
+                            className="w-full pl-32 pr-12 py-4 bg-surface border border-transparent focus:border-gray-200 rounded-2xl focus:ring-0 focus:outline-none transition-all font-sans text-charcoal placeholder:text-muted/50 shadow-sm resize-none overflow-hidden min-h-[56px] max-h-[200px]"
+                            rows={1}
+                            style={{ height: 'auto', minHeight: '56px' }}
+                            onInput={(e) => {
+                                const target = e.target as HTMLTextAreaElement;
+                                target.style.height = 'auto';
+                                target.style.height = `${Math.min(target.scrollHeight, 200)}px`;
+                            }}
                         />
                         <button
                             type="button"
@@ -436,7 +516,7 @@ export default function ChatInterface() {
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

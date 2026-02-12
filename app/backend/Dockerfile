@@ -9,7 +9,7 @@ WORKDIR /code
 
 # Install python dependencies
 RUN pip install --no-cache-dir \
-    fastapi uvicorn openai azure-identity faiss-cpu rapidfuzz portalocker openpyxl python-dotenv
+    fastapi uvicorn openai azure-identity faiss-cpu rapidfuzz portalocker openpyxl python-dotenv pandas
 
 # Copy application code
 COPY app /code/app

@@ -1,8 +1,12 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Load .env from repo root
 load_dotenv()
+
+# Import runtime resolver for robust path resolution
+from app.backend.runtime_resolver import get_runtime_dir
 
 class Config:
     # Azure OpenAI
@@ -17,14 +21,18 @@ class Config:
     OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
     OPENAI_EMBED_MODEL = os.getenv("OPENAI_EMBED_MODEL", "text-embedding-3-small")
 
-    # Paths
-    BASE_DIR = os.getcwd()
-    KB_CSV_PATH = os.path.join(BASE_DIR, os.getenv("KB_CSV_PATH", "engine-KB/PalmX-buyerKB.csv"))
-    RUNTIME_DIR = os.path.join(BASE_DIR, os.getenv("RUNTIME_DIR", "runtime"))
-    INDEX_PATH = os.path.join(RUNTIME_DIR, "index/faiss.index")
-    META_PATH = os.path.join(RUNTIME_DIR, "index/meta.json")
-    LEADS_PATH = os.path.join(RUNTIME_DIR, "leads/leads.csv")
-    AUDIT_PATH = os.path.join(RUNTIME_DIR, "leads/audit.csv")
+    # Paths — use runtime_resolver for robust path resolution
+    _runtime = get_runtime_dir()
+    RUNTIME_DIR = str(_runtime)
+
+    # KB path: resolve relative to repo root (parent of runtime/)
+    _repo_root = _runtime.parent
+    KB_CSV_PATH = str(_repo_root / os.getenv("KB_CSV_PATH", "engine-KB/PalmX-buyerKB.csv"))
+
+    INDEX_PATH = str(_runtime / "index" / "faiss.index")
+    META_PATH = str(_runtime / "index" / "meta.json")
+    LEADS_PATH = str(_runtime / "leads" / "leads.csv")
+    AUDIT_PATH = str(_runtime / "leads" / "audit.csv")
 
     # Admin
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")
@@ -32,4 +40,4 @@ class Config:
     # Ensure runtime dirs exist
     os.makedirs(os.path.dirname(INDEX_PATH), exist_ok=True)
     os.makedirs(os.path.dirname(LEADS_PATH), exist_ok=True)
-    os.makedirs(os.path.join(RUNTIME_DIR, "exports"), exist_ok=True)
+    os.makedirs(str(_runtime / "exports"), exist_ok=True)
