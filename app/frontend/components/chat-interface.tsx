@@ -473,13 +473,10 @@ export default function ChatInterface() {
             </div>
 
             {/* Input Area */}
-            <div className="bg-white/90 backdrop-blur-md p-6 border-t border-gray-100 z-20">
-                <form onSubmit={(e) => e.preventDefault()} className="relative max-w-3xl mx-auto">
-                    <div className="relative group">
-                        <div className="absolute top-1/2 -translate-y-1/2 left-4 text-xs font-bold tracking-widest text-accent uppercase pointer-events-none">
-                            {mode === 'concierge' ? 'Concierge' : 'Assistance'}
-                        </div>
-
+            <div className="bg-white/95 backdrop-blur-md p-4 md:p-6 border-t border-gray-100 z-20 pb-safe">
+                <form onSubmit={(e) => e.preventDefault()} className="relative max-w-3xl mx-auto flex gap-3 items-end">
+                    <div className="relative flex-1 group">
+                        {/* Force Rebuild Trigger */}
                         <textarea
                             id="chat-input"
                             value={input}
@@ -491,32 +488,34 @@ export default function ChatInterface() {
                                 }
                             }}
                             autoComplete="off"
-                            placeholder={mode === 'concierge' ? "Ask about availability and prices..." : "Please enter your details..."}
-                            className="w-full pl-32 pr-12 py-4 bg-surface border border-transparent focus:border-gray-200 rounded-2xl focus:ring-0 focus:outline-none transition-all font-sans text-charcoal placeholder:text-muted/50 shadow-sm resize-none overflow-hidden min-h-[56px] max-h-[200px]"
+                            placeholder={mode === 'concierge' ? "Start typing..." : "Please enter your details..."}
+                            className="w-full pl-5 pr-12 py-3.5 bg-[#F3F4F6] border-0 focus:ring-1 focus:ring-gray-200 rounded-[24px] focus:outline-none transition-all font-sans text-[15px] text-[#0B0B0B] placeholder:text-gray-400 resize-none overflow-hidden min-h-[52px] max-h-[160px] leading-relaxed"
                             rows={1}
-                            style={{ height: 'auto', minHeight: '56px' }}
+                            style={{ height: 'auto', minHeight: '52px' }}
                             onInput={(e) => {
                                 const target = e.target as HTMLTextAreaElement;
                                 target.style.height = 'auto';
-                                target.style.height = `${Math.min(target.scrollHeight, 200)}px`;
+                                target.style.height = `${Math.min(target.scrollHeight, 160)}px`;
                             }}
                         />
-                        <button
-                            type="button"
-                            onClick={(e) => handleSubmit(e)}
-                            disabled={!input.trim() || loading}
-                            className={cn(
-                                "absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all",
-                                input.trim() && !loading
-                                    ? "bg-black text-white hover:bg-primary"
-                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            )}
-                        >
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-                        </button>
+                        <div className="absolute right-2 bottom-2">
+                            <button
+                                type="button"
+                                onClick={(e) => handleSubmit(e)}
+                                disabled={!input.trim() || loading}
+                                className={cn(
+                                    "w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 shadow-sm",
+                                    input.trim() && !loading
+                                        ? "bg-[#0B0B0B] text-white hover:bg-[#D22048] hover:scale-105 active:scale-95"
+                                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                )}
+                            >
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={16} />}
+                            </button>
+                        </div>
                     </div>
                 </form>
-            </div >
+            </div>
         </div >
     );
 }
