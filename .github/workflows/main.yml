@@ -15,7 +15,7 @@ jobs:
 
       - name: Copy project to production folder
         run: |
-          rsync -av --delete ./ /var/app/PalmX/
+          rsync -av --delete --exclude '.env' ./ /var/app/PalmX/
 
       - name: Install dependencies
         run: |

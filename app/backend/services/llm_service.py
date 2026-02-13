@@ -70,8 +70,11 @@ class LLMService:
         if history is not None and len(history) > 0:
             history_str = "\n".join([f"{m.role}: {m.content}" for m in history])
 
+        from datetime import datetime
+        current_date = datetime.now().strftime("%B %d, %Y")
         system_prompt = f"""
         You are the Router for PalmX.
+        TODAY IS {current_date}.
         Classify user intent and extract filters based on the conversation history and current message.
 
         CONVERSATION HISTORY:

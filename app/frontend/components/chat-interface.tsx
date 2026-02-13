@@ -176,9 +176,9 @@ export default function ChatInterface() {
                         onClick={() => setMenuOpen(true)}
                         className="group flex flex-col gap-1.5 w-8 hover:opacity-70 transition-opacity p-2 -ml-2"
                     >
-                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
-                        <span className="w-5 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
-                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-[#D22048] transition-colors"></span>
+                        <span className="w-5 h-0.5 bg-black group-hover:bg-[#D22048] transition-colors"></span>
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-[#D22048] transition-colors"></span>
                     </button>
                     {/* Search Bar Removed as per user request (useless) */}
                 </div>
@@ -189,8 +189,8 @@ export default function ChatInterface() {
                         <Image
                             src="/brand/PalmHills-Logo.png"
                             alt="Palm Hills"
-                            width={160}
-                            height={42}
+                            width={240}
+                            height={62}
                             className="object-contain mb-1"
                         />
                         <span className="text-[9px] uppercase tracking-[0.3em] text-[#5A5A5A] font-medium font-serif">PALMX AI</span>
@@ -199,12 +199,19 @@ export default function ChatInterface() {
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-8">
-                    <span className="hidden md:block font-sans text-xs font-bold tracking-widest text-black">19743</span>
+                    <span className="hidden md:block font-arge text-sm font-bold tracking-widest text-black">19743</span>
                     <span className="hidden md:block w-px h-4 bg-gray-200"></span>
                     <span className="hidden md:block font-sans text-xs font-bold text-muted cursor-pointer hover:text-black tracking-widest">عربي</span>
-                    <button className="hidden lg:flex bg-black text-white px-8 py-3 rounded-full text-[10px] font-bold tracking-[0.2em] hover:bg-primary hover:scale-105 transition-all uppercase shadow-lg shadow-black/5">
-                        Request Sales Call
-                    </button>
+                    <div className="hidden lg:flex">
+                        <a
+                            href="https://www.palmhillsdevelopments.com/en-us/interestedIn"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-black text-white px-8 py-3 rounded-full text-[11px] font-bold tracking-[0.2em] font-arge hover:bg-[#D22048] hover:scale-105 transition-all uppercase shadow-lg shadow-black/5"
+                        >
+                            Request a Sales Call
+                        </a>
+                    </div>
                 </div>
             </header>
 
@@ -361,13 +368,10 @@ export default function ChatInterface() {
             </div>
 
             {/* Input Area */}
-            <div className="bg-white/90 backdrop-blur-md p-6 border-t border-gray-100 z-20">
-                <form onSubmit={(e) => e.preventDefault()} className="relative max-w-3xl mx-auto">
-                    <div className="relative group">
-                        <div className="absolute top-1/2 -translate-y-1/2 left-4 text-xs font-bold tracking-widest text-accent uppercase pointer-events-none">
-                            {mode === 'concierge' ? 'Concierge' : 'Assistance'}
-                        </div>
-
+            <div className="bg-white/95 backdrop-blur-md p-4 md:p-6 border-t border-gray-100 z-20 pb-safe">
+                <form onSubmit={handleSubmit} className="relative max-w-3xl mx-auto flex gap-3 items-end">
+                    <div className="relative flex-1 group">
+                        {/* Force Rebuild Trigger */}
                         <textarea
                             id="chat-input"
                             value={input}
@@ -375,36 +379,39 @@ export default function ChatInterface() {
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && !e.shiftKey) {
                                     e.preventDefault();
-                                    handleSubmit(e);
+                                    handleSubmit(e as any);
                                 }
                             }}
                             autoComplete="off"
-                            placeholder={mode === 'concierge' ? "Ask about availability and prices..." : "Please enter your details..."}
-                            className="w-full pl-32 pr-12 py-4 bg-surface border border-transparent focus:border-gray-200 rounded-2xl focus:ring-0 focus:outline-none transition-all font-sans text-charcoal placeholder:text-muted/50 shadow-sm resize-none overflow-hidden min-h-[56px] max-h-[200px]"
+                            placeholder={mode === 'concierge' ? "The journey to your dream starts here..." : "Please enter your details..."}
+                            className="w-full pl-5 pr-16 py-3.5 bg-[#F3F4F6] border-0 focus:ring-1 focus:ring-gray-200 rounded-[24px] focus:outline-none transition-all font-sans text-[15px] text-[#0B0B0B] placeholder:text-gray-400 resize-none overflow-hidden min-h-[52px] max-h-[160px] leading-relaxed"
                             rows={1}
-                            style={{ height: 'auto', minHeight: '56px' }}
+                            style={{ height: 'auto', minHeight: '52px' }}
                             onInput={(e) => {
                                 const target = e.target as HTMLTextAreaElement;
                                 target.style.height = 'auto';
-                                target.style.height = `${Math.min(target.scrollHeight, 200)}px`;
+                                target.style.height = `${Math.min(target.scrollHeight, 160)}px`;
                             }}
                         />
-                        <button
-                            type="button"
-                            onClick={(e) => handleSubmit(e)}
-                            disabled={!input.trim() || loading}
-                            className={cn(
-                                "absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all",
-                                input.trim() && !loading
-                                    ? "bg-black text-white hover:bg-primary"
-                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            )}
-                        >
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-                        </button>
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center -mt-0.5">
+                            <button
+                                type="submit"
+                                disabled={!input.trim() || loading}
+                                aria-label="Send message"
+                                className={cn(
+                                    "w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 shadow-sm",
+                                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D22048]/30",
+                                    input.trim() && !loading
+                                        ? "bg-[#0B0B0B] text-white hover:bg-[#D22048] hover:scale-105 active:scale-95"
+                                        : "bg-[#E9E9E9] text-[#9A9A9A] cursor-not-allowed"
+                                )}
+                            >
+                                {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={20} />}
+                            </button>
+                        </div>
                     </div>
                 </form>
-            </div >
+            </div>
         </div >
     );
 }
