@@ -58,6 +58,11 @@ class RAGService:
         logger.info(f"✅ Index hash saved. Future restarts will skip rebuild.")
 
     def _load_index(self):
+        # Skip loading if already loaded in memory (cache check)
+        if self.is_ready and self.index is not None and len(self.metadata) > 0:
+            logger.debug("RAG Index already loaded in memory. Skipping reload.")
+            return
+        
         if os.path.exists(Config.INDEX_PATH) and os.path.exists(Config.META_PATH):
             try:
                 self.index = faiss.read_index(Config.INDEX_PATH)

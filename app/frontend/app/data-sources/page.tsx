@@ -1,8 +1,9 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, FileText, Database } from 'lucide-react';
+import NavigationMenu from "@/components/navigation-menu";
 
 export default function DataSources() {
     const verifiedPortfolios = [
@@ -25,18 +26,29 @@ export default function DataSources() {
     ];
 
     const lastUpdate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const [menuOpen, setMenuOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-white text-foreground font-sans selection:bg-black selection:text-white">
 
             {/* Header */}
             <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md z-40 border-b border-gray-100 px-6 md:px-12 h-[88px] flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-4 group">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setMenuOpen(true)}
+                        className="group flex flex-col gap-1.5 w-8 hover:opacity-70 transition-opacity p-2 -ml-2"
+                    >
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                        <span className="w-5 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                    </button>
+                    {/* <Link href="/" className="flex items-center gap-4 group">
                     <div className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-black group-hover:bg-black group-hover:text-white transition-colors">
                         <ArrowLeft size={16} />
                     </div>
-                    <span className="font-serif text-sm tracking-widest font-bold text-black uppercase hidden md:block group-hover:translate-x-1 transition-transform">Back to Concierge</span>
-                </Link>
+                        <span className="font-serif text-sm tracking-widest font-bold text-black uppercase hidden md:block group-hover:translate-x-1 transition-transform">Back to Concierge</span>
+                    </Link> */}
+                </div>
 
                 <div className="flex flex-col items-center">
                     <span className="font-serif text-lg tracking-[0.2em] font-bold text-black border-b-2 border-transparent pb-1">PALM HILLS</span>
@@ -45,6 +57,9 @@ export default function DataSources() {
 
                 <div className="w-10"></div> {/* Spacer for balance */}
             </header>
+
+            {/* Navigation Menu */}
+            <NavigationMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
             {/* Main Content */}
             <main className="pt-40 px-6 md:px-12 pb-24 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
+from contextlib import asynccontextmanager
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import json
@@ -19,7 +20,18 @@ from app.backend.routes.admin_routes import router as admin_router
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PalmX-API")
 
-app = FastAPI(title="PalmX Pilot API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Ensure RAG index is loaded once at application startup
+    logger.info("Application startup: Ensuring RAG index is loaded...")
+    if not rag_service.is_ready:
+        rag_service._load_index()
+    logger.info(f"RAG service ready: {rag_service.is_ready}")
+    yield
+    # Shutdown (if needed)
+    logger.info("Application shutdown")
+
+app = FastAPI(title="PalmX Pilot API", version="1.0.0", lifespan=lifespan)
 
 # Mount admin routes
 app.include_router(admin_router)

@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useApp } from "@/contexts/app-context";
+import NavigationMenu from "@/components/navigation-menu";
+import { SignOutButton } from "@clerk/nextjs";
 import {
     Search,
     Download,
@@ -334,13 +337,15 @@ function LeadDetailDrawer({
 // Main Dashboard Component
 // ---------------------------------------------------------------------------
 export default function Dashboard() {
-    // State
-    const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-    const [leads, setLeads] = useState<NormalizedLead[]>([]);
-    const [sheets, setSheets] = useState<SheetInfo[]>([]);
-    const [auditData, setAuditData] = useState<AuditData | null>(null);
-    const [health, setHealth] = useState<HealthData | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { dashboardData, setDashboardData, dashboardLoading, setDashboardLoading, shouldRefetch, updateLastFetchTime } = useApp();
+    
+    // Use cached data if available, otherwise initialize state
+    const [analytics, setAnalytics] = useState<AnalyticsData | null>(dashboardData?.analytics || null);
+    const [leads, setLeads] = useState<NormalizedLead[]>(dashboardData?.leads || []);
+    const [sheets, setSheets] = useState<SheetInfo[]>(dashboardData?.sheets || []);
+    const [auditData, setAuditData] = useState<AuditData | null>(dashboardData?.auditData || null);
+    const [health, setHealth] = useState<HealthData | null>(dashboardData?.health || null);
+    const [loading, setLoading] = useState(!dashboardData); // Only loading if no cached data
     const [error, setError] = useState<string | null>(null);
 
     // Leads table state
@@ -361,11 +366,22 @@ export default function Dashboard() {
     // Data sheet selector
     const [activeSheet, setActiveSheet] = useState("leads.csv");
 
+    // Navigation menu
+    const [menuOpen, setMenuOpen] = useState(false);
+
     // --------------------------------------------------
     // Fetch data
     // --------------------------------------------------
-    const fetchAll = async (sheet = activeSheet, range = timeRange) => {
+    const fetchAll = async (sheet = activeSheet, range = timeRange, force = false) => {
+        // Skip if we have cached data and it's not stale, unless forced
+        if (!force && dashboardData && !shouldRefetch()) {
+            setLoading(false);
+            setDashboardLoading(false);
+            return;
+        }
+
         setLoading(true);
+        setDashboardLoading(true);
         setError(null);
         try {
             const [h, s, a, l, au] = await Promise.all([
@@ -380,26 +396,40 @@ export default function Dashboard() {
             setAnalytics(a);
             setLeads(l);
             setAuditData(au);
+            
+            // Update global cache
+            setDashboardData({
+                analytics: a,
+                leads: l,
+                sheets: s,
+                auditData: au,
+                health: h,
+            });
+            updateLastFetchTime();
         } catch (e: any) {
             setError(e.message || "Failed to load data");
         } finally {
             setLoading(false);
+            setDashboardLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchAll();
+        // Only fetch if no cached data or cache is stale
+        if (!dashboardData || shouldRefetch()) {
+            fetchAll();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleRangeChange = (r: string) => {
         setTimeRange(r);
-        fetchAll(activeSheet, r);
+        fetchAll(activeSheet, r, true); // Force refetch when range changes
     };
 
     const handleSheetChange = (s: string) => {
         setActiveSheet(s);
-        fetchAll(s, timeRange);
+        fetchAll(s, timeRange, true); // Force refetch when sheet changes
     };
 
     // --------------------------------------------------
@@ -492,7 +522,7 @@ export default function Dashboard() {
                         </div>
                     )}
                     <button
-                        onClick={() => fetchAll()}
+                        onClick={() => fetchAll(activeSheet, timeRange, true)}
                         className="px-6 py-3 bg-[#0B0B0B] text-white rounded-full text-xs font-bold tracking-widest uppercase hover:bg-[#D22048] transition-colors"
                     >
                         Retry
@@ -537,6 +567,14 @@ export default function Dashboard() {
             {/* Header */}
             <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md z-40 border-b border-[#E9E9E9] h-16 flex items-center justify-between px-6 md:px-10">
                 <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setMenuOpen(true)}
+                        className="group flex flex-col gap-1.5 w-8 hover:opacity-70 transition-opacity p-2 -ml-2"
+                    >
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                        <span className="w-5 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                    </button>
                     <Link href="/" className="flex items-center gap-3 group">
                         <Image
                             src="/brand/palmHills-BlockLogo.png"
@@ -589,20 +627,25 @@ export default function Dashboard() {
                     </div>
 
                     <button
-                        onClick={() => fetchAll()}
+                        onClick={() => fetchAll(activeSheet, timeRange, true)}
                         className="w-8 h-8 rounded-lg bg-[#FAFAFA] border border-[#E9E9E9] flex items-center justify-center text-[#5A5A5A] hover:text-[#0B0B0B] hover:border-[#0B0B0B] transition-colors"
                     >
                         <RefreshCw size={12} />
                     </button>
 
-                    <Link
+                    {/* <Link
                         href="/"
                         className="hidden md:flex px-4 py-2 bg-[#0B0B0B] text-white rounded-full text-[10px] font-bold tracking-widest uppercase hover:bg-[#D22048] transition-colors"
                     >
                         Concierge
-                    </Link>
+                    </Link> */}
+
+                 
                 </div>
             </header>
+
+            {/* Navigation Menu */}
+            <NavigationMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
             {/* Main */}
             <main className="pt-24 pb-16 px-6 md:px-10 max-w-[1440px] mx-auto space-y-10">
