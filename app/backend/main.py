@@ -342,7 +342,7 @@ async def create_lead(lead: Lead):
         raise HTTPException(status_code=500, detail="Failed to save lead")
     return {"status": "success", "message": "Lead captured"}
 
-@app.get("/admin/leads")
+@app.get("/admin/leads-legacy")
 async def get_leads(password: str = Header(None)):
     if password != Config.ADMIN_PASSWORD:
         raise HTTPException(status_code=401, detail="Unauthorized")

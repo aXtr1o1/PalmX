@@ -21,7 +21,7 @@ import pandas as pd
 from app.backend.runtime_resolver import get_runtime_dir, get_leads_dir
 
 logger = logging.getLogger("PalmX-Admin")
-router = APIRouter(prefix="/admin", tags=["Admin"])
+router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
 # ---------------------------------------------------------------------------
 # In-memory cache: keyed by (filename, mtime) → parsed DataFrame
@@ -199,6 +199,7 @@ _COL_MAP = {
     "budget_max": ["budget_max", "max_budget", "budget_to", "price_max"],
     "timeline": ["timeline", "purchase_timeline", "delivery_timeline", "timeframe", "expected_delivery"],
     "tags": ["tags", "labels", "keywords", "flags"],
+    "temperature": ["temperature", "temp", "lead_temperature", "classification", "status"],
 }
 
 
@@ -272,8 +273,9 @@ async def get_leads(response: Response, sheet: str = Query("leads.csv")):
         col_bmax = _find_col(cols, _COL_MAP["budget_max"])
         col_timeline = _find_col(cols, _COL_MAP["timeline"])
         col_tags = _find_col(cols, _COL_MAP["tags"])
+        col_temp = _find_col(cols, _COL_MAP["temperature"])
 
-        logger.info(f"Mapping results for {sheet}: Contact='{col_contact}', Projects='{col_projects}', Summary='{col_summary}'")
+        logger.info(f"Mapping results for {sheet}: Contact='{col_contact}', Projects='{col_projects}', Temp='{col_temp}'")
 
         results = []
         for _, row in df.iterrows():
@@ -295,6 +297,7 @@ async def get_leads(response: Response, sheet: str = Query("leads.csv")):
                 "budget_max": _parse_num(raw.get(col_bmax, "")) if col_bmax else None,
                 "timeline": raw.get(col_timeline, "") if col_timeline else None,
                 "tags": tags,
+                "temperature": raw.get(col_temp, "") if col_temp else None,
                 "raw": raw,
             })
         return results
@@ -441,6 +444,7 @@ async def get_analytics(
             "by_purpose": _breakdown("purpose"),
             "by_timeline": _breakdown("timeline"),
             "by_tag": _breakdown("tags"),
+            "by_temperature": _breakdown("temperature"),
         },
     }
 

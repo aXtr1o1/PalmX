@@ -58,5 +58,6 @@ class Lead(BaseModel):
     next_step: Optional[str] = None # Call, Visit
     lead_summary: Optional[str] = None # Conversation summary
     tags: List[str] = Field(default_factory=list) # e.g. "High Value", "Urgent"
+    temperature: Optional[str] = None # Hot, Warm, Cold
     kb_version_hash: Optional[str] = "v1.0"
     session_id: str

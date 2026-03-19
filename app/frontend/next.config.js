@@ -3,7 +3,7 @@ const nextConfig = {
     output: 'standalone', // Optimized for Docker
     async rewrites() {
         const isDev = process.env.NODE_ENV !== 'production';
-        const backendUrl = process.env.BACKEND_URL || (isDev ? 'http://127.0.0.1:8000' : 'http://20.224.153.225:8000');
+        const backendUrl = process.env.BACKEND_URL || 'http://backend:8000';
 
         console.log(`[Next.js] Proxying API requests to: ${backendUrl}`);
 
@@ -14,11 +14,11 @@ const nextConfig = {
             },
             {
                 source: '/admin-api/:path*',
-                destination: `${backendUrl}/admin/:path*`,
+                destination: `${backendUrl}/api/admin/:path*`,
             },
             {
                 source: '/admin/:path*',
-                destination: `${backendUrl}/admin/:path*`,
+                destination: `${backendUrl}/api/admin/:path*`,
             },
         ]
     },
