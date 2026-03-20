@@ -237,6 +237,7 @@ function LeadDetailDrawer({
                     {/* Fields */}
                     <div className="grid grid-cols-2 gap-4">
                         {[
+                            { label: "Status", value: lead.temperature },
                             { label: "Region", value: lead.region },
                             { label: "Unit Type", value: lead.unit_type },
                             { label: "Purpose", value: lead.purpose },
@@ -707,8 +708,9 @@ export default function Dashboard() {
                 {analytics && (
                     <>
                         <SectionHeader title="Analytics" icon={BarChart3} />
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {/* Leads over time */}
+
+                        {/* Leads over time - FULL ROW SPACE */}
+                        <div className="mb-4">
                             <ChartCard title="Leads Over Time">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={analytics.timeseries}>
@@ -742,7 +744,9 @@ export default function Dashboard() {
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </ChartCard>
+                        </div>
 
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             {/* By Project */}
                             <ChartCard title="Top Projects">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -928,6 +932,39 @@ export default function Dashboard() {
                                     </BarChart>
                                 </ResponsiveContainer>
                             </ChartCard>
+
+                            {/* Lead Quality | Temperature */}
+                            <ChartCard title="Lead Temperature">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={analytics.breakdowns.by_temperature}
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="count"
+                                            nameKey="label"
+                                            label={({ name, value }) => `${name}: ${value}`}
+                                        >
+                                            {analytics.breakdowns.by_temperature.map((entry, index) => {
+                                                const label = entry.label.toLowerCase();
+                                                const color =
+                                                    label === 'hot' ? '#D22048' :
+                                                        label === 'warm' ? '#F59E0B' :
+                                                            '#64748B';
+                                                return <Cell key={`cell-${index}`} fill={color} />;
+                                            })}
+                                        </Pie>
+                                        <Tooltip
+                                            contentStyle={{
+                                                fontSize: 12,
+                                                borderRadius: 12,
+                                                border: "1px solid #E9E9E9",
+                                            }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </ChartCard>
                         </div>
                     </>
                 )}
@@ -987,6 +1024,7 @@ export default function Dashboard() {
                                         <th className="px-5 py-3 font-medium">Contact</th>
                                         <th className="px-5 py-3 font-medium">Interest</th>
                                         <th className="px-5 py-3 font-medium">Budget</th>
+                                        <th className="px-5 py-3 font-medium">Status</th>
                                         <th className="px-5 py-3 font-medium">Region</th>
                                         <th className="px-5 py-3 font-medium">Tags</th>
                                         <th className="px-5 py-3 font-medium text-right">Date</th>
@@ -1025,6 +1063,20 @@ export default function Dashboard() {
                                                         ? `${fmtNum(lead.budget_min)}–${fmtNum(lead.budget_max)}`
                                                         : "—"}
                                                 </span>
+                                            </td>
+                                            <td className="px-5 py-3">
+                                                {lead.temperature ? (
+                                                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${lead.temperature.toLowerCase() === 'hot'
+                                                        ? 'bg-red-50 text-red-600 border border-red-100'
+                                                        : lead.temperature.toLowerCase() === 'warm'
+                                                            ? 'bg-amber-50 text-amber-600 border border-amber-100'
+                                                            : 'bg-slate-50 text-slate-600 border border-slate-100'
+                                                        }`}>
+                                                        {lead.temperature}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-xs text-[#9A9A9A]">Not set</span>
+                                                )}
                                             </td>
                                             <td className="px-5 py-3">
                                                 <span className="text-xs text-[#5A5A5A]">

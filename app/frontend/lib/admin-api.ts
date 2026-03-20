@@ -42,6 +42,7 @@ export interface NormalizedLead {
     budget_max: number | null;
     timeline: string | null;
     tags: string[];
+    temperature?: string | null;
     raw: Record<string, string>;
 }
 
@@ -74,6 +75,7 @@ export interface AnalyticsData {
         by_purpose: BreakdownItem[];
         by_timeline: BreakdownItem[];
         by_tag: BreakdownItem[];
+        by_temperature: BreakdownItem[];
     };
 }
 

@@ -19,7 +19,7 @@ class LeadsService:
             "timestamp", "session_id", "name", "phone", 
             "interest_projects", "preferred_region", "unit_type", 
             "budget_min", "budget_max", "purpose", "timeline", 
-            "next_step", "lead_summary", "tags", "kb_version_hash"
+            "next_step", "lead_summary", "tags", "temperature", "kb_version_hash"
         ]
         
         if not os.path.exists(Config.LEADS_PATH):
@@ -67,6 +67,7 @@ class LeadsService:
             lead.next_step or "",
             lead.lead_summary or "",
             ",".join(lead.tags),
+            lead.temperature or "",
             lead.kb_version_hash or "v1.0"
         ]
         
