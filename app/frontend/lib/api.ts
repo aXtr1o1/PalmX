@@ -24,7 +24,7 @@ export interface Lead {
     session_id: string;
 }
 
-const API_BASE = ''; // Relative path handled by Next.js rewrites
+const API_BASE = 'http://localhost:8000'; // Relative path handled by Next.js rewrites
 
 export const api = {
     chat: async (sessionId: string, messages: ChatMessage[]): Promise<ChatResponse> => {

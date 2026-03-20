@@ -16,10 +16,101 @@ from app.backend.services.rag_service import rag_service
 from app.backend.services.leads_service import leads_service
 from app.backend.services.kb_service import kb_service
 from app.backend.routes.admin_routes import router as admin_router
-
+from app.backend.services.persona_llm import build_system_prompt
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PalmX-API")
+
+# ---------------------------------------------------------------------------
+# Persona persistence (backend-only)
+# ---------------------------------------------------------------------------
+# The frontend currently sends only `{session_id, messages, locale}`.
+# To keep persona_state/persona_stage/support_stage consistent across turns
+# without touching frontend code, we store the persona configuration per session_id.
+_PERSONA_BY_SESSION: dict[str, ChatResponse] = {}
+
+
+def _default_persona_for_intent(intent: str) -> ChatResponse:
+    """
+    Create a safe default persona configuration for a new session.
+    """
+    mode = "concierge"
+    persona_state = "primary"
+    persona_stage = "exploration"
+    support_stage = "faq"
+
+    if intent == "lead_capture":
+        mode = "lead_capture"
+        persona_state = "primary"
+        persona_stage = "qualification"
+        support_stage = "faq"
+    elif intent == "support_contact":
+        mode = "support"
+        persona_state = "support"
+        persona_stage = "qualification"
+        support_stage = "faq"
+    elif intent in ("pricing", "compare", "amenity_check"):
+        persona_state = "primary"
+        persona_stage = "recommendation"
+        mode = "concierge"
+    else:
+        # project_query, list_projects, etc.
+        persona_state = "primary"
+        persona_stage = "exploration"
+        mode = "concierge"
+
+    # message/retrieved_projects are not used by build_system_prompt(); keep minimal.
+    return ChatResponse(
+        message="",
+        retrieved_projects=[],
+        mode=mode,
+        persona_state=persona_state,
+        persona_stage=persona_stage,
+        support_stage=support_stage,
+    )
+
+
+def _get_persona_for_session(session_id: str, intent: str, model_persona: Optional[ChatResponse] = None) -> ChatResponse:
+    """
+    Return the persona configuration for this session, initializing on first contact.
+    """
+    
+    if session_id not in _PERSONA_BY_SESSION:
+        _PERSONA_BY_SESSION[session_id] = _default_persona_for_intent(intent)
+        return _PERSONA_BY_SESSION[session_id]
+
+    cfg = _PERSONA_BY_SESSION[session_id]
+    
+
+    # Keep previous persona values (history-like behavior), but align with critical intent modes.
+    if intent == "support_contact":
+        cfg.mode = "support"
+        cfg.persona_state = "support"
+        cfg.persona_stage = "qualification"
+        cfg.support_stage = "faq"
+    elif intent == "lead_capture":
+        cfg.mode = "lead_capture"
+        cfg.persona_state = "primary"
+        cfg.persona_stage = "qualification"
+        cfg.support_stage = "faq"
+    else:
+        cfg.mode = "concierge"
+        if cfg.persona_state == "support":
+            cfg.persona_state = "primary"
+            cfg.persona_stage = "exploration"
+            cfg.support_stage = "faq"
+
+    if intent in ("pricing", "compare", "amenity_check") and cfg.persona_state == "primary":
+        cfg.persona_stage = "recommendation"
+    if model_persona:
+        cfg.mode = model_persona.mode
+        cfg.persona_state = model_persona.persona_state
+        cfg.persona_stage = model_persona.persona_stage
+        cfg.support_stage = model_persona.support_stage
+
+    print(f"Persona configuration: {cfg}")
+    _PERSONA_BY_SESSION[session_id] = cfg
+    return cfg
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -46,95 +137,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-CONCIERGE_SYSTEM_PROMPT = """
-You are PalmX Concierge, the Senior Sales Executive for Palm Hills.
-Your goal is to convert inquiries into site visits or calls by being intelligent, human, and persuasive.
-You are NOT a support bot. You are a "closer" with a discreet, luxurious, and sharp commercial brain.
-
-### 8. Temporal Logic (STRICT)
-- **TODAY IS**: {current_date}.
-- **Year Inference**: If the user mentions a month (e.g., "March") or a relative time (e.g., "this month", "next month"), you MUST calculate the year relative to TODAY.
-- **2024 REGRESSION PREVENTION**: Never output "2024" for future timelines. If it is currently February 2026, then "March" refers to March 2026.
-- **Format**: In the confirmation summary (Stage 6), you MUST always explicitly include the year in the Timeline field (e.g., "Timeline: March 2026").
-
-### 1. The Core Objective
-- **Qualify** in ≤ 60 seconds (Need, Budget, Timeline).
-- **Curate** the right options (Shortlist 2-4 matches).
-- **Sell the Dream**: Frame every fact with lifestyle or investment logic (Yield, ROI, Scarcity).
-- **Close Softly**: Guide every turn towards a Lead Capture (Name + Phone) or a Booking.
-
-### 2. Tone & Voice (Luxury + Human)
-- **Style**: Calm, confident, concise, premium. Natural conversation.
-- **Forbidden**: Robotic lists ("Status: Commercial"), "Not specified", "I don't know", repetitive "May I assist?", overhype ("AMAZING!!!"), emojis.
-- **The Brain**: Connect dots. IF user says "India", suggest "Virtual Tour". IF "Investment", talk "Yield".
-
-### 3. The Conversation Operating System (Stage Machine)
-**Every reply must contain:** 
-1. **Value Now** (Shortlist / Insight) 
-2. **Progress** (Question / CTA)
-
-**Stage 1: Intent Lock** (If vague)
-- "When you say commercial—are you looking for retail, office, clinic, or F&B?"
-
-**Stage 2: Qualification** (Ask MAX 2 questions)
-- "To narrow this down: Are you focused on West Cairo or the Coast?"
-- "Do you have a preferred price band?"
-
-**Stage 3: Curated Shortlist** (When intent is clear)
-- Present 2-4 best matches.
-- For each: **Why it fits** + **Price Band**.
-
-**Stage 4: Objection Handling**
-- **Overseas**: "No problem — we can do a virtual walkthrough + WhatsApp updates."
-- **Price**: "Give me a ballpark and I'll find the best value option."
-
-**Stage 5: Soft Close** (The Goal)
-- "Want me to share the brochure + current availability on WhatsApp and book a 10-minute call?"
-
-**Stage 6: The Handover (Confirmation)**
-- **CRITICAL**: Before saving the lead, you MUST summarize what you have collected to ensure accuracy.
-- "Perfect. To ensure our Senior Consultant serves you best, I have noted:
-  - **Name**: [Name]
-  - **Interest**: [Project/Type] 
-  - **Budget**: [Range] (If user gave USD/AED, show EGP equivalent here)
-  - **Timeline**: [Date] (Always include year, e.g., March 2026)
-  - **Phone**: [Number]
-  Is this correct?"
-- **Action**: Only call `save_lead` tool AFTER they say "Yes".
-
-### 4. Response Format Rules (Strict)
-1. **Acknowledgement**: 1 short line ("Understood — you want retail.")
-2. **The Meat**: Shortlist or Insight (Bullet points).
-3. **The Pivot**: 1-2 Qualification Questions.
-4. **The CTA**: Single clear next step.
-5. **Visual Impact**: In every paragraph, **BOLD** 1-2 key value props (e.g., **High ROI**, **Waterfront Views**) to make them pop.
-
-### 5. Field Checklist (Capture these Seamlessly)
-- [ ] Name
-- [ ] Phone
-- [ ] Interest (Project/Type)
-- [ ] Budget (Infer or Ask) -> **Convert to EGP** for the record.
-- [ ] Timeline (Infer or Ask)
-- [ ] Purpose (Own/Invest)
-*If fields are missing at Stage 6, ask ONE clarifying question or note as "Not specified" in the summary for them to fill.*
-
-### 6. Currency Handling
-- **Always** mention the **EGP** equivalent for budget/price in the Confirmation Summary, even if the user spoke in USD/AED.
-- When calling `save_lead`, store the value in EGP (or "X USD (~Y EGP)").
-
-### 5. Handling Missing Data (No Dead Ends)
-- **Never say**: "Location: Not specified".
-- **Say**: "I can confirm current inventory/pricing from the latest sheet." or "Availability changes; I'll validate this live."
-
-### 6. Lead Capture (Sales Muscle)
-- Give value first, THEN ask for details.
-- **Minimal**: Name + Phone/WhatsApp.
-- **Consent**: "Okay to message you on WhatsApp?"
-
-### 7. Strict Truthfulness
-- Do not invent facts. If sold out, offer alternatives.
-- Use validated data from CONTEXT only.
-"""
 
 @app.get("/api/health")
 async def health_check():
@@ -199,8 +201,8 @@ async def chat_endpoint(request: ChatRequest):
         for p in retrieved_docs:
             context_text += f"---\n{kb_service.build_project_card(p)}\n"
             
-        current_date = datetime.now().strftime("%B %d, %Y")
-        full_system_msg = CONCIERGE_SYSTEM_PROMPT.format(current_date=current_date) + f"\n\nCONTEXT:\n{context_text}"
+        persona_cfg = _get_persona_for_session(session_id, router_out.intent)
+        full_system_msg  = build_system_prompt(user_msg, history, persona_cfg) + f"\n\nCONTEXT:\n{context_text}"
         
         # 4. Answer Generation
         response_data = llm_service.answer_completion(
@@ -208,6 +210,20 @@ async def chat_endpoint(request: ChatRequest):
             request.messages,
             tools=TOOLS
         )
+        try:
+            response_json = json.loads(response_data)
+            persona_cfg.mode = response_json.get("mode", persona_cfg.mode)
+            persona_cfg.persona_state = response_json.get("persona_state", persona_cfg.persona_state)
+            persona_cfg.persona_stage = response_json.get("persona_stage", persona_cfg.persona_stage)
+            persona_cfg.support_stage = response_json.get("support_stage", persona_cfg.support_stage)
+            retrieved_projects = response_json.get("retrieved_projects", [])
+            message = response_json.get("message", "")
+            
+            _PERSONA_BY_SESSION[session_id] = persona_cfg
+        except Exception:
+            # fallback if model returns plain text
+            message = response_data 
+            retrieved_projects = []
         
         final_text = ""
         
@@ -238,7 +254,7 @@ async def chat_endpoint(request: ChatRequest):
                     final_text = f"Thank you {lead.name}. Your details have been saved. A sales representative will contact you at {lead.phone} shortly."
         else:
             final_text = response_data
-
+        
         # 6. Audit
         leads_service.log_audit(
             session_id, 
@@ -248,11 +264,19 @@ async def chat_endpoint(request: ChatRequest):
             [] 
         )
         
+        # Persist persona configuration for the next turn.
+        persona_cfg = _get_persona_for_session(session_id, router_out.intent, model_persona=persona_cfg)
+        _PERSONA_BY_SESSION[session_id] = persona_cfg
+
         return ChatResponse(
             message=final_text,
             retrieved_projects=[p.project_name for p in retrieved_docs],
-            mode="lead_capture" if router_out.intent == "lead_capture" else "concierge"
+            mode=persona_cfg.mode,
+            persona_state=persona_cfg.persona_state,
+            persona_stage=persona_cfg.persona_stage,
+            support_stage=persona_cfg.support_stage,
         )
+
 
     except Exception as e:
         logger.error(f"Chat error: {e}")
@@ -287,7 +311,11 @@ async def chat_stream_endpoint(request: ChatRequest):
             context_text += f"---\n{kb_service.build_project_card(p)}\n"
         
         current_date = datetime.now().strftime("%B %d, %Y")
-        full_system_msg = CONCIERGE_SYSTEM_PROMPT.format(current_date=current_date) + f"\n\nCONTEXT:\n{context_text}"
+        persona_cfg = _get_persona_for_session(session_id, router_out.intent, model_persona=None)
+        full_system_msg = build_system_prompt(user_msg, history, persona_cfg) + f"\n\nCONTEXT:\n{context_text}"
+
+        # Persist persona configuration for the next turn.
+        
 
         # 4. Stream tokens
         def generate():
@@ -295,6 +323,24 @@ async def chat_stream_endpoint(request: ChatRequest):
             for chunk in llm_service.stream_answer_completion(
                 full_system_msg, request.messages, tools=TOOLS
             ):
+                if "__PERSONA_JSON__" in chunk:
+                    try:
+                        persona_json = chunk.split("__PERSONA_JSON__")[1]
+                        persona_data = json.loads(persona_json)
+
+                        model_persona = ChatResponse(
+                            message="",
+                            retrieved_projects=[],
+                            mode=persona_data.get("mode", persona_cfg.mode),
+                            persona_state=persona_data.get("persona_state", persona_cfg.persona_state),
+                            persona_stage=persona_data.get("persona_stage", persona_cfg.persona_stage),
+                            support_stage=persona_data.get("support_stage", persona_cfg.support_stage)
+                        )
+                        persona_cfg=_get_persona_for_session(session_id, router_out.intent, model_persona=model_persona)
+                        _PERSONA_BY_SESSION[session_id] = persona_cfg
+                    except Exception as e:
+                        logger.error(f"Error parsing persona JSON: {e}")
+                    continue
                 if "__TOOL_CALLS__" in chunk:
                     tc_json = chunk.split("__TOOL_CALLS__")[1]
                     tool_calls = json.loads(tc_json)
@@ -323,8 +369,8 @@ async def chat_stream_endpoint(request: ChatRequest):
                 else:
                     full_response += chunk
                     yield f"data: {json.dumps({'token': chunk})}\n\n"
-            
-            yield f"data: {json.dumps({'done': True, 'retrieved_projects': [p.project_name for p in retrieved_docs], 'mode': 'lead_capture' if router_out.intent == 'lead_capture' else 'concierge'})}\n\n"
+
+            yield f"data: {json.dumps({'done': True, 'retrieved_projects': [p.project_name for p in retrieved_docs]})}\n\n"
             
             leads_service.log_audit(
                 session_id, user_msg, router_out.intent,

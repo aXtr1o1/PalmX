@@ -1,4 +1,4 @@
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Dict
 from pydantic import BaseModel, Field
 
 # --- KB Models ---
@@ -42,7 +42,13 @@ class ChatResponse(BaseModel):
     message: str
     next_action: Optional[str] = None
     retrieved_projects: List[str] = []
-    mode: str = "concierge" # concierge | lead_capture
+    mode: str = "concierge"                            # concierge | lead_capture | support
+    persona_state: str = "primary" 
+    persona_stage: str = "qualification"
+    support_stage: str = "faq"                          # primary | secondary | support
+    tool_calls: Optional[List[Dict]] = None            # e.g., [{"tool": "save_lead", "args": {...}}]
+    context_summary: Optional[str] = None              # e.g., lead fields summary
+    kb_version_hash: Optional[str] = "v1.0"            # Version of KB used for context
 
 # --- Lead Models ---
 class Lead(BaseModel):

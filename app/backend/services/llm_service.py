@@ -61,7 +61,7 @@ class LLMService:
         except Exception as e:
             logger.error(f"Embedding failed: {e}")
             return [0.0] * 1536
-
+    
     def router_completion(self, user_message: str, history: List[Message] = None) -> RouterOutput:
         """
         Determines user intent and extracts entities strictly, using history for context.
