@@ -187,10 +187,14 @@ async def lifespan(app: FastAPI):
     # Shutdown (if needed)
     logger.info("Application shutdown")
 
-app = FastAPI(title="PalmX Pilot API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="PalmX Pilot API", version="1.0.0", lifespan=lifespan, root_path="/api")
 
-# Mount admin routes
+# Mount admin routes.
+# Provide compatibility for both URL styles:
+# - `/admin/*` for clients that don't include the `/api` segment
+# - `/api/admin/*` for clients that do
 app.include_router(admin_router)
+
 
 # CORS
 app.add_middleware(

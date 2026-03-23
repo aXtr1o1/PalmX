@@ -21,7 +21,10 @@ import pandas as pd
 from app.backend.runtime_resolver import get_runtime_dir, get_leads_dir
 
 logger = logging.getLogger("PalmX-Admin")
-router = APIRouter(prefix="/api/admin", tags=["Admin"])
+# Expose admin endpoints under `/admin/*`.
+# We also mount the same router under `/api/admin/*` from `app/backend/main.py`
+# to keep compatibility with both frontend URL styles.
+router = APIRouter(prefix="/admin", tags=["Admin"])
 
 # ---------------------------------------------------------------------------
 # In-memory cache: keyed by (filename, mtime) → parsed DataFrame
