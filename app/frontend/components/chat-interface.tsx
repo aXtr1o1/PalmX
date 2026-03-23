@@ -40,7 +40,8 @@ export default function ChatInterface() {
 
         const checkHealth = async () => {
             try {
-                const res = await fetch('/api/health');
+                const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+                const res = await fetch(backendUrl ? `${backendUrl}/api/health` : "/api/health");
                 if (res.ok) {
                     setSystemReady(true);
                     setBootProgress(100);

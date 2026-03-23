@@ -1,9 +1,13 @@
 /**
  * PalmX Admin API Client — typed fetch wrappers for all admin endpoints.
- * Uses Next.js proxy rewrites (/admin/* → backend /admin/*).
+ * Connects directly to backend when `NEXT_PUBLIC_BACKEND_URL` is set.
  */
 
-const ADMIN_BASE = '/admin';
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+
+// If backendUrl is missing, keep old relative `/admin/*` behavior
+// (works in dev when Next rewrites are enabled).
+const ADMIN_BASE = backendUrl ? `${backendUrl}/api/admin` : "/admin";
 
 // ---------------------------------------------------------------------------
 // Types

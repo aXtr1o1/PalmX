@@ -26,12 +26,17 @@ export interface Lead {
 
 // Use relative paths so Next.js proxy/rewrites apply consistently.
 // (Chat UI uses `/api/health` already; keep chat endpoints aligned.)
-// Use Next.js rewrites (next.config.js) instead of hard-coding an IP.
-const API_BASE = '';
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+
+// If `NEXT_PUBLIC_BACKEND_URL` is set, we connect directly to the backend.
+// Otherwise we fall back to relative paths (works in dev when Next rewrites are enabled).
+const withBackend = (path: string) => {
+    return backendUrl ? `${backendUrl}${path}` : path;
+};
 
 export const api = {
     chat: async (sessionId: string, messages: ChatMessage[]): Promise<ChatResponse> => {
-        const res = await fetch(`${API_BASE}/api/chat`, {
+        const res = await fetch(withBackend("/api/chat"), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_id: sessionId, messages, locale: 'en' }),
@@ -46,7 +51,7 @@ export const api = {
         onToken: (token: string) => void,
         onDone: (data: { retrieved_projects: string[]; mode: 'concierge' | 'lead_capture' }) => void
     ) => {
-        const res = await fetch(`${API_BASE}/api/chat/stream`, {
+        const res = await fetch(withBackend("/api/chat/stream"), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_id: sessionId, messages, locale: 'en' }),
@@ -91,7 +96,7 @@ export const api = {
     },
 
     createLead: async (lead: Lead) => {
-        const res = await fetch(`${API_BASE}/api/lead`, {
+        const res = await fetch(withBackend("/api/lead"), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(lead),
@@ -101,8 +106,8 @@ export const api = {
     },
 
     getLeads: async (password: string) => {
-        // Next.js rewrite maps /admin-api -> Backend /admin
-        const res = await fetch(`${API_BASE}/admin-api/leads`, {
+        // Legacy endpoint shape (kept for compatibility).
+        const res = await fetch(backendUrl ? `${backendUrl}/api/admin/leads` : "/admin-api/leads", {
             headers: { 'password': password }
         });
         if (!res.ok) throw new Error('Failed to fetch leads');
