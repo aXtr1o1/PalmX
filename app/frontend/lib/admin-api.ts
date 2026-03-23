@@ -7,7 +7,10 @@ const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 // If backendUrl is missing, keep old relative `/admin/*` behavior
 // (works in dev when Next rewrites are enabled).
-const ADMIN_BASE = backendUrl ? `${backendUrl}/api/admin` : "/admin";
+// Always use the backend prefix `/api/admin` (backend router prefix).
+// If `NEXT_PUBLIC_BACKEND_URL` is not set, we still call `/api/admin/*` and rely on
+// Next.js rewrites (`/api/:path*`).
+const ADMIN_BASE = backendUrl ? `${backendUrl}/api/admin` : "/api/admin";
 
 // ---------------------------------------------------------------------------
 // Types
