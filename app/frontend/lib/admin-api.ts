@@ -43,6 +43,11 @@ export interface NormalizedLead {
     timeline: string | null;
     tags: string[];
     temperature?: string | null;
+    classification?: string | null;
+    score?: number | null;
+    reason_codes?: string[];
+    recommended_action?: string | null;
+    handoff_summary?: string | null;
     raw: Record<string, string>;
 }
 

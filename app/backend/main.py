@@ -29,6 +29,77 @@ logger = logging.getLogger("PalmX-API")
 # without touching frontend code, we store the persona configuration per session_id.
 _PERSONA_BY_SESSION: dict[str, ChatResponse] = {}
 
+def _log_persona(session_id: str, cfg: ChatResponse, source: str) -> None:
+    """
+    Log persona state transitions for easier debugging and audit.
+    """
+    logger.info(
+        "[Persona] source=%s session_id=%s mode=%s persona_state=%s persona_stage=%s support_stage=%s",
+        source,
+        session_id,
+        cfg.mode,
+        cfg.persona_state,
+        cfg.persona_stage,
+        cfg.support_stage,
+    )
+
+def _decide_persona_via_model(
+    session_id: str,
+    intent: str,
+    user_message: str,
+    history: List[Message],
+    current_cfg: ChatResponse,
+) -> Optional[ChatResponse]:
+    """
+    Fallback persona selector: asks model for persona JSON explicitly.
+    Used when stream marker-based persona extraction does not appear.
+    """
+    history_text = "\n".join([f"{m.role}: {m.content}" for m in history[-12:]])
+    prompt = f"""
+You are a persona-state selector for PalmX.
+Return STRICT JSON ONLY with keys:
+- mode (concierge | lead_capture | support)
+- persona_state (primary | secondary | support)
+- persona_stage (discovery | qualification | recommendation | exploration | objection | intent_escalation | cta | confirmation | handoff | fallback)
+- support_stage (faq | comparison | detail_drilldown | shortlist_refinement | re_engagement)
+
+Current backend intent: {intent}
+Current persona:
+- mode: {current_cfg.mode}
+- persona_state: {current_cfg.persona_state}
+- persona_stage: {current_cfg.persona_stage}
+- support_stage: {current_cfg.support_stage}
+
+Conversation history:
+{history_text}
+
+Latest user message:
+{user_message}
+"""
+    try:
+        response = llm_service.client.chat.completions.create(
+            model=llm_service.deployment,
+            messages=[
+                {"role": "system", "content": "Return only valid JSON object. No prose."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0,
+            response_format={"type": "json_object"},
+        )
+        data = json.loads(response.choices[0].message.content)
+        model_persona = ChatResponse(
+            message="",
+            retrieved_projects=[],
+            mode=data.get("mode", current_cfg.mode),
+            persona_state=data.get("persona_state", current_cfg.persona_state),
+            persona_stage=data.get("persona_stage", current_cfg.persona_stage),
+            support_stage=data.get("support_stage", current_cfg.support_stage),
+        )
+        _get_persona_for_session(session_id, intent, model_persona=model_persona)
+        return model_persona
+    except Exception as e:
+        logger.error(f"Persona fallback model decision failed: {e}")
+        return None
 
 def _default_persona_for_intent(intent: str) -> ChatResponse:
     """
@@ -70,46 +141,39 @@ def _default_persona_for_intent(intent: str) -> ChatResponse:
     )
 
 
-def _get_persona_for_session(session_id: str, intent: str, model_persona: Optional[ChatResponse] = None) -> ChatResponse:
+def _get_persona_for_session(
+    session_id: str,
+    intent: str,
+    model_persona: Optional[ChatResponse] = None,
+    user_message: str = "",
+) -> ChatResponse:
     """
     Return the persona configuration for this session, initializing on first contact.
     """
-    
+    print(f"Getting persona for session: {session_id}")
+    print(f"Persona by session: {_PERSONA_BY_SESSION}")
     if session_id not in _PERSONA_BY_SESSION:
         _PERSONA_BY_SESSION[session_id] = _default_persona_for_intent(intent)
+        _log_persona(session_id, _PERSONA_BY_SESSION[session_id], "init_from_intent")
         return _PERSONA_BY_SESSION[session_id]
 
     cfg = _PERSONA_BY_SESSION[session_id]
-    
 
-    # Keep previous persona values (history-like behavior), but align with critical intent modes.
-    if intent == "support_contact":
-        cfg.mode = "support"
-        cfg.persona_state = "support"
-        cfg.persona_stage = "qualification"
-        cfg.support_stage = "faq"
-    elif intent == "lead_capture":
-        cfg.mode = "lead_capture"
-        cfg.persona_state = "primary"
-        cfg.persona_stage = "qualification"
-        cfg.support_stage = "faq"
-    else:
-        cfg.mode = "concierge"
-        if cfg.persona_state == "support":
-            cfg.persona_state = "primary"
-            cfg.persona_stage = "exploration"
-            cfg.support_stage = "faq"
+    # After the initial persona is chosen, backend must NOT decide persona_stage/mode.
+    # The model decides those via its output; we only apply the model's values here.
+    if model_persona is not None:
+        if model_persona.mode:
+            cfg.mode = model_persona.mode
+        if model_persona.persona_state:
+            cfg.persona_state = model_persona.persona_state
+        if model_persona.persona_stage:
+            cfg.persona_stage = model_persona.persona_stage
+        if model_persona.support_stage:
+            cfg.support_stage = model_persona.support_stage
 
-    if intent in ("pricing", "compare", "amenity_check") and cfg.persona_state == "primary":
-        cfg.persona_stage = "recommendation"
-    if model_persona:
-        cfg.mode = model_persona.mode
-        cfg.persona_state = model_persona.persona_state
-        cfg.persona_stage = model_persona.persona_stage
-        cfg.support_stage = model_persona.support_stage
+        _PERSONA_BY_SESSION[session_id] = cfg
+        _log_persona(session_id, cfg, "model_update")
 
-    print(f"Persona configuration: {cfg}")
-    _PERSONA_BY_SESSION[session_id] = cfg
     return cfg
 
 @asynccontextmanager
@@ -201,7 +265,7 @@ async def chat_endpoint(request: ChatRequest):
         for p in retrieved_docs:
             context_text += f"---\n{kb_service.build_project_card(p)}\n"
             
-        persona_cfg = _get_persona_for_session(session_id, router_out.intent)
+        persona_cfg = _get_persona_for_session(session_id, router_out.intent, user_message=user_msg)
         full_system_msg  = build_system_prompt(user_msg, history, persona_cfg) + f"\n\nCONTEXT:\n{context_text}"
         
         # 4. Answer Generation
@@ -265,7 +329,12 @@ async def chat_endpoint(request: ChatRequest):
         )
         
         # Persist persona configuration for the next turn.
-        persona_cfg = _get_persona_for_session(session_id, router_out.intent, model_persona=persona_cfg)
+        persona_cfg = _get_persona_for_session(
+            session_id,
+            router_out.intent,
+            model_persona=persona_cfg,
+            user_message=user_msg,
+        )
         _PERSONA_BY_SESSION[session_id] = persona_cfg
 
         return ChatResponse(
@@ -311,36 +380,33 @@ async def chat_stream_endpoint(request: ChatRequest):
             context_text += f"---\n{kb_service.build_project_card(p)}\n"
         
         current_date = datetime.now().strftime("%B %d, %Y")
-        persona_cfg = _get_persona_for_session(session_id, router_out.intent, model_persona=None)
+        persona_cfg = _get_persona_for_session(
+            session_id,
+            router_out.intent,
+            model_persona=None,
+            user_message=user_msg,
+        )
         full_system_msg = build_system_prompt(user_msg, history, persona_cfg) + f"\n\nCONTEXT:\n{context_text}"
+        full_system_msg += (
+            "\n\nSTREAM_OUTPUT_RULES (STRICT):\n"
+            "- First, output __PERSONA_JSON__ then a SINGLE valid JSON object then __END_PERSONA_JSON__.\n"
+            "- JSON keys must include: mode, persona_state, persona_stage, support_stage.\n"
+            "- After __END_PERSONA_JSON__, output ONLY the user-visible assistant message text.\n"
+        )
 
         # Persist persona configuration for the next turn.
         
 
         # 4. Stream tokens
         def generate():
-            full_response = ""
+            pending = ""
+            persona_extracted = False
+            persona_start_marker = "__PERSONA_JSON__"
+            persona_end_marker = "__END_PERSONA_JSON__"
+
             for chunk in llm_service.stream_answer_completion(
                 full_system_msg, request.messages, tools=TOOLS
             ):
-                if "__PERSONA_JSON__" in chunk:
-                    try:
-                        persona_json = chunk.split("__PERSONA_JSON__")[1]
-                        persona_data = json.loads(persona_json)
-
-                        model_persona = ChatResponse(
-                            message="",
-                            retrieved_projects=[],
-                            mode=persona_data.get("mode", persona_cfg.mode),
-                            persona_state=persona_data.get("persona_state", persona_cfg.persona_state),
-                            persona_stage=persona_data.get("persona_stage", persona_cfg.persona_stage),
-                            support_stage=persona_data.get("support_stage", persona_cfg.support_stage)
-                        )
-                        persona_cfg=_get_persona_for_session(session_id, router_out.intent, model_persona=model_persona)
-                        _PERSONA_BY_SESSION[session_id] = persona_cfg
-                    except Exception as e:
-                        logger.error(f"Error parsing persona JSON: {e}")
-                    continue
                 if "__TOOL_CALLS__" in chunk:
                     tc_json = chunk.split("__TOOL_CALLS__")[1]
                     tool_calls = json.loads(tc_json)
@@ -366,9 +432,68 @@ async def chat_stream_endpoint(request: ChatRequest):
                             leads_service.save_lead(lead)
                             confirm_msg = f"Thank you {lead.name}. Your details have been saved. A sales representative will contact you at {lead.phone} shortly."
                             yield f"data: {json.dumps({'token': confirm_msg})}\n\n"
-                else:
-                    full_response += chunk
+                    continue
+
+                if persona_extracted:
                     yield f"data: {json.dumps({'token': chunk})}\n\n"
+                    continue
+
+                pending += chunk
+                # logger.info(f"Pending: {pending}")
+                # Failsafe: if the model never emits the persona marker, don't block the stream forever.
+                if len(pending) > 5000 and persona_start_marker not in pending:
+                    persona_extracted = True
+                    yield f"data: {json.dumps({'token': pending})}\n\n"
+                    pending = ""
+                    continue
+
+                start_idx = pending.find(persona_start_marker)
+                if start_idx == -1:
+                    continue
+
+                end_idx = pending.find(persona_end_marker, start_idx + len(persona_start_marker))
+                if end_idx == -1:
+                    continue
+
+                json_str = pending[start_idx + len(persona_start_marker): end_idx]
+                remainder = pending[end_idx + len(persona_end_marker):]
+                pending = ""
+
+                try:
+                    persona_data = json.loads(json_str)
+                    logger.info(f"Persona data: {persona_data}")
+                    if isinstance(persona_data, dict):
+                        model_persona = ChatResponse(
+                            message="",
+                            retrieved_projects=[],
+                            mode=persona_data.get("mode", persona_cfg.mode),
+                            persona_state=persona_data.get("persona_state", persona_cfg.persona_state),
+                            persona_stage=persona_data.get("persona_stage", persona_cfg.persona_stage),
+                            support_stage=persona_data.get("support_stage", persona_cfg.support_stage),
+                        )
+                        _get_persona_for_session(session_id, router_out.intent, model_persona=model_persona)
+                        persona_extracted = True
+                except Exception as e:
+                    logger.error(f"Error parsing persona json in stream: {e}")
+
+                # If extraction succeeded, remainder is the user-visible message.
+                # If extraction failed, fall back to emitting remainder so the user still sees something.
+                if remainder:
+                    yield f"data: {json.dumps({'token': remainder})}\n\n"
+
+            if not persona_extracted and pending:
+                yield f"data: {json.dumps({'token': pending})}\n\n"
+
+            # Guaranteed persona update path:
+            # if marker extraction did not happen, force a model persona decision.
+            if not persona_extracted:
+                _decide_persona_via_model(
+                    session_id=session_id,
+                    intent=router_out.intent,
+                    user_message=user_msg,
+                    history=history,
+                    current_cfg=persona_cfg,
+                )
 
             yield f"data: {json.dumps({'done': True, 'retrieved_projects': [p.project_name for p in retrieved_docs]})}\n\n"
             

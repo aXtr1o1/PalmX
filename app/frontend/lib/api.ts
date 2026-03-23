@@ -24,7 +24,9 @@ export interface Lead {
     session_id: string;
 }
 
-const API_BASE = 'http://localhost:8000'; // Relative path handled by Next.js rewrites
+// Use relative paths so Next.js proxy/rewrites apply consistently.
+// (Chat UI uses `/api/health` already; keep chat endpoints aligned.)
+const API_BASE = '';
 
 export const api = {
     chat: async (sessionId: string, messages: ChatMessage[]): Promise<ChatResponse> => {
@@ -65,9 +67,12 @@ export const api = {
             buffer = lines.pop() || '';
 
             for (const line of lines) {
-                if (line.startsWith('data: ')) {
+                const seg = line.trim();
+                if (seg.startsWith('data:')) {
                     try {
-                        const data = JSON.parse(line.slice(6));
+                        // Accept both `data: <json>` and `data:<json>` formats.
+                        const jsonPart = seg.replace(/^data:\s*/, '');
+                        const data = JSON.parse(jsonPart);
                         if (data.done) {
                             onDone({
                                 retrieved_projects: data.retrieved_projects || [],

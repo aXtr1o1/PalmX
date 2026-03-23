@@ -7,8 +7,8 @@ import { Send, MapPin, Building2, User, Sparkles, ArrowRight, Loader2 } from "lu
 import ReactMarkdown from "react-markdown";
 import { api, ChatMessage, Lead } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import NavigationMenu from "./navigation-menu";
 import { useApp } from "@/contexts/app-context";
+import NavigationMenu from "./navigation-menu";
 
 const SESSION_ID_KEY = "palmx_sess_id";
 
@@ -172,15 +172,14 @@ export default function ChatInterface() {
             <header className="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-md z-50 h-[88px] flex items-center justify-between px-6 md:px-12 border-b border-gray-100 transition-all duration-300">
                 {/* Left: Menu */}
                 <div className="flex items-center gap-6">
-                    <button
+                <button
                         onClick={() => setMenuOpen(true)}
                         className="group flex flex-col gap-1.5 w-8 hover:opacity-70 transition-opacity p-2 -ml-2"
                     >
-                        <span className="w-8 h-0.5 bg-black group-hover:bg-[#D22048] transition-colors"></span>
-                        <span className="w-5 h-0.5 bg-black group-hover:bg-[#D22048] transition-colors"></span>
-                        <span className="w-8 h-0.5 bg-black group-hover:bg-[#D22048] transition-colors"></span>
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                        <span className="w-5 h-0.5 bg-[#5A5A5A] group-hover:bg-primary transition-colors"></span>
+                        <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
                     </button>
-                    {/* Search Bar Removed as per user request (useless) */}
                 </div>
 
                 {/* Center: Logo */}
@@ -224,7 +223,11 @@ export default function ChatInterface() {
             {/* Chat Area */}
             <div className="flex-1 relative overflow-hidden flex flex-col max-w-[1400px] mx-auto w-full px-4 md:px-8">
 
-                <div ref={scrollRef} className="flex-1 overflow-y-auto py-8 space-y-12 scroll-smooth no-scrollbar">
+                <div
+                    ref={scrollRef}
+                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                    className="flex-1 overflow-y-auto py-8 space-y-12 scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                >
 
                     {/* Welcome State */}
                     {messages.length === 0 && (

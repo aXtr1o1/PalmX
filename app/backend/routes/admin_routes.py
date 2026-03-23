@@ -200,6 +200,11 @@ _COL_MAP = {
     "timeline": ["timeline", "purchase_timeline", "delivery_timeline", "timeframe", "expected_delivery"],
     "tags": ["tags", "labels", "keywords", "flags"],
     "temperature": ["temperature", "temp", "lead_temperature", "classification", "status"],
+    "classification": ["classification"],
+    "score": ["score"],
+    "reason_codes": ["reason_codes", "reasoncode", "reason_codes_json", "reasons"],
+    "recommended_action": ["recommended_action", "recommendedAction", "recommended"],
+    "handoff_summary": ["handoff_summary", "handoffSummary", "handoff"],
 }
 
 
@@ -248,6 +253,30 @@ def _parse_num(val: Any) -> Optional[float]:
         return None
 
 
+def _parse_reason_codes(val: Any) -> list[str]:
+    """
+    Parse `reason_codes` stored as JSON array string or fallback to delimiter-splitting.
+    """
+    if val is None:
+        return []
+    if isinstance(val, float) and pd.isna(val):
+        return []
+    s = str(val).strip()
+    if not s:
+        return []
+    if s.startswith("["):
+        try:
+            parsed = json.loads(s)
+            if isinstance(parsed, list):
+                return [str(x).strip() for x in parsed if str(x).strip()]
+        except Exception:
+            pass
+    # Fallback: split by common separators.
+    import re
+    parts = re.split(r"[;|]+", s)
+    return [p.strip() for p in parts if p.strip()]
+
+
 @router.get("/leads")
 async def get_leads(response: Response, sheet: str = Query("leads.csv")):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -274,8 +303,15 @@ async def get_leads(response: Response, sheet: str = Query("leads.csv")):
         col_timeline = _find_col(cols, _COL_MAP["timeline"])
         col_tags = _find_col(cols, _COL_MAP["tags"])
         col_temp = _find_col(cols, _COL_MAP["temperature"])
+        col_score = _find_col(cols, _COL_MAP["score"])
+        col_reason_codes = _find_col(cols, _COL_MAP["reason_codes"])
+        col_recommended_action = _find_col(cols, _COL_MAP["recommended_action"])
+        col_handoff_summary = _find_col(cols, _COL_MAP["handoff_summary"])
+        col_classification = _find_col(cols, _COL_MAP["classification"])
 
-        logger.info(f"Mapping results for {sheet}: Contact='{col_contact}', Projects='{col_projects}', Temp='{col_temp}'")
+        logger.info(
+            f"Mapping results for {sheet}: Contact='{col_contact}', Projects='{col_projects}', Temp='{col_temp}', Score='{col_score}'"
+        )
 
         results = []
         for _, row in df.iterrows():
@@ -298,6 +334,11 @@ async def get_leads(response: Response, sheet: str = Query("leads.csv")):
                 "timeline": raw.get(col_timeline, "") if col_timeline else None,
                 "tags": tags,
                 "temperature": raw.get(col_temp, "") if col_temp else None,
+                "classification": (raw.get(col_classification, "") if col_classification else (raw.get(col_temp, "") if col_temp else None)),
+                "score": _parse_num(raw.get(col_score, "")) if col_score else None,
+                "reason_codes": _parse_reason_codes(raw.get(col_reason_codes, "")) if col_reason_codes else [],
+                "recommended_action": raw.get(col_recommended_action, "") if col_recommended_action else None,
+                "handoff_summary": raw.get(col_handoff_summary, "") if col_handoff_summary else None,
                 "raw": raw,
             })
         return results

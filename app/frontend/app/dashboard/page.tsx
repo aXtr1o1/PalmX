@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useApp } from "@/contexts/app-context";
 import NavigationMenu from "@/components/navigation-menu";
-import { SignOutButton } from "@clerk/nextjs";
+import { useSearchParams } from "next/navigation";
 import {
     Search,
     Download,
@@ -198,6 +198,37 @@ function LeadDetailDrawer({
 }) {
     const [copied, setCopied] = useState(false);
 
+    // UI fallback: if backend normalization misses a column name, still render from `lead.raw`.
+    const recommendedAction =
+        (typeof lead.recommended_action === "string" ? lead.recommended_action : null) ||
+        (lead.raw?.recommended_action as unknown as string) ||
+        null;
+
+    const handoffSummary =
+        (typeof lead.handoff_summary === "string" ? lead.handoff_summary : null) ||
+        (lead.raw?.handoff_summary as unknown as string) ||
+        null;
+
+    const reasonCodes =
+        (lead.reason_codes && lead.reason_codes.length > 0 ? lead.reason_codes : null) ||
+        (() => {
+            const rawVal = (lead.raw?.reason_codes as unknown as string) || "";
+            if (!rawVal) return [];
+            try {
+                const parsed = JSON.parse(rawVal);
+                if (Array.isArray(parsed)) {
+                    return parsed.map((x) => String(x)).filter((x) => x.trim().length > 0);
+                }
+            } catch {
+                // ignore
+            }
+            // Fallback: split by common delimiters.
+            return rawVal
+                .split(/[;|]+/)
+                .map((x) => x.trim())
+                .filter((x) => x.length > 0);
+        })();
+
     const copyJson = () => {
         navigator.clipboard.writeText(JSON.stringify(lead.raw, null, 2));
         setCopied(true);
@@ -238,6 +269,7 @@ function LeadDetailDrawer({
                     <div className="grid grid-cols-2 gap-4">
                         {[
                             { label: "Status", value: lead.temperature },
+                            { label: "Score", value: typeof lead.score === "number" ? lead.score : null },
                             { label: "Region", value: lead.region },
                             { label: "Unit Type", value: lead.unit_type },
                             { label: "Purpose", value: lead.purpose },
@@ -310,6 +342,47 @@ function LeadDetailDrawer({
                         </div>
                     )}
 
+                    {/* SOP scoring (deterministic) */}
+                    {typeof recommendedAction === "string" && recommendedAction.trim() && (
+                        <div>
+                            <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[#5A5A5A]">
+                                Recommended Action
+                            </span>
+                            <p className="text-sm text-[#0B0B0B] mt-2 leading-relaxed bg-[#FAFAFA] p-4 rounded-xl border border-[#E9E9E9]">
+                                {recommendedAction}
+                            </p>
+                        </div>
+                    )}
+
+                    {reasonCodes && reasonCodes.length > 0 && (
+                        <div>
+                            <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[#5A5A5A]">
+                                Reason Codes
+                            </span>
+                            <div className="mt-2 space-y-2">
+                                {reasonCodes.map((rc, i) => (
+                                    <p
+                                        key={i}
+                                        className="text-sm text-[#0B0B0B] leading-relaxed bg-[#FAFAFA] p-4 rounded-xl border border-[#E9E9E9]"
+                                    >
+                                        {rc}
+                                    </p>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {typeof handoffSummary === "string" && handoffSummary.trim() && (
+                        <div>
+                            <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-[#5A5A5A]">
+                                First-call Handoff
+                            </span>
+                            <p className="text-sm text-[#0B0B0B] mt-2 leading-relaxed bg-[#FAFAFA] p-4 rounded-xl border border-[#E9E9E9]">
+                                {handoffSummary}
+                            </p>
+                        </div>
+                    )}
+
                     {/* Raw JSON */}
                     <div>
                         <div className="flex items-center justify-between mb-2">
@@ -339,6 +412,9 @@ function LeadDetailDrawer({
 // ---------------------------------------------------------------------------
 export default function Dashboard() {
     const { dashboardData, setDashboardData, dashboardLoading, setDashboardLoading, shouldRefetch, updateLastFetchTime } = useApp();
+
+    const searchParams = useSearchParams();
+    const autoFetch = searchParams.get("autofetch") === "1";
     
     // Use cached data if available, otherwise initialize state
     const [analytics, setAnalytics] = useState<AnalyticsData | null>(dashboardData?.analytics || null);
@@ -370,12 +446,28 @@ export default function Dashboard() {
     // Navigation menu
     const [menuOpen, setMenuOpen] = useState(false);
 
+    // Dashboard should not auto-fetch; user must explicitly click to load
+    // unless query param `?autofetch=1` is present from the sidebar.
+    const [dashboardRequested, setDashboardRequested] = useState(() => autoFetch);
+
     // --------------------------------------------------
     // Fetch data
     // --------------------------------------------------
+    const sopFieldsPresent = (data: any) => {
+        const leadsArr: any[] = data?.leads || [];
+        if (!Array.isArray(leadsArr) || leadsArr.length === 0) return false;
+        return leadsArr.some((l) => {
+            const scoreOk = typeof l?.score === "number";
+            const recOk =
+                typeof l?.recommended_action === "string" ||
+                typeof l?.raw?.recommended_action === "string";
+            return scoreOk || recOk;
+        });
+    };
+
     const fetchAll = async (sheet = activeSheet, range = timeRange, force = false) => {
         // Skip if we have cached data and it's not stale, unless forced
-        if (!force && dashboardData && !shouldRefetch()) {
+        if (!force && dashboardData && !shouldRefetch() && sopFieldsPresent(dashboardData)) {
             setLoading(false);
             setDashboardLoading(false);
             return;
@@ -416,12 +508,13 @@ export default function Dashboard() {
     };
 
     useEffect(() => {
+        if (!dashboardRequested) return;
         // Only fetch if no cached data or cache is stale
-        if (!dashboardData || shouldRefetch()) {
+        if (!dashboardData || shouldRefetch() || !sopFieldsPresent(dashboardData)) {
             fetchAll();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dashboardRequested]);
 
     const handleRangeChange = (r: string) => {
         setTimeRange(r);
@@ -534,9 +627,9 @@ export default function Dashboard() {
     }
 
     // --------------------------------------------------
-    // Loading state
+    // Loading state (no auto-fetch until user clicks)
     // --------------------------------------------------
-    if (loading && !analytics) {
+    if (!dashboardRequested || (loading && !analytics)) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
@@ -553,6 +646,18 @@ export default function Dashboard() {
                     <p className="text-xs text-[#5A5A5A] tracking-widest uppercase">
                         Loading dashboard
                     </p>
+
+                    {!autoFetch && (
+                        <button
+                            onClick={() => {
+                                setDashboardRequested(true);
+                                fetchAll(activeSheet, timeRange, true);
+                            }}
+                            className="mt-3 px-6 py-3 bg-[#0B0B0B] text-white rounded-full text-xs font-bold tracking-widest uppercase hover:bg-[#D22048] transition-colors"
+                        >
+                            Load Dashboard
+                        </button>
+                    )}
                 </div>
             </div>
         );
@@ -939,12 +1044,53 @@ export default function Dashboard() {
                                     <PieChart>
                                         <Pie
                                             data={analytics.breakdowns.by_temperature}
-                                            innerRadius={60}
-                                            outerRadius={80}
-                                            paddingAngle={5}
                                             dataKey="count"
                                             nameKey="label"
-                                            label={({ name, value }) => `${name}: ${value}`}
+                                            cx="50%"
+                                            cy="50%"
+                                            outerRadius={70}
+                                            innerRadius={50}
+                                            strokeWidth={1}
+                                            stroke="#fff"
+                                            paddingAngle={2}
+                                            labelLine={{ stroke: "#E9E9E9", strokeWidth: 1 }}
+                                            label={({
+                                                cx,
+                                                cy,
+                                                midAngle = 0,
+                                                innerRadius,
+                                                outerRadius,
+                                                index,
+                                                name,
+                                                value,
+                                            }) => {
+                                                const RADIAN = Math.PI / 180;
+                                                // Push labels outward similarly to the Unit Type chart.
+                                                const radius = outerRadius * 1.35;
+                                                const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                                const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+                                                const labelLower = String(name).toLowerCase();
+                                                const color =
+                                                    labelLower === "hot"
+                                                        ? "#D22048"
+                                                        : labelLower === "warm"
+                                                          ? "#F59E0B"
+                                                          : "#64748B";
+
+                                                return (
+                                                    <text
+                                                        x={x}
+                                                        y={y}
+                                                        fill={color}
+                                                        textAnchor={x > cx ? "start" : "end"}
+                                                        dominantBaseline="central"
+                                                        className="text-[10px] font-bold uppercase tracking-wider"
+                                                    >
+                                                        {`${name}: ${value}`}
+                                                    </text>
+                                                );
+                                            }}
                                         >
                                             {analytics.breakdowns.by_temperature.map((entry, index) => {
                                                 const label = entry.label.toLowerCase();
@@ -1065,18 +1211,43 @@ export default function Dashboard() {
                                                 </span>
                                             </td>
                                             <td className="px-5 py-3">
-                                                {lead.temperature ? (
-                                                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${lead.temperature.toLowerCase() === 'hot'
-                                                        ? 'bg-red-50 text-red-600 border border-red-100'
-                                                        : lead.temperature.toLowerCase() === 'warm'
-                                                            ? 'bg-amber-50 text-amber-600 border border-amber-100'
-                                                            : 'bg-slate-50 text-slate-600 border border-slate-100'
-                                                        }`}>
-                                                        {lead.temperature}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-xs text-[#9A9A9A]">Not set</span>
-                                                )}
+                                                <div className="flex flex-col gap-1">
+                                                    {lead.temperature ? (
+                                                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${lead.temperature.toLowerCase() === 'hot'
+                                                            ? 'bg-red-50 text-red-600 border border-red-100'
+                                                            : lead.temperature.toLowerCase() === 'warm'
+                                                                ? 'bg-amber-50 text-amber-600 border border-amber-100'
+                                                                : 'bg-slate-50 text-slate-600 border border-slate-100'
+                                                            }`}>
+                                                            {lead.temperature}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-xs text-[#9A9A9A]">Not set</span>
+                                                    )}
+
+                                                    {typeof lead.score === "number" && (
+                                                        <div className="text-[9px] text-[#9A9A9A]">
+                                                            Score: {Math.round(lead.score)}
+                                                        </div>
+                                                    )}
+
+                                                    {(() => {
+                                                        const norm =
+                                                            typeof lead.recommended_action === "string"
+                                                                ? lead.recommended_action.trim()
+                                                                : "";
+                                                        const raw =
+                                                            lead.raw && typeof (lead.raw as any).recommended_action === "string"
+                                                                ? (lead.raw as any).recommended_action.trim()
+                                                                : "";
+                                                        const v = norm || raw;
+                                                        return v ? (
+                                                            <div className="text-[9px] text-[#9A9A9A] max-w-[140px] truncate">
+                                                                Next: {v}
+                                                            </div>
+                                                        ) : null;
+                                                    })()}
+                                                </div>
                                             </td>
                                             <td className="px-5 py-3">
                                                 <span className="text-xs text-[#5A5A5A]">

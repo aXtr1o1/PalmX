@@ -1,38 +1,24 @@
 'use client';
 
-import {SignUp} from '@clerk/nextjs';
-import Image from 'next/image';
+import Link from "next/link";
 
 export default function SignUpPage() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 font-sans">
-        <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
-          <div className="flex justify-center mb-6">
-            <Image 
-              src="/logo.svg" 
-              alt="PalmX Logo" 
-              width={200} 
-              height={52}
-              className="h-auto"
-              priority
-            />
+        <main className="min-h-screen bg-white flex items-center justify-center p-6">
+          <div className="w-full max-w-lg bg-[#FAFAFA] border border-[#E9E9E9] rounded-2xl p-8">
+            <h1 className="font-serif text-2xl text-[#0B0B0B]">Sign-up disabled</h1>
+            <p className="mt-3 text-sm text-[#5A5A5A]">
+              This app is currently running with auth UI turned off.
+            </p>
+            <div className="mt-6">
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center px-6 py-3 bg-[#0B0B0B] text-white rounded-full text-xs font-bold tracking-widest uppercase hover:bg-[#D22048] transition-colors"
+              >
+                Back to Home
+              </Link>
+            </div>
           </div>
-          <SignUp
-            path="/sign-up"
-            routing="path"
-            signInUrl="/sign-in"
-            appearance={{
-              elements: {
-                card: "rounded-xl shadow-md",
-                headerTitle: "text-xl font-semibold text-center text-gray-700 font-sans",
-                formButtonPrimary: "bg-black text-white hover:bg-primary rounded-full font-sans transition-all",
-                formFieldLabel: "font-sans",
-                formFieldInput: "font-sans",
-                footerActionLink: "font-sans",
-              },
-            }}
-          />
-        </div>
-      </div>
+        </main>
     );
 }

@@ -238,3 +238,60 @@ Am Johnsonno, looking for Villa in West Cairo",list_projects,"[""jirian_palm_hil
 2026-03-20T18:42:42.854000,mku1t8,provide me rekated to property,list_projects,"[""hacienda_waters"", ""jirian_palm_hills"", ""hacienda_heneish""]",[],v1.0,all
 2026-03-20T18:43:16.373703,mku1t8,what is hacienda waters,project_query,"[""hacienda_waters_2"", ""hacienda_waters"", ""hacienda_white""]",[],v1.0,all
 2026-03-20T18:43:37.379011,mku1t8,can I take it for 1000 EGP,pricing,"[""hacienda_waters"", ""hacienda_bay"", ""hacienda_heneish""]",[],v1.0,all
+2026-03-23T12:16:42.566764,mku1t8,Show me some good options,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-03-23T12:17:20.106932,mku1t8,I want to invest but not sure where.,list_projects,"[""st_88"", ""new_capital_gardens"", ""jirian_palm_hills""]",[],v1.0,all
+2026-03-23T12:17:59.719273,mku1t8,Just browsing some properties.,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-03-23T12:25:15.485324,mku1t8,That seems too expensive.,pricing,"[""hacienda_heneish"", ""hacienda_waters"", ""hacienda_blue""]",[],v1.0,all
+2026-03-23T12:25:40.300130,mku1t8,That seems too expensive.,pricing,"[""hacienda_heneish"", ""new_capital_gardens"", ""hacienda_waters""]",[],v1.0,all
+2026-03-23T12:26:04.625317,mku1t8,I'm not sure this is worth it,pricing,"[""hacienda_waters"", ""hacienda_heneish"", ""st_88""]",[],v1.0,all
+2026-03-23T12:26:19.969931,mku1t8,I think I’ll wait for a year.,lead_capture,[],[],v1.0,all
+2026-03-23T12:26:40.998034,mku1t8,I don’t trust these projects much,support_contact,[],[],v1.0,all
+2026-03-23T12:38:51.142497,mku1t8,i dont trust these project much,list_projects,[],[],v1.0,all
+2026-03-23T12:39:26.790680,mku1t8,I think I'll wait for a year,lead_capture,[],[],v1.0,all
+2026-03-23T12:41:05.452486,mku1t8,Hi,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-03-23T12:42:50.324218,mku1t8,hi,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-03-23T12:43:09.965975,mku1t8,give me some suggestions,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-03-23T12:43:57.980820,mku1t8,I dont believe this projects,list_projects,"[""golf_extension"", ""lakeyard"", ""st_88""]",[],v1.0,all
+2026-03-23T12:44:41.964440,mku1t8,i dont belive this project,list_projects,[],[],v1.0,all
+2026-03-23T12:46:15.146963,mku1t8,I dont believe in this project,list_projects,[],[],v1.0,all
+2026-03-23T12:46:32.625551,mku1t8,I dont understand,support_contact,[],[],v1.0,all
+2026-03-23T12:48:23.938495,mku1t8,Hi,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-03-23T12:49:02.341391,mku1t8,hi,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-03-23T12:51:48.719483,mku1t8,hi,support_contact,[],[],v1.0,all
+2026-03-23T12:52:08.059917,mku1t8,Give me some suggestions,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-03-23T12:53:52.704587,mku1t8,purpose is to buy,lead_capture,[],[],v1.0,all
+2026-03-23T12:54:16.322313,mku1t8,North Coast,list_projects,"[""hacienda_waters_2"", ""hacienda_heneish"", ""hacienda_white""]",[],v1.0,all
+2026-03-23T12:54:28.719926,mku1t8,300,pricing,"[""hacienda_west"", ""hacienda_blue"", ""hacienda_heneish""]",[],v1.0,all
+2026-03-23T12:54:52.430844,mku1t8,I dont beleive these projests!,support_contact,[],[],v1.0,all
+2026-03-23T12:55:20.375475,mku1t8,I think I’ll wait for a year.,lead_capture,[],[],v1.0,all
+2026-03-23T14:14:47.793185,mku1t8,Hi,support_contact,[],[],v1.0,all
+2026-03-23T14:15:13.960906,mku1t8,Provide me some details on the Properties,list_projects,"[""hacienda_blue"", ""hacienda_waters"", ""jirian_palm_hills""]",[],v1.0,all
+2026-03-23T14:15:50.933222,mku1t8,I dont have any,lead_capture,[],[],v1.0,all
+2026-03-23T14:17:15.097699,mku1t8,yeah for personal use,list_projects,[],[],v1.0,all
+2026-03-23T14:17:37.660799,mku1t8,North Coast,list_projects,"[""hacienda_white"", ""hacienda_waters_2"", ""lakeyard""]",[],v1.0,all
+2026-03-23T14:18:05.361287,mku1t8,I like more details on white,project_query,"[""hacienda_white""]",[],v1.0,all
+2026-03-23T14:18:32.811239,mku1t8,sure,list_projects,[],[],v1.0,all
+2026-03-23T14:18:43.888978,mku1t8,I dont believe this project,project_query,"[""hacienda_white""]",[],v1.0,all
+2026-03-23T14:19:09.162263,mku1t8,developer cerdibility,project_query,"[""lakeyard"", ""hacienda_white"", ""hacienda_waters_2""]",[],v1.0,all
+2026-03-23T14:19:27.056913,mku1t8,I am not convinced,support_contact,[],[],v1.0,all
+2026-03-23T14:20:48.522026,mku1t8,Hi ,list_projects,"[""hacienda_waters_2"", ""hacienda_white"", ""lakeyard""]",[],v1.0,all
+2026-03-23T14:21:05.395608,mku1t8,I need information on properties,list_projects,"[""hacienda_white"", ""hacienda_waters_2"", ""lakeyard""]",[],v1.0,all
+2026-03-23T14:22:34.293079,mku1t8,Personal use,list_projects,"[""hacienda_waters_2"", ""hacienda_white"", ""hacienda_heneish""]",[],v1.0,all
+2026-03-23T14:22:50.330896,mku1t8,North Coast,list_projects,"[""hacienda_waters_2"", ""hacienda_white"", ""lakeyard""]",[],v1.0,all
+2026-03-23T14:23:06.918327,mku1t8,Blue,project_query,[],[],v1.0,all
+2026-03-23T14:23:51.339852,mku1t8,I dont believe this,support_contact,[],[],v1.0,all
+2026-03-23T14:24:06.287504,mku1t8,give,list_projects,"[""hacienda_waters_2"", ""hacienda_white"", ""lakeyard""]",[],v1.0,all
+2026-03-23T14:24:20.296315,mku1t8,Give more,project_query,[],[],v1.0,all
+2026-03-23T14:24:55.656884,mku1t8,Still idk beleive them,support_contact,[],[],v1.0,all
+2026-03-23T14:25:24.695716,mku1t8,I dont actially trust them,support_contact,[],[],v1.0,all
+2026-03-23T14:26:29.984450,mku1t8,Hi,support_contact,[],[],v1.0,all
+2026-03-23T14:26:49.862618,mku1t8,Provide me information on properties,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
+2026-03-23T14:27:06.329835,mku1t8,Personals use,list_projects,"[""village_de_la_capitale"", ""jirian_palm_hills"", ""p_x""]",[],v1.0,all
+2026-03-23T14:27:15.938160,mku1t8,New Cpatial,list_projects,[],[],v1.0,all
+2026-03-23T14:27:25.234153,mku1t8,Townhouse,list_projects,[],[],v1.0,all
+2026-03-23T14:27:39.429254,mku1t8,90000000,lead_capture,[],[],v1.0,all
+2026-03-23T14:28:09.498033,mku1t8,I dont believe plam hills developer provide me different developers,list_projects,[],[],v1.0,all
+2026-03-23T14:28:36.959082,mku1t8,No Give me details on other projects,list_projects,[],[],v1.0,all
+2026-03-23T14:28:45.745820,mku1t8,done by different developers,list_projects,[],[],v1.0,all
+2026-03-23T14:48:58.681682,mku1t8,Hi,support_contact,[],[],v1.0,all
+2026-03-23T14:58:05.156864,mku1t8,Ready to move options,list_projects,[],[],v1.0,all

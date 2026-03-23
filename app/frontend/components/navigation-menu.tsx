@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SignOutButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 
 interface NavigationMenuProps {
@@ -47,10 +46,11 @@ export default function NavigationMenu({ menuOpen, setMenuOpen }: NavigationMenu
                     <nav className="flex flex-col space-y-6">
                         {[
                             { label: 'Concierge', href: '/' },
-                            { label: 'Dashboard', href: '/dashboard' },
+                            { label: 'Dashboard', href: '/dashboard?autofetch=1' },
                             { label: 'Data Sources', href: '/data-sources' },
                         ].map((item, i) => {
-                            const isActive = pathname === item.href;
+                            const hrefPath = item.href.split("?")[0];
+                            const isActive = pathname === hrefPath;
                             return (
                                 <Link
                                     key={item.label}
@@ -139,18 +139,6 @@ export default function NavigationMenu({ menuOpen, setMenuOpen }: NavigationMenu
                             © {new Date().getFullYear()} Palm Hills Developments.
                         </p>
                     </div>
-                    <SignOutButton>
-                            <button
-                                onClick={() => setMenuOpen(false)}
-                                className={cn(
-                                    "font-serif text-2xl md:text-2xl text-white-500 text-left hover:text-primary transition-all duration-300 transform hover:translate-x-2",
-                                    menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                                )}
-                                style={{ transitionDelay: `${450}ms` }}
-                            >
-                                Sign Out
-                            </button>
-                        </SignOutButton>
 
                 </div>
             </div>
