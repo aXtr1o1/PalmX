@@ -26,7 +26,7 @@ export interface Lead {
 
 // Use relative paths so Next.js proxy/rewrites apply consistently.
 // (Chat UI uses `/api/health` already; keep chat endpoints aligned.)
-const API_BASE = '';
+const API_BASE = 'http://20.224.153.225:8000';
 
 export const api = {
     chat: async (sessionId: string, messages: ChatMessage[]): Promise<ChatResponse> => {
