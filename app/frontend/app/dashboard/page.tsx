@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { Suspense, useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useApp } from "@/contexts/app-context";
@@ -411,6 +411,22 @@ function LeadDetailDrawer({
 // Main Dashboard Component
 // ---------------------------------------------------------------------------
 export default function Dashboard() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen bg-white flex items-center justify-center">
+                    <p className="text-xs text-[#5A5A5A] tracking-widest uppercase">
+                        Loading dashboard
+                    </p>
+                </div>
+            }
+        >
+            <DashboardContent />
+        </Suspense>
+    );
+}
+
+function DashboardContent() {
     const { dashboardData, setDashboardData, dashboardLoading, setDashboardLoading, shouldRefetch, updateLastFetchTime } = useApp();
 
     const searchParams = useSearchParams();
