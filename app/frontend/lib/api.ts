@@ -26,6 +26,7 @@ export interface Lead {
 
 // Use relative paths so Next.js proxy/rewrites apply consistently.
 // (Chat UI uses `/api/health` already; keep chat endpoints aligned.)
+// Use Next.js rewrites (next.config.js) instead of hard-coding an IP.
 const API_BASE = '';
 
 export const api = {

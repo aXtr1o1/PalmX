@@ -3,7 +3,13 @@ const nextConfig = {
     output: 'standalone', // Optimized for Docker
     async rewrites() {
         const isDev = process.env.NODE_ENV !== 'production';
-        const backendUrl =  'http://20.224.153.225:8000';
+        // Configure backend from env so you can use localhost/IP on dev and the right URL on Vercel.
+        // Recommended: set `NEXT_PUBLIC_BACKEND_URL` in your environment.
+        const backendUrl =
+            process.env.NEXT_PUBLIC_BACKEND_URL ||
+            process.env.BACKEND_URL ||
+            // Safe default for local dev:
+            'http://localhost:8000';
 
         console.log(`[Next.js] Proxying API requests to: ${backendUrl}`);
 
