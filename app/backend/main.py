@@ -56,14 +56,73 @@ def _decide_persona_via_model(
     """
     history_text = "\n".join([f"{m.role}: {m.content}" for m in history[-12:]])
     prompt = f"""
-You are a persona-state selector for PalmX.
-Return STRICT JSON ONLY with keys:
-- mode (concierge | lead_capture | support)
-- persona_state (primary | secondary | support)
-- persona_stage (discovery | qualification | recommendation | exploration | objection | intent_escalation | cta | confirmation | handoff | fallback)
-- support_stage (faq | comparison | detail_drilldown | shortlist_refinement | re_engagement)
+    You are an intelligent Persona-State Selector for PalmX.
+
+Your job is to analyze the conversation context and select the MOST appropriate persona configuration.
+
+You must return STRICT JSON ONLY with:
+{
+  "mode": "concierge | lead_capture | support",
+  "persona_state": "primary | secondary | support",
+  "persona_stage": "discovery | qualification | recommendation | exploration | objection | intent_escalation | cta | confirmation | handoff | fallback",
+  "support_stage": "faq | comparison | detail_drilldown | shortlist_refinement | re_engagement"
+}
+
+-------------------------
+PERSONA DEFINITIONS
+-------------------------
+
+PRIMARY PERSONA (Default user journey flow)
+Use when the user is progressing toward a decision.
+
+- discovery → User intent is unclear; ask ONE sharp question to clarify.
+- qualification → Collect key details (budget, preferences, constraints).
+- recommendation → Suggest best-fit options based on known inputs.
+- exploration → Show alternatives when user is browsing or unsure.
+- objection → Handle doubts, hesitations, or blockers.
+- intent_escalation → Strong buying signals (ready, interested, serious).
+- cta → Push user toward action (book, sign up, proceed).
+- confirmation → Confirm selections, details, or decisions.
+- handoff → Transfer to human agent or external process.
+- fallback → Handle unknown, vague, or unsupported queries safely.
+
+SECONDARY PERSONA (User-type signals)
+Use ONLY when explicitly indicated.
+
+- investor → Focus on ROI, returns, pricing value.
+- end_user → Personal usage intent.
+- overseas → User is remote or international.
+- urgency → Immediate need or time pressure.
+- personalization → Wants highly tailored/custom responses.
+
+SUPPORT PERSONA (Information assistance mode)
+Use when user is NOT progressing toward conversion but seeking info.
+
+- faq → Direct factual question.
+- comparison → Comparing multiple options.
+- detail_drilldown → Deep dive into one option.
+- shortlist_refinement → Narrowing choices.
+- re_engagement → Revive inactive or disengaged user.
+
+-------------------------
+DECISION RULES
+-------------------------
+
+1. Default to PRIMARY persona unless clear signals suggest otherwise.
+2. Use SECONDARY persona_state ONLY if a strong user trait is detected.
+3. Use SUPPORT mode ONLY if the user is asking informational or comparison queries.
+4. Always choose the MOST ADVANCED logical stage in the journey.
+5. If intent is unclear → use discovery.
+6. If user shows buying intent → prioritize intent_escalation or cta.
+7. If conversation breaks or is invalid → fallback.
+8. Never leave any field empty (use null ONLY for support_stage if not applicable).
+
+-------------------------
+INPUTS
+-------------------------
 
 Current backend intent: {intent}
+
 Current persona:
 - mode: {current_cfg.mode}
 - persona_state: {current_cfg.persona_state}
@@ -75,6 +134,12 @@ Conversation history:
 
 Latest user message:
 {user_message}
+
+-------------------------
+OUTPUT FORMAT (STRICT)
+-------------------------
+
+Return ONLY valid JSON. No explanation. No text outside JSON.
 """
     try:
         response = llm_service.client.chat.completions.create(
@@ -111,7 +176,7 @@ def _default_persona() -> ChatResponse:
         retrieved_projects=[],
         mode="concierge",
         persona_state="primary",
-        persona_stage="initial_greeting",
+        persona_stage="discovery",
         support_stage="faq",
     )
 

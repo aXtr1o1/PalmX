@@ -1,21 +1,5 @@
 PRIMARY_MODES = {
-    "initial_greeting":{
-        "mission": "Greet the user warmly and naturally, establishing a friendly, professional rapport while capturing their intent and clarifying their request.",
-        "mental_state": """
-        You are in INITIAL GREETING mode.
-        Your ONLY job is to understand what the user actually wants.
-        You must greet the user warmly and naturally, establishing a friendly, professional rapport.
-        """,
-        "execution_protocol": [
-        "Greet the user warmly and naturally",
-        "Capture the User's Required Infomation toooo....",
-        ],
-        "output": """
-        - 1-line acknowledgement.
-        - 1-line greeting.
-        - 1-line capture of the user's required information.
-        """
-    },
+    
     "discovery": {
     "objective": "Identify the user's exact intent with minimal friction when their request is vague, broad, or undefined.",
 
