@@ -107,7 +107,7 @@ def _default_persona_for_intent(intent: str) -> ChatResponse:
     """
     mode = "concierge"
     persona_state = "primary"
-    persona_stage = "exploration"
+    persona_stage = "discovery"
     support_stage = "faq"
 
     if intent == "lead_capture":
@@ -127,7 +127,7 @@ def _default_persona_for_intent(intent: str) -> ChatResponse:
     else:
         # project_query, list_projects, etc.
         persona_state = "primary"
-        persona_stage = "exploration"
+        persona_stage = "discovery"
         mode = "concierge"
 
     # message/retrieved_projects are not used by build_system_prompt(); keep minimal.
