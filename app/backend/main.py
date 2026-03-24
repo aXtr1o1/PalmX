@@ -8,7 +8,6 @@ import json
 import logging
 import os
 from datetime import datetime
-
 from app.backend.config import Config
 from app.backend.models import ChatRequest, ChatResponse, Lead, Message
 from app.backend.services.llm_service import llm_service
@@ -27,6 +26,7 @@ logger = logging.getLogger("PalmX-API")
 # The frontend currently sends only `{session_id, messages, locale}`.
 # To keep persona_state/persona_stage/support_stage consistent across turns
 # without touching frontend code, we store the persona configuration per session_id.
+
 _PERSONA_BY_SESSION: dict[str, ChatResponse] = {}
 
 def _log_persona(session_id: str, cfg: ChatResponse, source: str) -> None:
@@ -101,43 +101,18 @@ Latest user message:
         logger.error(f"Persona fallback model decision failed: {e}")
         return None
 
-def _default_persona_for_intent(intent: str) -> ChatResponse:
+def _default_persona() -> ChatResponse:
     """
-    Create a safe default persona configuration for a new session.
+    Create a neutral initial persona configuration.
+    Persona stage/state should be selected by `_decide_persona_via_model`.
     """
-    mode = "concierge"
-    persona_state = "primary"
-    persona_stage = "discovery"
-    support_stage = "faq"
-
-    if intent == "lead_capture":
-        mode = "lead_capture"
-        persona_state = "primary"
-        persona_stage = "qualification"
-        support_stage = "faq"
-    elif intent == "support_contact":
-        mode = "support"
-        persona_state = "support"
-        persona_stage = "qualification"
-        support_stage = "faq"
-    elif intent in ("pricing", "compare", "amenity_check"):
-        persona_state = "primary"
-        persona_stage = "recommendation"
-        mode = "concierge"
-    else:
-        # project_query, list_projects, etc.
-        persona_state = "primary"
-        persona_stage = "discovery"
-        mode = "concierge"
-
-    # message/retrieved_projects are not used by build_system_prompt(); keep minimal.
     return ChatResponse(
         message="",
         retrieved_projects=[],
-        mode=mode,
-        persona_state=persona_state,
-        persona_stage=persona_stage,
-        support_stage=support_stage,
+        mode="concierge",
+        persona_state="primary",
+        persona_stage="initial_greeting",
+        support_stage="faq",
     )
 
 
@@ -150,11 +125,9 @@ def _get_persona_for_session(
     """
     Return the persona configuration for this session, initializing on first contact.
     """
-    print(f"Getting persona for session: {session_id}")
-    print(f"Persona by session: {_PERSONA_BY_SESSION}")
     if session_id not in _PERSONA_BY_SESSION:
-        _PERSONA_BY_SESSION[session_id] = _default_persona_for_intent(intent)
-        _log_persona(session_id, _PERSONA_BY_SESSION[session_id], "init_from_intent")
+        _PERSONA_BY_SESSION[session_id] = _default_persona()
+        _log_persona(session_id, _PERSONA_BY_SESSION[session_id], "init_neutral")
         return _PERSONA_BY_SESSION[session_id]
 
     cfg = _PERSONA_BY_SESSION[session_id]
@@ -243,7 +216,7 @@ TOOLS = [
 
 # --- Endpoints ---
 
-@app.post("/api/chat", response_model=ChatResponse)
+@app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     try:
         user_msg = request.messages[-1].content
@@ -269,7 +242,19 @@ async def chat_endpoint(request: ChatRequest):
         for p in retrieved_docs:
             context_text += f"---\n{kb_service.build_project_card(p)}\n"
             
-        persona_cfg = _get_persona_for_session(session_id, router_out.intent, user_message=user_msg)
+        # Persona is selected by the model before building the answer prompt.
+        current_cfg = _get_persona_for_session(session_id, router_out.intent, user_message=user_msg)
+        decided_persona = _decide_persona_via_model(
+            session_id=session_id,
+            intent=router_out.intent,
+            user_message=user_msg,
+            history=history,
+            current_cfg=current_cfg,
+        )
+        logger.info(f"Decided persona: {decided_persona}")
+        logger.info(f"Current persona: {current_cfg}")
+
+        persona_cfg = decided_persona or current_cfg
         full_system_msg  = build_system_prompt(user_msg, history, persona_cfg) + f"\n\nCONTEXT:\n{context_text}"
         
         # 4. Answer Generation
@@ -359,7 +344,7 @@ async def chat_endpoint(request: ChatRequest):
             mode="concierge"
         )
 
-@app.post("/api/chat/stream")
+@app.post("/chat/stream")
 async def chat_stream_endpoint(request: ChatRequest):
     try:
         user_msg = request.messages[-1].content
@@ -383,13 +368,30 @@ async def chat_stream_endpoint(request: ChatRequest):
         for p in retrieved_docs:
             context_text += f"---\n{kb_service.build_project_card(p)}\n"
         
-        current_date = datetime.now().strftime("%B %d, %Y")
-        persona_cfg = _get_persona_for_session(
+        # Persona is selected by the model before building the streaming prompt.
+        current_cfg = _get_persona_for_session(
             session_id,
             router_out.intent,
             model_persona=None,
             user_message=user_msg,
         )
+        decided_persona = _decide_persona_via_model(
+            session_id=session_id,
+            intent=router_out.intent,
+            user_message=user_msg,
+            history=history,
+            current_cfg=current_cfg,
+        )
+        logger.info(f"Decided persona: {decided_persona}")
+        logger.info(f"Current persona: {current_cfg}")
+        
+        logger.info(f"User message: {user_msg}")
+        logger.info(f"History: {history}")
+        logger.info(f"Router out: {router_out}")
+        logger.info(f"Retrieved docs: {retrieved_docs}")
+        logger.info(f"Context text: {context_text}")
+        
+        persona_cfg = decided_persona or current_cfg
         full_system_msg = build_system_prompt(user_msg, history, persona_cfg) + f"\n\nCONTEXT:\n{context_text}"
         full_system_msg += (
             "\n\nSTREAM_OUTPUT_RULES (STRICT):\n"

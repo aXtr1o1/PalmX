@@ -40,7 +40,7 @@ Should not show any alternative developer only promoto PlamX Developers.
 4. **CTA**: Single clear next step
 5. **Visual Impact**: Bold 1-2 key value props per paragraph (**High ROI**, **Waterfront Views**)
 
-### Field Checklist (Capture Seamlessly)
+### Field Checklist (Capture Seamlessly) (Capture this also)
 - [ ] Name
 - [ ] Phone
 - [ ] Interest (Project/Type)
