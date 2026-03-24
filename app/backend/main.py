@@ -29,6 +29,13 @@ logger = logging.getLogger("PalmX-API")
 
 _PERSONA_BY_SESSION: dict[str, ChatResponse] = {}
 
+
+def _safe_stage(val: Any, fallback: str) -> str:
+    if isinstance(val, str):
+        v = val.strip()
+        return v if v else fallback
+    return fallback
+
 def _log_persona(session_id: str, cfg: ChatResponse, source: str) -> None:
     """
     Log persona state transitions for easier debugging and audit.
@@ -115,7 +122,7 @@ DECISION RULES
 5. If intent is unclear → use discovery.
 6. If user shows buying intent → prioritize intent_escalation or cta.
 7. If conversation breaks or is invalid → fallback.
-8. Never leave any field empty (use null ONLY for support_stage if not applicable).
+8. Never leave any field empty; always return valid non-empty strings for every field.
 
 -------------------------
 INPUTS
@@ -155,10 +162,10 @@ Return ONLY valid JSON. No explanation. No text outside JSON.
         model_persona = ChatResponse(
             message="",
             retrieved_projects=[],
-            mode=data.get("mode", current_cfg.mode),
-            persona_state=data.get("persona_state", current_cfg.persona_state),
-            persona_stage=data.get("persona_stage", current_cfg.persona_stage),
-            support_stage=data.get("support_stage", current_cfg.support_stage),
+            mode=_safe_stage(data.get("mode"), current_cfg.mode),
+            persona_state=_safe_stage(data.get("persona_state"), current_cfg.persona_state),
+            persona_stage=_safe_stage(data.get("persona_stage"), current_cfg.persona_stage),
+            support_stage=_safe_stage(data.get("support_stage"), current_cfg.support_stage),
         )
         _get_persona_for_session(session_id, intent, model_persona=model_persona)
         return model_persona
@@ -330,10 +337,10 @@ async def chat_endpoint(request: ChatRequest):
         )
         try:
             response_json = json.loads(response_data)
-            persona_cfg.mode = response_json.get("mode", persona_cfg.mode)
-            persona_cfg.persona_state = response_json.get("persona_state", persona_cfg.persona_state)
-            persona_cfg.persona_stage = response_json.get("persona_stage", persona_cfg.persona_stage)
-            persona_cfg.support_stage = response_json.get("support_stage", persona_cfg.support_stage)
+            persona_cfg.mode = _safe_stage(response_json.get("mode"), persona_cfg.mode)
+            persona_cfg.persona_state = _safe_stage(response_json.get("persona_state"), persona_cfg.persona_state)
+            persona_cfg.persona_stage = _safe_stage(response_json.get("persona_stage"), persona_cfg.persona_stage)
+            persona_cfg.support_stage = _safe_stage(response_json.get("support_stage"), persona_cfg.support_stage)
             retrieved_projects = response_json.get("retrieved_projects", [])
             message = response_json.get("message", "")
             
@@ -537,10 +544,10 @@ async def chat_stream_endpoint(request: ChatRequest):
                         model_persona = ChatResponse(
                             message="",
                             retrieved_projects=[],
-                            mode=persona_data.get("mode", persona_cfg.mode),
-                            persona_state=persona_data.get("persona_state", persona_cfg.persona_state),
-                            persona_stage=persona_data.get("persona_stage", persona_cfg.persona_stage),
-                            support_stage=persona_data.get("support_stage", persona_cfg.support_stage),
+                            mode=_safe_stage(persona_data.get("mode"), persona_cfg.mode),
+                            persona_state=_safe_stage(persona_data.get("persona_state"), persona_cfg.persona_state),
+                            persona_stage=_safe_stage(persona_data.get("persona_stage"), persona_cfg.persona_stage),
+                            support_stage=_safe_stage(persona_data.get("support_stage"), persona_cfg.support_stage),
                         )
                         _get_persona_for_session(session_id, router_out.intent, model_persona=model_persona)
                         persona_extracted = True
