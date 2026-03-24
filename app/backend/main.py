@@ -61,12 +61,12 @@ def _decide_persona_via_model(
 Your job is to analyze the conversation context and select the MOST appropriate persona configuration.
 
 You must return STRICT JSON ONLY with:
-{
+
   "mode": "concierge | lead_capture | support",
   "persona_state": "primary | secondary | support",
   "persona_stage": "discovery | qualification | recommendation | exploration | objection | intent_escalation | cta | confirmation | handoff | fallback",
   "support_stage": "faq | comparison | detail_drilldown | shortlist_refinement | re_engagement"
-}
+
 
 -------------------------
 PERSONA DEFINITIONS
