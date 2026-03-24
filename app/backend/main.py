@@ -36,6 +36,29 @@ def _safe_stage(val: Any, fallback: str) -> str:
         return v if v else fallback
     return fallback
 
+
+def _save_lead_from_args(session_id: str, args: dict[str, Any]) -> bool:
+    """Build and persist lead from tool-call style arguments."""
+    lead = Lead(
+        session_id=session_id,
+        name=args.get("name"),
+        phone=args.get("phone"),
+        interest_projects=args.get("interest_projects", "").split(",") if args.get("interest_projects") else [],
+        preferred_region=args.get("preferred_region"),
+        unit_type=args.get("unit_type"),
+        budget_min=args.get("budget_min"),
+        budget_max=args.get("budget_max"),
+        purpose=args.get("purpose"),
+        timeline=args.get("timeline"),
+        next_step=args.get("next_step"),
+        lead_summary=args.get("lead_summary"),
+        tags=args.get("tags", "").split(",") if args.get("tags") else [],
+        kb_version_hash=args.get("kb_version_hash", "v1.0"),
+    )
+    saved = leads_service.save_lead(lead)
+    logger.info("Lead save attempted for session=%s saved=%s name=%s", session_id, saved, lead.name)
+    return saved
+
 def _log_persona(session_id: str, cfg: ChatResponse, source: str) -> None:
     """
     Log persona state transitions for easier debugging and audit.
@@ -335,6 +358,7 @@ async def chat_endpoint(request: ChatRequest):
             request.messages,
             tools=TOOLS
         )
+        response_json = None
         try:
             response_json = json.loads(response_data)
             persona_cfg.mode = _safe_stage(response_json.get("mode"), persona_cfg.mode)
@@ -358,25 +382,23 @@ async def chat_endpoint(request: ChatRequest):
                 if tool_call.function.name == "save_lead":
                     args = json.loads(tool_call.function.arguments)
                     logger.info(f"Tool Call 'save_lead' Args: {args}")
-                    
-                    lead = Lead(
-                        session_id=session_id,
-                        name=args.get('name'),
-                        phone=args.get('phone'),
-                        interest_projects=args.get('interest_projects', '').split(',') if args.get('interest_projects') else [],
-                        preferred_region=args.get('preferred_region'),
-                        unit_type=args.get('unit_type'),
-                        budget_min=args.get('budget_min'),
-                        budget_max=args.get('budget_max'),
-                        purpose=args.get('purpose'),
-                        timeline=args.get('timeline'),
-                        next_step=args.get('next_step'),
-                        lead_summary=args.get('lead_summary'),
-                        tags=args.get('tags', '').split(',') if args.get('tags') else [],
-                        kb_version_hash=args.get('kb_version_hash', 'v1.0')
-                    )
-                    leads_service.save_lead(lead)
-                    final_text = f"Thank you {lead.name}. Your details have been saved. A sales representative will contact you at {lead.phone} shortly."
+                    _save_lead_from_args(session_id, args)
+                    final_text = f"Thank you {args.get('name')}. Your details have been saved. A sales representative will contact you at {args.get('phone')} shortly."
+        # Fallback: some models return `tool_calls` inside JSON payload instead of native tool_calls.
+        elif isinstance(response_json, dict) and isinstance(response_json.get("tool_calls"), list):
+            for tc in response_json.get("tool_calls", []):
+                fn = tc.get("tool") or tc.get("name") or tc.get("function", {}).get("name")
+                if fn != "save_lead":
+                    continue
+                raw_args = tc.get("args") or tc.get("arguments") or tc.get("function", {}).get("arguments") or {}
+                if isinstance(raw_args, str):
+                    try:
+                        raw_args = json.loads(raw_args)
+                    except Exception:
+                        raw_args = {}
+                if isinstance(raw_args, dict):
+                    _save_lead_from_args(session_id, raw_args)
+                    final_text = f"Thank you {raw_args.get('name')}. Your details have been saved. A sales representative will contact you at {raw_args.get('phone')} shortly."
         else:
             final_text = response_data
         
@@ -491,24 +513,8 @@ async def chat_stream_endpoint(request: ChatRequest):
                     for tc in tool_calls:
                         if tc["function"]["name"] == "save_lead":
                             args = json.loads(tc["function"]["arguments"])
-                            lead = Lead(
-                                session_id=session_id,
-                                name=args.get('name'),
-                                phone=args.get('phone'),
-                                interest_projects=args.get('interest_projects', '').split(',') if args.get('interest_projects') else [],
-                                preferred_region=args.get('preferred_region'),
-                                unit_type=args.get('unit_type'),
-                                budget_min=args.get('budget_min'),
-                                budget_max=args.get('budget_max'),
-                                purpose=args.get('purpose'),
-                                timeline=args.get('timeline'),
-                                next_step=args.get('next_step'),
-                                lead_summary=args.get('lead_summary'),
-                                tags=args.get('tags', '').split(',') if args.get('tags') else [],
-                                kb_version_hash=args.get('kb_version_hash', 'v1.0')
-                            )
-                            leads_service.save_lead(lead)
-                            confirm_msg = f"Thank you {lead.name}. Your details have been saved. A sales representative will contact you at {lead.phone} shortly."
+                            _save_lead_from_args(session_id, args)
+                            confirm_msg = f"Thank you {args.get('name')}. Your details have been saved. A sales representative will contact you at {args.get('phone')} shortly."
                             yield f"data: {json.dumps({'token': confirm_msg})}\n\n"
                     continue
 
