@@ -1,1 +1,0 @@
-# PalmX Backend Routes

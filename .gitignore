@@ -35,3 +35,7 @@ ui/node_modules/
 #leads*.csv
 *.xlsx
 
+venv/
+.env
+__pycache__/
+*.pyc
