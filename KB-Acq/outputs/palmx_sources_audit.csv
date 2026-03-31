@@ -1,0 +1,159 @@
+project_id,field_name,field_value,source_url,evidence_type,evidence_snippet,screenshot_path,captured_date
+97_hills,starting_price_value,37000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/97-hills,dom,Zone 'Zone 1' starting from 37M,,2026-02-10
+97_hills,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/97-hills,https://www.palmhillsdevelopments.com/en-us/residential-properties/97-hills,dom,Project detail page,,2026-02-10
+97_hills,region,East,https://www.palmhillsdevelopments.com/en-us/residential-properties/97-hills,dom,Location: New Cairo,,2026-02-10
+97_hills,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/97-hills,dom,Status: under_construction,,2026-02-10
+badya,starting_price_value,34400000,https://www.palmhillsdevelopments.com/en-us/residential-properties/city/badya,dom,Zone 'Dae' starting from 34.4M,,2026-02-10
+badya,starting_price_value,14700000,https://www.palmhillsdevelopments.com/en-us/residential-properties/city/badya,dom,Zone 'Rae' starting from 14.7M,,2026-02-10
+badya,starting_price_value,14700000,https://www.palmhillsdevelopments.com/en-us/residential-properties/city/badya,dom,Zone 'Isana' starting from 14.7M,,2026-02-10
+badya,starting_price_value,18200000,https://www.palmhillsdevelopments.com/en-us/residential-properties/city/badya,dom,Zone 'Isha' starting from 18.2M,,2026-02-10
+badya,starting_price_value,17500000,https://www.palmhillsdevelopments.com/en-us/residential-properties/city/badya,dom,Zone 'Isola' starting from 17.5M,,2026-02-10
+badya,starting_price_value,14700000,https://www.palmhillsdevelopments.com/en-us/residential-properties/city/badya,dom,Zone 'Isara' starting from 14.7M,,2026-02-10
+badya,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/city/badya,https://www.palmhillsdevelopments.com/en-us/residential-properties/city/badya,dom,Project detail page,,2026-02-10
+badya,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/city/badya,dom,Location: 6th of October / West Cairo,,2026-02-10
+badya,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/city/badya,dom,Status: under_construction,,2026-02-10
+bamboo,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/bamboo,https://www.palmhillsdevelopments.com/en-us/residential-properties/bamboo,dom,Project detail page,,2026-02-10
+bamboo,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/bamboo,dom,Location: 6th of October / West Cairo,,2026-02-10
+bamboo,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/bamboo,dom,Status: delivered,,2026-02-10
+bamboo_extension,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/bamboo-extension,https://www.palmhillsdevelopments.com/en-us/residential-properties/bamboo-extension,dom,Project detail page,,2026-02-10
+bamboo_extension,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/bamboo-extension,dom,Location: 6th of October / West Cairo,,2026-02-10
+bamboo_extension,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/bamboo-extension,dom,Status: delivered,,2026-02-10
+casa,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/casa,https://www.palmhillsdevelopments.com/en-us/residential-properties/casa,dom,Project detail page,,2026-02-10
+casa,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/casa,dom,Location: 6th of October / West Cairo,,2026-02-10
+casa,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/casa,dom,Status: delivered,,2026-02-10
+golf_extension,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/golf-extension,https://www.palmhillsdevelopments.com/en-us/residential-properties/golf-extension,dom,Project detail page,,2026-02-10
+golf_extension,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/golf-extension,dom,Location: 6th of October / West Cairo,,2026-02-10
+golf_extension,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/golf-extension,dom,Status: delivered,,2026-02-10
+golf_views,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/golf-views,https://www.palmhillsdevelopments.com/en-us/residential-properties/golf-views,dom,Project detail page,,2026-02-10
+golf_views,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/golf-views,dom,Location: 6th of October / West Cairo,,2026-02-10
+golf_views,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/golf-views,dom,Status: delivered,,2026-02-10
+hacienda_bay,starting_price_value,25000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-bay,dom,Zone 'Le Sidi' starting from 25M,,2026-02-10
+hacienda_bay,starting_price_value,100000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-bay,dom,Zone 'Water Villas' starting from 100M,,2026-02-10
+hacienda_bay,starting_price_value,45000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-bay,dom,Zone 'X' starting from 45M,,2026-02-10
+hacienda_bay,starting_price_value,25000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-bay,dom,Zone 'Lakeyard' starting from 25M,,2026-02-10
+hacienda_bay,starting_price_value,100000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-bay,dom,Zone 'Bay Villas' starting from 100M,,2026-02-10
+hacienda_bay,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-bay,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-bay,dom,Project detail page,,2026-02-10
+hacienda_bay,region,Coast,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-bay,dom,Location: North Coast,,2026-02-10
+hacienda_bay,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-bay,dom,Status: under_construction,,2026-02-10
+hacienda_blue,starting_price_value,58000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-blue,dom,Zone 'Villas' starting from 58M,,2026-02-10
+hacienda_blue,starting_price_value,19000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-blue,dom,Zone 'Chalets' starting from 19M,,2026-02-10
+hacienda_blue,starting_price_value,31000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-blue,dom,Zone 'Townhouse' starting from 31M,,2026-02-10
+hacienda_blue,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-blue,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-blue,dom,Project detail page,,2026-02-10
+hacienda_blue,region,Coast,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-blue,dom,Location: North Coast,,2026-02-10
+hacienda_blue,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-blue,dom,Status: under_construction,,2026-02-10
+hacienda_heneish,starting_price_value,52400000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-heneish,dom,Zone 'Villa' starting from 52.4M,,2026-02-10
+hacienda_heneish,starting_price_value,16900000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-heneish,dom,Zone 'Condos' starting from 16.9M,,2026-02-10
+hacienda_heneish,starting_price_value,17800000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-heneish,dom,Zone 'Cabins' starting from 17.8M,,2026-02-10
+hacienda_heneish,starting_price_value,94800000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-heneish,dom,Zone 'Pied Dans L'eau' starting from 94.8M,,2026-02-10
+hacienda_heneish,starting_price_value,19500000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-heneish,dom,Zone 'Chalets' starting from 19.5M,,2026-02-10
+hacienda_heneish,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-heneish,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-heneish,dom,Project detail page,,2026-02-10
+hacienda_heneish,region,Coast,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-heneish,dom,Location: North Coast,,2026-02-10
+hacienda_heneish,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-heneish,dom,Status: under_construction,,2026-02-10
+hacienda_waters,starting_price_value,11200000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-waters,dom,Zone 'Apartments' starting from 11.2M,,2026-02-10
+hacienda_waters,starting_price_value,106500000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-waters,dom,Zone 'Villas' starting from 106.5M,,2026-02-10
+hacienda_waters,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-waters,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-waters,dom,Project detail page,,2026-02-10
+hacienda_waters,region,Coast,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-waters,dom,Location: North Coast,,2026-02-10
+hacienda_waters,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-waters,dom,Status: under_construction,,2026-02-10
+hacienda_waters_2,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-waters-2,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-waters-2,dom,Project detail page,,2026-02-10
+hacienda_waters_2,region,Coast,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-waters-2,dom,Location: North Coast,,2026-02-10
+hacienda_waters_2,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-waters-2,dom,Status: under_construction,,2026-02-10
+hacienda_west,starting_price_value,41200000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-west,dom,Zone 'Beach House' starting from 41.2M,,2026-02-10
+hacienda_west,starting_price_value,29600000,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-west,dom,Zone 'Lime Chalets' starting from 29.6M,,2026-02-10
+hacienda_west,starting_price_value,33299999,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-west,dom,Zone 'Aria Cabanna' starting from 33.3M,,2026-02-10
+hacienda_west,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-west,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-west,dom,Project detail page,,2026-02-10
+hacienda_west,region,Coast,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-west,dom,Location: North Coast,,2026-02-10
+hacienda_west,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-west,dom,Status: under_construction,,2026-02-10
+hacienda_white,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-white,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-white,dom,Project detail page,,2026-02-10
+hacienda_white,region,Coast,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-white,dom,Location: North Coast,,2026-02-10
+hacienda_white,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/hacienda-white,dom,Status: delivered,,2026-02-10
+jirian_palm_hills,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/jirian-palm-hills,https://www.palmhillsdevelopments.com/en-us/residential-properties/jirian-palm-hills,dom,Project detail page,,2026-02-10
+jirian_palm_hills,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/jirian-palm-hills,dom,Location: 6th of October / West Cairo,,2026-02-10
+jirian_palm_hills,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/jirian-palm-hills,dom,Status: under_construction,,2026-02-10
+new_capital_gardens,starting_price_value,5500000,https://www.palmhillsdevelopments.com/en-us/residential-properties/new-capital-gardens,dom,Zone 'Phase 1' starting from 5.5M,,2026-02-10
+new_capital_gardens,starting_price_value,5500000,https://www.palmhillsdevelopments.com/en-us/residential-properties/new-capital-gardens,dom,Zone 'Phase 2' starting from 5.5M,,2026-02-10
+new_capital_gardens,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/new-capital-gardens,https://www.palmhillsdevelopments.com/en-us/residential-properties/new-capital-gardens,dom,Project detail page,,2026-02-10
+new_capital_gardens,region,New_Capital,https://www.palmhillsdevelopments.com/en-us/residential-properties/new-capital-gardens,dom,Location: New Administrative Capital,,2026-02-10
+new_capital_gardens,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/new-capital-gardens,dom,Status: under_construction,,2026-02-10
+palm_hills_alexandria,starting_price_value,28000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-alexandria,dom,Zone 'Palm Villas' starting from 28M,,2026-02-10
+palm_hills_alexandria,starting_price_value,23300000,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-alexandria,dom,Zone 'Tessera' starting from 23.3M,,2026-02-10
+palm_hills_alexandria,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-alexandria,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-alexandria,dom,Project detail page,,2026-02-10
+palm_hills_alexandria,region,Alex,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-alexandria,dom,Location: Alexandria,,2026-02-10
+palm_hills_alexandria,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-alexandria,dom,Status: under_construction,,2026-02-10
+palm_hills_katameya_1,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-katameya-1,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-katameya-1,dom,Project detail page,,2026-02-10
+palm_hills_katameya_1,region,East,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-katameya-1,dom,Location: New Cairo,,2026-02-10
+palm_hills_katameya_1,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-katameya-1,dom,Status: delivered,,2026-02-10
+palm_hills_katameya_2,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-katameya-2,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-katameya-2,dom,Project detail page,,2026-02-10
+palm_hills_katameya_2,region,East,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-katameya-2,dom,Location: New Cairo,,2026-02-10
+palm_hills_katameya_2,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-katameya-2,dom,Status: delivered,,2026-02-10
+palm_hills_new_alamein,starting_price_value,8100000,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-alamein,dom,Zone 'Alamein Apartments' starting from 8.1M,,2026-02-10
+palm_hills_new_alamein,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-alamein,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-alamein,dom,Project detail page,,2026-02-10
+palm_hills_new_alamein,region,Coast,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-alamein,dom,Location: North Coast,,2026-02-10
+palm_hills_new_alamein,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-alamein,dom,Status: under_construction,,2026-02-10
+palm_hills_new_cairo,starting_price_value,90000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-cairo,dom,Zone 'Phase 1' starting from 90M,,2026-02-10
+palm_hills_new_cairo,starting_price_value,30700000,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-cairo,dom,Zone 'Phase 2' starting from 30.7M,,2026-02-10
+palm_hills_new_cairo,starting_price_value,20200000,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-cairo,dom,Zone 'Phase 3' starting from 20.2M,,2026-02-10
+palm_hills_new_cairo,starting_price_value,26900000,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-cairo,dom,Zone 'Phase 4' starting from 26.9M,,2026-02-10
+palm_hills_new_cairo,starting_price_value,8900000,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-cairo,dom,Zone 'Phase 5' starting from 8.9M,,2026-02-10
+palm_hills_new_cairo,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-cairo,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-cairo,dom,Project detail page,,2026-02-10
+palm_hills_new_cairo,region,East,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-cairo,dom,Location: New Cairo,,2026-02-10
+palm_hills_new_cairo,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-new-cairo,dom,Status: under_construction,,2026-02-10
+palm_hills_october,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-october,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-october,dom,Project detail page,,2026-02-10
+palm_hills_october,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-october,dom,Location: 6th of October / West Cairo,,2026-02-10
+palm_hills_october,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-hills-october,dom,Status: delivered,,2026-02-10
+palm_parks,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-parks,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-parks,dom,Project detail page,,2026-02-10
+palm_parks,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-parks,dom,Location: 6th of October / West Cairo,,2026-02-10
+palm_parks,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-parks,dom,Status: delivered,,2026-02-10
+palm_valley,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-valley,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-valley,dom,Project detail page,,2026-02-10
+palm_valley,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-valley,dom,Location: 6th of October / West Cairo,,2026-02-10
+palm_valley,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/palm-valley,dom,Status: delivered,,2026-02-10
+the_crown,starting_price_value,50100000,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown,dom,Zone 'Phase 3' starting from 50.1M,,2026-02-10
+the_crown,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown,dom,Project detail page,,2026-02-10
+the_crown,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown,dom,Location: 6th of October / West Cairo,,2026-02-10
+the_crown,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown,dom,Status: under_construction,,2026-02-10
+the_crown_extension,starting_price_value,28000000,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown-extension,dom,Zone 'Family Homes' starting from 28M,,2026-02-10
+the_crown_extension,starting_price_value,34900000,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown-extension,dom,Zone 'Twin Homes' starting from 34.9M,,2026-02-10
+the_crown_extension,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown-extension,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown-extension,dom,Project detail page,,2026-02-10
+the_crown_extension,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown-extension,dom,Location: 6th of October / West Cairo,,2026-02-10
+the_crown_extension,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-crown-extension,dom,Status: under_construction,,2026-02-10
+the_village,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-village,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-village,dom,Project detail page,,2026-02-10
+the_village,region,East,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-village,dom,Location: New Cairo,,2026-02-10
+the_village,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/the-village,dom,Status: delivered,,2026-02-10
+village_avenue,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-avenue,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-avenue,dom,Project detail page,,2026-02-10
+village_avenue,region,East,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-avenue,dom,Location: New Cairo,,2026-02-10
+village_avenue,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-avenue,dom,Status: delivered,,2026-02-10
+village_gardens_katameya,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-gardens-katameya,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-gardens-katameya,dom,Project detail page,,2026-02-10
+village_gardens_katameya,region,East,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-gardens-katameya,dom,Location: New Cairo,,2026-02-10
+village_gardens_katameya,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-gardens-katameya,dom,Status: delivered,,2026-02-10
+village_gate,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-gate,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-gate,dom,Project detail page,,2026-02-10
+village_gate,region,East,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-gate,dom,Location: New Cairo,,2026-02-10
+village_gate,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/village-gate,dom,Status: delivered,,2026-02-10
+woodville,official_project_url,https://www.palmhillsdevelopments.com/en-us/residential-properties/woodville,https://www.palmhillsdevelopments.com/en-us/residential-properties/woodville,dom,Project detail page,,2026-02-10
+woodville,region,West,https://www.palmhillsdevelopments.com/en-us/residential-properties/woodville,dom,Location: 6th of October / West Cairo,,2026-02-10
+woodville,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/residential-properties/woodville,dom,Status: delivered,,2026-02-10
+crown_central,official_project_url,https://www.palmhillsdevelopments.com/en-us/commercial-properties/crown-central,https://www.palmhillsdevelopments.com/en-us/commercial-properties/crown-central,dom,Project detail page,,2026-02-10
+crown_central,region,West,https://www.palmhillsdevelopments.com/en-us/commercial-properties/crown-central,dom,Location: 6th of October / West Cairo,,2026-02-10
+crown_central,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/commercial-properties/crown-central,dom,Status: under_construction,,2026-02-10
+palmet_october,official_project_url,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palmet-october,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palmet-october,dom,Project detail page,,2026-02-10
+palmet_october,region,West,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palmet-october,dom,Location: 6th of October / West Cairo,,2026-02-10
+palmet_october,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palmet-october,dom,Status: under_construction,,2026-02-10
+palmet_new_cairo,official_project_url,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palmet-new-cairo,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palmet-new-cairo,dom,Project detail page,,2026-02-10
+palmet_new_cairo,region,East,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palmet-new-cairo,dom,Location: New Cairo,,2026-02-10
+palmet_new_cairo,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palmet-new-cairo,dom,Status: under_construction,,2026-02-10
+village_gate_mall,official_project_url,https://www.palmhillsdevelopments.com/en-us/commercial-properties/village-gate-mall,https://www.palmhillsdevelopments.com/en-us/commercial-properties/village-gate-mall,dom,Project detail page,,2026-02-10
+village_gate_mall,region,East,https://www.palmhillsdevelopments.com/en-us/commercial-properties/village-gate-mall,dom,Location: New Cairo,,2026-02-10
+village_gate_mall,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/commercial-properties/village-gate-mall,dom,Status: under_construction,,2026-02-10
+golf_central,official_project_url,https://www.palmhillsdevelopments.com/en-us/commercial-properties/golf-central,https://www.palmhillsdevelopments.com/en-us/commercial-properties/golf-central,dom,Project detail page,,2026-02-10
+golf_central,region,West,https://www.palmhillsdevelopments.com/en-us/commercial-properties/golf-central,dom,Location: 6th of October / West Cairo,,2026-02-10
+golf_central,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/commercial-properties/golf-central,dom,Status: under_construction,,2026-02-10
+hale_town,official_project_url,https://www.palmhillsdevelopments.com/en-us/commercial-properties/hale-town,https://www.palmhillsdevelopments.com/en-us/commercial-properties/hale-town,dom,Project detail page,,2026-02-10
+hale_town,region,West,https://www.palmhillsdevelopments.com/en-us/commercial-properties/hale-town,dom,Location: 6th of October / West Cairo,,2026-02-10
+hale_town,project_status,under_construction,https://www.palmhillsdevelopments.com/en-us/commercial-properties/hale-town,dom,Status: under_construction,,2026-02-10
+lakeyard,official_project_url,https://www.palmhillsdevelopments.com/en-us/commercial-properties/lakeyard,https://www.palmhillsdevelopments.com/en-us/commercial-properties/lakeyard,dom,Project detail page,,2026-02-10
+lakeyard,region,Coast,https://www.palmhillsdevelopments.com/en-us/commercial-properties/lakeyard,dom,Location: North Coast,,2026-02-10
+lakeyard,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/commercial-properties/lakeyard,dom,Status: delivered,,2026-02-10
+palm_central,official_project_url,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palm-central,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palm-central,dom,Project detail page,,2026-02-10
+palm_central,region,West,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palm-central,dom,Location: 6th of October / West Cairo,,2026-02-10
+palm_central,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/commercial-properties/palm-central,dom,Status: delivered,,2026-02-10
+the_lane,official_project_url,https://www.palmhillsdevelopments.com/en-us/commercial-properties/the-lane,https://www.palmhillsdevelopments.com/en-us/commercial-properties/the-lane,dom,Project detail page,,2026-02-10
+the_lane,region,West,https://www.palmhillsdevelopments.com/en-us/commercial-properties/the-lane,dom,Location: 6th of October / West Cairo,,2026-02-10
+the_lane,project_status,delivered,https://www.palmhillsdevelopments.com/en-us/commercial-properties/the-lane,dom,Status: delivered,,2026-02-10
