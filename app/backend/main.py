@@ -9,6 +9,7 @@ import logging
 import os
 from datetime import datetime
 from app.backend.config import Config
+
 from app.backend.models import ChatRequest, ChatResponse, Lead, Message
 from app.backend.services.llm_service import llm_service
 from app.backend.services.rag_service import rag_service
@@ -16,10 +17,11 @@ from app.backend.services.leads_service import leads_service
 from app.backend.services.kb_service import kb_service
 from app.backend.routes.admin_routes import router as admin_router
 from app.backend.services.persona_llm import build_system_prompt
+import re
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PalmX-API")
-
+HOTLINE_NUMBER = Config.HOTLINE_NUMBER
 # ---------------------------------------------------------------------------
 # Persona persistence (backend-only)
 # ---------------------------------------------------------------------------
@@ -72,6 +74,47 @@ def _log_persona(session_id: str, cfg: ChatResponse, source: str) -> None:
         cfg.persona_stage,
         cfg.support_stage,
     )
+
+def _normalize_phone_for_links(phone: Optional[str]) -> Optional[str]:
+    """
+    Normalize user-provided phone into a best-effort E.164-like digits string (no '+').
+    Assumptions:
+    - If user provides Egyptian local mobile starting with '01' (11 digits), prefix '20'.
+    - If user provides '+', we strip it and keep digits.
+    - Otherwise, keep digits only.
+    """
+    if not phone or not isinstance(phone, str):
+        return None
+    raw = phone.strip()
+    digits = re.sub(r"\D", "", raw)
+    if not digits:
+        return None
+    # Egypt local mobile heuristic: 01xxxxxxxxx (11 digits)
+    if digits.startswith("01") and len(digits) == 11:
+        return "20" + digits[1:]
+    return digits
+
+def _build_contact_cta_card(phone: Optional[str]) -> Optional[dict[str, Any]]:
+    """
+    Frontend-facing CTA card payload.
+    """
+    normalized = _normalize_phone_for_links(phone)
+    if not normalized:
+        return None
+
+    portal_url = "https://www.palmhillsdevelopments.com/en-us/interestedIn"
+    whatsapp_url = f"https://wa.me/{normalized}"
+
+
+    return {
+        "title": "Continue on WhatsApp",
+        "cta": "Continue on WhatsApp",
+        "actions": [
+            {"label": "WhatsApp", "type": "link", "url": whatsapp_url},
+         
+            {"label": "Open Portal", "type": "link", "url": portal_url},
+        ],
+    }
 
 def _decide_persona_via_model(
     session_id: str,
@@ -520,6 +563,12 @@ async def chat_stream_endpoint(request: ChatRequest):
             persona_extracted = False
             persona_start_marker = "__PERSONA_JSON__"
             persona_end_marker = "__END_PERSONA_JSON__"
+            persona_cta_marker = "__CTA_JSON__"
+            persona_cta_end_marker = "__END_CTA_JSON__"
+
+            # Optional payload attached to the final done event.
+            done_cta_card: Optional[dict[str, Any]] = None
+            done_mode: Optional[str] = None
 
             for chunk in llm_service.stream_answer_completion(
                 full_system_msg, request.messages, tools=TOOLS
@@ -532,6 +581,8 @@ async def chat_stream_endpoint(request: ChatRequest):
                             args = json.loads(tc["function"]["arguments"])
                             _save_lead_from_args(session_id, args)
                             confirm_msg = f"Thank you {args.get('name')}. Your details have been saved. A sales representative will contact you at {args.get('phone')} shortly."
+                            done_cta_card = _build_contact_cta_card(HOTLINE_NUMBER)
+                            done_mode = "lead_capture"
                             yield f"data: {json.dumps({'token': confirm_msg})}\n\n"
                     continue
 
@@ -574,6 +625,7 @@ async def chat_stream_endpoint(request: ChatRequest):
                         )
                         _get_persona_for_session(session_id, router_out.intent, model_persona=model_persona)
                         persona_extracted = True
+                        done_mode = model_persona.mode
                 except Exception as e:
                     logger.error(f"Error parsing persona json in stream: {e}")
 
@@ -588,15 +640,50 @@ async def chat_stream_endpoint(request: ChatRequest):
             # Guaranteed persona update path:
             # if marker extraction did not happen, force a model persona decision.
             if not persona_extracted:
-                _decide_persona_via_model(
+                decided = _decide_persona_via_model(
                     session_id=session_id,
                     intent=router_out.intent,
                     user_message=user_msg,
                     history=history,
                     current_cfg=persona_cfg,
                 )
+                if decided is not None:
+                    done_mode = decided.mode
 
-            yield f"data: {json.dumps({'done': True, 'retrieved_projects': [p.project_name for p in retrieved_docs]})}\n\n"
+            
+            payload: dict[str, Any] = {
+                "done": True,
+                "retrieved_projects": [p.project_name for p in retrieved_docs],
+                "mode": done_mode or persona_cfg.mode,
+            }
+            
+            try:
+                logger.info(f"Before CTA card building")
+                logger.info(f"Done mode: {done_mode}")
+                val=_get_persona_for_session(session_id, router_out.intent, model_persona=persona_cfg)
+                logger.info(f"Persona cfg mode: {val.persona_stage}")
+                logger.info(f"Router out intent: {router_out.intent}")
+                if router_out.intent in ("support_contact","handoff") or val.persona_stage in ("handoff","support_contact"):
+                    
+                    
+                    logger.info(f"Building cta card for {router_out.intent}")
+                    payload["cta_card"] = _build_contact_cta_card(HOTLINE_NUMBER)
+            except Exception as e:
+                logger.info(f"Before CTA card building")
+                logger.info(f"Done mode: {done_mode}")
+                logger.info(f"Persona cfg mode: {persona_cfg.mode}")
+                logger.info(f"Router out intent: {router_out.intent}")
+                if router_out.intent in ("support_contact","handoff") or persona_cfg.mode in ("handoff","support_contact"):
+                    logger.info(f"Building cta card for {router_out.intent}")
+                    payload["cta_card"] = _build_contact_cta_card(HOTLINE_NUMBER)
+                else:
+                    logger.error(f"Error building cta card: {e}")
+                    payload["cta_card"] = None
+
+            if done_cta_card:
+                payload["cta_card"] = done_cta_card
+
+            yield f"data: {json.dumps(payload)}\n\n"
             
             leads_service.log_audit(
                 session_id, user_msg, router_out.intent,

@@ -111,6 +111,7 @@ When using bullet points, do not keep them short or mechanical. Each bullet poin
 
 ### Currency Handling
 - **Always** mention EGP equivalent even if user mentions USD/AED
+- **Always** mention EGP in the respons ewhile asking anything to user.
 - When calling `save_lead`, store in EGP (or "X USD (~Y EGP)")
 
 ### Handling Missing Data
