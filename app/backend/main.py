@@ -290,14 +290,30 @@ def _get_persona_for_session(
 async def lifespan(app: FastAPI):
     # Startup: Ensure RAG index is loaded once at application startup
     logger.info("Application startup: Ensuring RAG index is loaded...")
-    if not rag_service.is_ready:
+    try:
         rag_service._load_index()
-    logger.info(f"RAG service ready: {rag_service.is_ready}")
+
+        if not rag_service.is_ready:
+            logger.warning("RAG index is not ready after loading attempt.")
+            rag_service.build_index_if_needed()
+            rag_service._load_index()
+
+
+        if not rag_service.is_ready:
+            rag_service._load_index()
+            logger.info(f"RAG service didnt load properly")
+        
+        if rag_service.is_ready:
+            logger.info("RAG index is ready.")
+
+    except Exception as e:
+        logger.error(f"Error during RAG index loading: {e}")
+
     yield
     # Shutdown (if needed)
     logger.info("Application shutdown")
 
-app = FastAPI(title="PalmX Pilot API", version="1.0.0", lifespan=lifespan, root_path="/api")
+app = FastAPI(title="PalmX Pilot API", version="1.0.0", lifespan=lifespan,root_path="/api" )
 
 # Mount admin routes.
 # Provide compatibility for both URL styles:
@@ -497,6 +513,7 @@ async def chat_stream_endpoint(request: ChatRequest):
             results = rag_service.search(
                 router_out.query_rewrite, k=3, filters=router_out.filters
             )
+            logger.info(f"the results are printed{results}")
             retrieved_docs = [r['project'] for r in results]
 
         # 3. Context
