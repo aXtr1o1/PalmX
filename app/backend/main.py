@@ -263,7 +263,7 @@ async def lifespan(app: FastAPI):
         
         if rag_service.is_ready:
             logger.info("RAG index is ready.")
-            
+
     except Exception as e:
         logger.error(f"Error during RAG index loading: {e}")
 
@@ -271,7 +271,7 @@ async def lifespan(app: FastAPI):
     # Shutdown (if needed)
     logger.info("Application shutdown")
 
-app = FastAPI(title="PalmX Pilot API", version="1.0.0", lifespan=lifespan, )
+app = FastAPI(title="PalmX Pilot API", version="1.0.0", lifespan=lifespan,root_path="/api" )
 
 # Mount admin routes.
 # Provide compatibility for both URL styles:
@@ -327,7 +327,7 @@ TOOLS = [
 
 # --- Endpoints ---
 
-@app.post("/api/chat", response_model=ChatResponse)
+@app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     try:
         user_msg = request.messages[-1].content
@@ -454,7 +454,7 @@ async def chat_endpoint(request: ChatRequest):
             mode="concierge"
         )
 
-@app.post("/api/chat/stream")
+@app.post("/chat/stream")
 async def chat_stream_endpoint(request: ChatRequest):
     try:
         user_msg = request.messages[-1].content
