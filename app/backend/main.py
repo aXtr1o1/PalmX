@@ -9,6 +9,7 @@ import logging
 import os
 from datetime import datetime
 from app.backend.config import Config
+
 from app.backend.models import ChatRequest, ChatResponse, Lead, Message
 from app.backend.services.llm_service import llm_service
 from app.backend.services.rag_service import rag_service
@@ -20,7 +21,7 @@ import re
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PalmX-API")
-HOTLINE_NUMBER = "+201224311234"
+HOTLINE_NUMBER = Config.HOTLINE_NUMBER
 # ---------------------------------------------------------------------------
 # Persona persistence (backend-only)
 # ---------------------------------------------------------------------------
@@ -103,14 +104,14 @@ def _build_contact_cta_card(phone: Optional[str]) -> Optional[dict[str, Any]]:
 
     portal_url = "https://www.palmhillsdevelopments.com/en-us/interestedIn"
     whatsapp_url = f"https://wa.me/{normalized}"
-    sms_url = f"sms:{normalized}"
+
 
     return {
-        "title": "Continue on WhatsApp or SMS",
-        "cta": "Choose your preferred channel",
+        "title": "Continue on WhatsApp",
+        "cta": "Continue on WhatsApp",
         "actions": [
             {"label": "WhatsApp", "type": "link", "url": whatsapp_url},
-            {"label": "SMS", "type": "link", "url": sms_url},
+         
             {"label": "Open Portal", "type": "link", "url": portal_url},
         ],
     }
@@ -655,12 +656,29 @@ async def chat_stream_endpoint(request: ChatRequest):
                 "retrieved_projects": [p.project_name for p in retrieved_docs],
                 "mode": done_mode or persona_cfg.mode,
             }
-            if router_out.intent in ("support_contact","handoff") or persona_cfg.mode in ("handoff","support_contact"):
-                
-                
-                logger.info(f"Building cta card for {router_out.intent}")
-                payload["cta_card"] = _build_contact_cta_card(HOTLINE_NUMBER)
-                
+            
+            try:
+                logger.info(f"Before CTA card building")
+                logger.info(f"Done mode: {done_mode}")
+                val=_get_persona_for_session(session_id, router_out.intent, model_persona=persona_cfg)
+                logger.info(f"Persona cfg mode: {val.persona_stage}")
+                logger.info(f"Router out intent: {router_out.intent}")
+                if router_out.intent in ("support_contact","handoff") or val.persona_stage in ("handoff","support_contact"):
+                    
+                    
+                    logger.info(f"Building cta card for {router_out.intent}")
+                    payload["cta_card"] = _build_contact_cta_card(HOTLINE_NUMBER)
+            except Exception as e:
+                logger.info(f"Before CTA card building")
+                logger.info(f"Done mode: {done_mode}")
+                logger.info(f"Persona cfg mode: {persona_cfg.mode}")
+                logger.info(f"Router out intent: {router_out.intent}")
+                if router_out.intent in ("support_contact","handoff") or persona_cfg.mode in ("handoff","support_contact"):
+                    logger.info(f"Building cta card for {router_out.intent}")
+                    payload["cta_card"] = _build_contact_cta_card(HOTLINE_NUMBER)
+                else:
+                    logger.error(f"Error building cta card: {e}")
+                    payload["cta_card"] = None
 
             if done_cta_card:
                 payload["cta_card"] = done_cta_card

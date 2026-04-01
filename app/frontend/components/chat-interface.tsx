@@ -94,7 +94,7 @@ export default function ChatInterface() {
 
         const userMsg = { role: "user" as const, content: text };
         setMessages(prev => [...prev, userMsg]);
-        setInput("");
+        setInput("".trim());
         setLoading(true);
 
         try {
@@ -294,8 +294,7 @@ export default function ChatInterface() {
                             <div className={cn(
                                 "max-w-[85%] md:max-w-[70%] px-8 py-6 text-base leading-7 relative shadow-sm",
                                 m.role === 'user'
-                                    ? "bg-[#D22048] text-white rounded-3xl rounded-tr-sm"
-                                    : "bg-white text-gray-800 border border-gray-50 rounded-3xl rounded-tl-sm shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)]"
+                                    ? "bg-gradient-to-tl from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e] text-white rounded-3xl rounded-tr-sm shadow-lg shadow-black/20" : "bg-white text-gray-800 border border-gray-50 rounded-3xl rounded-tl-sm shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)]"
                             )}>
                                 {m.role === 'user' ? (
                                     <div className="whitespace-pre-wrap font-light tracking-wide">{m.content}</div>
@@ -337,6 +336,66 @@ export default function ChatInterface() {
                                         >
                                             {m.content}
                                         </ReactMarkdown>
+                                        {/* CTA Button */}
+{m.cta && (
+  <div className="mt-6">
+    <a
+      href={m.cta.url || "#"}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-xs font-semibold tracking-widest hover:bg-[#D22048] transition-all"
+    >
+      {m.cta.label}
+      <ArrowRight size={14} />
+    </a>
+  </div>
+)}
+
+{/* CTA Card */}
+{m.cta_card && (
+  <div className="mt-6">
+    <div className="relative px-5 py-5 bg-gradient-to-tl from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e] 
+      hover:from-[#1a1a1a] hover:via-[#7f0f22] hover:to-[#a8172a] 
+      hover:shadow-lg hover:shadow-black/30 
+      border border-white/5 rounded-2xl 
+      text-left transition-all duration-200 hover:-translate-y-0.5 
+      flex flex-col justify-between gap-3 min-h-[120px] overflow-hidden">
+
+      {/* Background Accent */}
+      <div className="absolute bottom-0 left-0 w-16 h-16 bg-black/20 rounded-tr-full" />
+
+      {/* Title */}
+      <span className="font-serif text-[13px] font-semibold text-white leading-snug tracking-wide z-10">
+        {m.cta_card.title}
+      </span>
+
+      {/* Optional Price */}
+      {m.cta_card.price && (
+        <span className="text-[11px] text-white/70 font-light z-10">
+          {m.cta_card.price}
+        </span>
+      )}
+
+      {/* Actions */}
+      {m.cta_card.actions?.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2 z-10">
+          {m.cta_card.actions.map((a, idx) => (
+            <a
+              key={idx}
+              href={a.url || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-white text-black px-4 py-1.5 rounded-full text-[10px] font-semibold tracking-widest border border-gray-200 hover:border-black transition-all uppercase"
+            >
+              {a.label}
+              <ArrowRight size={12} />
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+)}
                                     </div>
                                 )}
                                 {m.role === 'assistant' && (

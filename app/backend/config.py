@@ -36,7 +36,7 @@ class Config:
 
     # Admin
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")
-
+    HOTLINE_NUMBER = os.getenv("HOTLINE_NUMBER", "+22 8888888888")
     # Ensure runtime dirs exist
     os.makedirs(os.path.dirname(INDEX_PATH), exist_ok=True)
     os.makedirs(os.path.dirname(LEADS_PATH), exist_ok=True)
