@@ -490,6 +490,15 @@ Your job is to make the next step feel obvious, helpful, and low-effort.
 - Offer something specific (availability, brochure, call, visit)
 - Keep it smooth and minimal
 - Make the user feel it's the logical next step
+- Call the save_lead tool to save the lead
+- The save_lead tool will return the lead id
+- Use the lead id to update the lead
+- The lead id is the primary key of the lead table
+- The lead table is stored in the database
+- The lead table has the following columns:
+  - id
+  - name
+  - phone
 """,
 
     "dont": """
@@ -632,6 +641,15 @@ The user should feel: 'I’m in good hands.'
 - Always mention WHEN (e.g., shortly, within X minutes/hours)
 - Keep it simple and clear — no ambiguity
 - Do not introduce new information or offers
+- Call the save_lead tool to save the lead
+- The save_lead tool will return the lead id
+- Use the lead id to update the lead
+- The lead id is the primary key of the lead table
+- The lead table is stored in the database
+- The lead table has the following columns:
+  - id
+  - name
+  - phone
 """,
 
     "tone_rules": """

@@ -20,7 +20,7 @@ import re
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PalmX-API")
-
+HOTLINE_NUMBER = "+201224311234"
 # ---------------------------------------------------------------------------
 # Persona persistence (backend-only)
 # ---------------------------------------------------------------------------
@@ -580,7 +580,7 @@ async def chat_stream_endpoint(request: ChatRequest):
                             args = json.loads(tc["function"]["arguments"])
                             _save_lead_from_args(session_id, args)
                             confirm_msg = f"Thank you {args.get('name')}. Your details have been saved. A sales representative will contact you at {args.get('phone')} shortly."
-                            done_cta_card = _build_contact_cta_card(args.get("phone"))
+                            done_cta_card = _build_contact_cta_card(HOTLINE_NUMBER)
                             done_mode = "lead_capture"
                             yield f"data: {json.dumps({'token': confirm_msg})}\n\n"
                     continue
@@ -649,11 +649,19 @@ async def chat_stream_endpoint(request: ChatRequest):
                 if decided is not None:
                     done_mode = decided.mode
 
+            
             payload: dict[str, Any] = {
                 "done": True,
                 "retrieved_projects": [p.project_name for p in retrieved_docs],
                 "mode": done_mode or persona_cfg.mode,
             }
+            if router_out.intent in ("support_contact","handoff") or persona_cfg.mode in ("handoff","support_contact"):
+                
+                
+                logger.info(f"Building cta card for {router_out.intent}")
+                payload["cta_card"] = _build_contact_cta_card(HOTLINE_NUMBER)
+                
+
             if done_cta_card:
                 payload["cta_card"] = done_cta_card
 

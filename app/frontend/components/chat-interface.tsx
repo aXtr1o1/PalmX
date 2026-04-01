@@ -239,47 +239,43 @@ export default function ChatInterface() {
             {/* Chat Area */}
             <div className="flex-1 relative overflow-hidden flex flex-col max-w-[1400px] mx-auto w-full px-4 md:px-8">
 
-                <div
+                
+
+                    {/* Welcome State */}
+                    {messages.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full space-y-12 opacity-100 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
+                            {/* Premium Brand Glyph */}
+                           
+
+                            <div className="text-center max-w-2xl space-y-6">
+                                <h2 className="font-serif text-5xl md:text-6xl text-black leading-tight tracking-tight">
+                                    The Art of Living
+                                </h2>
+                                <p className="text-muted font-light leading-relaxed text-lg md:text-xl max-w-lg mx-auto">
+                                    I am <span className="text-black font-medium font-serif">PalmX</span>. Your private concierge for Palm Hills.
+                                    Looking for a villa in the West or a chalet by the sea?
+                                </p>
+                            </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
+                            {QUICK_PROMPTS.map((p, i) => (
+                                <button
+                                key={i}
+                                onClick={() => handleSubmit(undefined, p.label)}
+                                className="relative px-5 py-5 bg-gradient-to-tl from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e] hover:from-[#1a1a1a] hover:via-[#7f0f22] hover:to-[#a8172a] hover:shadow-lg hover:shadow-black/30 border border-white/5 rounded-2xl text-left transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-start gap-1.5 h-28 overflow-hidden">
+                                <div className="absolute bottom-0 left-0 w-16 h-16 bg-black/20 rounded-tr-full" />
+                                <span className="font-serif text-[13px] font-semibold text-white leading-snug tracking-wide">{p.label}</span>
+                                <span className="text-[10px] text-white/60 font-light leading-snug">{p.description}</span>
+                                </button>
+                                ))}
+                                        </div>
+                                    </div>
+                    ):(
+                        <div
                     ref={scrollRef}
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                     className="flex-1 overflow-y-auto py-8 space-y-12 scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
-
-                    {/* Welcome State */}
-{messages.length === 0 && (
-    <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-        
-        <div className="text-center max-w-2xl space-y-6 mb-12">
-            <h2 className="font-serif text-5xl md:text-6xl text-black leading-tight tracking-tight">
-                The Art of Living
-            </h2>
-            <p className="text-muted font-light leading-relaxed text-lg md:text-xl max-w-lg mx-auto">
-                I am <span className="text-black font-medium font-serif">PalmX</span>. Your private concierge for Palm Hills.
-                Looking for a villa in the West or a chalet by the sea?
-            </p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
-            {QUICK_PROMPTS.map((p, i) => (
-                <button
-                key={i}
-                onClick={() => handleSubmit(undefined, p.label)}
-                className="relative px-5 py-5 bg-gradient-to-tl from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e] hover:from-[#1a1a1a] hover:via-[#7f0f22] hover:to-[#a8172a] hover:shadow-lg hover:shadow-black/30 border border-white/5 rounded-2xl text-left transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-start gap-1.5 h-28 overflow-hidden"
-            >
-                <div className="absolute bottom-0 left-0 w-16 h-16 bg-black/20 rounded-tr-full" />
-                <span className="font-serif text-[13px] font-semibold text-white leading-snug tracking-wide">
-                    {p.label}
-                </span>
-                <span className="text-[10px] text-white/60 font-light leading-snug">
-                    {p.description}
-                </span>
-            </button>
-            ))}
-        </div>
-    </div>
-)}
-
-                    {/* Messages */}
                     {messages.map((m, i) => (
                         <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} group max-w-5xl mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-500`}>
 
@@ -341,48 +337,7 @@ export default function ChatInterface() {
                                         >
                                             {m.content}
                                         </ReactMarkdown>
-                                        {m.cta && (
-                                        <div className="mt-6">
-                                            <a
-                                                href={m.cta.url || '#'}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-xs font-semibold tracking-widest hover:bg-[#D22048] transition-all"
-                                            >
-                                                {m.cta.label}
-                                                <ArrowRight size={14} />
-                                            </a>
-                                        </div>
-                                    )}
-                                        {m.cta_card && (
-                                            <div className="mt-6 rounded-2xl border border-gray-100 bg-[#FAFAFA] p-5">
-                                                <div className="font-serif text-sm tracking-wide text-[#0B0B0B]">
-                                                    {m.cta_card.title}
-                                                </div>
-                                                {m.cta_card.cta && (
-                                                    <div className="mt-1 text-xs text-gray-500 tracking-wide">
-                                                        {m.cta_card.cta}
-                                                    </div>
-                                                )}
-                                                {m.cta_card.actions && m.cta_card.actions.length > 0 && (
-                                                    <div className="mt-4 flex flex-wrap gap-2">
-                                                        {m.cta_card.actions.map((a, idx) => (
-                                                            <a
-                                                                key={idx}
-                                                                href={a.url || '#'}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="inline-flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full text-[11px] font-semibold tracking-widest border border-gray-200 hover:border-black hover:bg-white transition-all uppercase"
-                                                            >
-                                                                {a.label}
-                                                                <ArrowRight size={14} />
-                                                            </a>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-                                                                        </div>
+                                    </div>
                                 )}
                                 {m.role === 'assistant' && (
                                     <div className="absolute -bottom-6 left-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-2 text-[9px] text-muted uppercase tracking-[0.2em] mt-2 ml-1">
@@ -418,10 +373,13 @@ export default function ChatInterface() {
 
                     <div className="h-4"></div>
                 </div>
-            </div>
             
-            {/* Input Area */}
-            <div className="bg-white/95 backdrop-blur-md p-4 md:p-6 border-t border-gray-100 z-20 pb-safe">
+
+        
+            
+
+                    )}
+                    <div className="bg-white/95 backdrop-blur-md p-4 md:p-6 border-t border-gray-100 z-20 pb-safe">
                 <form onSubmit={handleSubmit} className="relative max-w-3xl mx-auto flex gap-3 items-end">
                     <div className="relative flex-1 group">
                         {/* Force Rebuild Trigger */}
@@ -465,6 +423,9 @@ export default function ChatInterface() {
                     </div>
                 </form>
             </div>
-        </div >
+                    </div>
+                    </div>
+             
+                    
     );
 }
