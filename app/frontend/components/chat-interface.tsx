@@ -19,6 +19,7 @@ const QUICK_PROMPTS = [
     "Ready to move options"
 ];
 
+
 export default function ChatInterface() {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState("");
@@ -125,10 +126,24 @@ export default function ChatInterface() {
                 },
                 // onDone — set mode
                 (data) => {
-                    if (data.mode === 'lead_capture' && mode !== 'lead_capture') {
-                        setMode('lead_capture');
-                    } else {
-                        setMode(data.mode);
+                    setMode(data.mode);
+                
+                    // ✅ Inject CTA into last assistant message
+                    if (data.cta || data.cta_card) {
+                        setMessages(prev => {
+                            const updated = [...prev];
+                            const lastMsg = updated[updated.length - 1];
+                
+                            if (lastMsg?.role === "assistant") {
+                                updated[updated.length - 1] = {
+                                    ...lastMsg,
+                                    cta: data.cta,
+                                    cta_card: data.cta_card
+                                };
+                            }
+                
+                            return updated;
+                        });
                     }
                 }
             );
@@ -231,19 +246,10 @@ export default function ChatInterface() {
                 >
 
                     {/* Welcome State */}
-                    {messages.length === 0 && (
-                        <div className="flex flex-col items-center justify-center h-[70vh] space-y-12 opacity-0 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
+                    {messages.length === 0 &&  !loading &&(
+                        <div className="flex flex-col items-center justify-center h-[70vh] space-y-12 opacity-100 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
                             {/* Premium Brand Glyph */}
-                            <div className="w-24 h-24 rounded-full border border-gray-100 flex items-center justify-center mb-4 bg-white shadow-xl shadow-gray-100/50 overflow-hidden p-4">
-                                <Image
-                                    src="/brand/palmHills-BlockLogo.png"
-                                    alt="PalmX"
-                                    width={80}
-                                    height={80}
-                                    className="object-contain"
-                                />
-                            </div>
-
+                            
                             <div className="text-center max-w-2xl space-y-6">
                                 <h2 className="font-serif text-5xl md:text-6xl text-black leading-tight tracking-tight">
                                     The Art of Living
@@ -333,7 +339,48 @@ export default function ChatInterface() {
                                         >
                                             {m.content}
                                         </ReactMarkdown>
-                                    </div>
+                                        {m.cta && (
+                                        <div className="mt-6">
+                                            <a
+                                                href={m.cta.url || '#'}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-xs font-semibold tracking-widest hover:bg-[#D22048] transition-all"
+                                            >
+                                                {m.cta.label}
+                                                <ArrowRight size={14} />
+                                            </a>
+                                        </div>
+                                    )}
+                                        {m.cta_card && (
+                                            <div className="mt-6 rounded-2xl border border-gray-100 bg-[#FAFAFA] p-5">
+                                                <div className="font-serif text-sm tracking-wide text-[#0B0B0B]">
+                                                    {m.cta_card.title}
+                                                </div>
+                                                {m.cta_card.cta && (
+                                                    <div className="mt-1 text-xs text-gray-500 tracking-wide">
+                                                        {m.cta_card.cta}
+                                                    </div>
+                                                )}
+                                                {m.cta_card.actions && m.cta_card.actions.length > 0 && (
+                                                    <div className="mt-4 flex flex-wrap gap-2">
+                                                        {m.cta_card.actions.map((a, idx) => (
+                                                            <a
+                                                                key={idx}
+                                                                href={a.url || '#'}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="inline-flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full text-[11px] font-semibold tracking-widest border border-gray-200 hover:border-black hover:bg-white transition-all uppercase"
+                                                            >
+                                                                {a.label}
+                                                                <ArrowRight size={14} />
+                                                            </a>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                                                        </div>
                                 )}
                                 {m.role === 'assistant' && (
                                     <div className="absolute -bottom-6 left-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-2 text-[9px] text-muted uppercase tracking-[0.2em] mt-2 ml-1">

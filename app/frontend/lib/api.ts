@@ -1,6 +1,31 @@
 export interface ChatMessage {
-    role: 'user' | 'assistant' | 'system';
+    role: "user" | "assistant";
     content: string;
+    cta?: {
+      label: string;
+      action: "link" | "callback";
+      url?: string;
+    };
+    cta_card?: {
+      title: string;
+      price?: string;
+      location?: string;
+      image?: string;
+      cta?: string;
+      actions?: Array<{
+        label: string;
+        type: "link" | "callback";
+        url?: string;
+      }>;
+    };
+  }
+export interface CTACard {
+    title: string;
+    price?: string;
+    location?: string;
+    image?: string;
+    cta?: string;
+    link?: string;
 }
 
 export interface ChatResponse {
@@ -49,7 +74,12 @@ export const api = {
         sessionId: string,
         messages: ChatMessage[],
         onToken: (token: string) => void,
-        onDone: (data: { retrieved_projects: string[]; mode: 'concierge' | 'lead_capture' }) => void
+        onDone: (data: { 
+            retrieved_projects: string[]; 
+            mode: 'concierge' | 'lead_capture';
+            cta?: ChatMessage["cta"]; // ✅ ADD THIS
+            cta_card?: ChatMessage["cta_card"];
+          }) => void
     ) => {
         const res = await fetch(withBackend("/api/chat/stream"), {
             method: 'POST',
@@ -82,7 +112,9 @@ export const api = {
                         if (data.done) {
                             onDone({
                                 retrieved_projects: data.retrieved_projects || [],
-                                mode: data.mode || 'concierge'
+                                mode: data.mode || 'concierge',
+                                cta: data.cta,
+                                cta_card: data.cta_card
                             });
                         } else if (data.token) {
                             onToken(data.token);
