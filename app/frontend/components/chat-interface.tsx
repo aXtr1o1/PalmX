@@ -13,10 +13,10 @@ import NavigationMenu from "./navigation-menu";
 const SESSION_ID_KEY = "palmx_sess_id";
 
 const QUICK_PROMPTS = [
-    "Villa in Badya starting 10M",
-    "Apartments in New Cairo",
-    "Payment plans for The Crown",
-    "Ready to move options"
+    { label: "Villa in Badya starting 10M", description: "Explore luxury villas from 10M EGP" },
+    { label: "Apartments in New Cairo", description: "Browse available units & layouts" },
+    { label: "Payment plans for The Crown", description: "Flexible plans tailored for you" },
+    { label: "Ready to move options", description: "Units available for immediate handover" },
 ];
 
 export default function ChatInterface() {
@@ -231,45 +231,38 @@ export default function ChatInterface() {
                 >
 
                     {/* Welcome State */}
-                    {messages.length === 0 && (
-                        <div className="flex flex-col items-center justify-center h-[70vh] space-y-12 opacity-0 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-forwards">
-                            {/* Premium Brand Glyph */}
-                            <div className="w-24 h-24 rounded-full border border-gray-100 flex items-center justify-center mb-4 bg-white shadow-xl shadow-gray-100/50 overflow-hidden p-4">
-                                <Image
-                                    src="/brand/palmHills-BlockLogo.png"
-                                    alt="PalmX"
-                                    width={80}
-                                    height={80}
-                                    className="object-contain"
-                                />
-                            </div>
+{messages.length === 0 && (
+    <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+        
+        <div className="text-center max-w-2xl space-y-6 mb-12">
+            <h2 className="font-serif text-5xl md:text-6xl text-black leading-tight tracking-tight">
+                The Art of Living
+            </h2>
+            <p className="text-muted font-light leading-relaxed text-lg md:text-xl max-w-lg mx-auto">
+                I am <span className="text-black font-medium font-serif">PalmX</span>. Your private concierge for Palm Hills.
+                Looking for a villa in the West or a chalet by the sea?
+            </p>
+        </div>
 
-                            <div className="text-center max-w-2xl space-y-6">
-                                <h2 className="font-serif text-5xl md:text-6xl text-black leading-tight tracking-tight">
-                                    The Art of Living
-                                </h2>
-                                <p className="text-muted font-light leading-relaxed text-lg md:text-xl max-w-lg mx-auto">
-                                    I am <span className="text-black font-medium font-serif">PalmX</span>. Your private concierge for Palm Hills.
-                                    Looking for a villa in the West or a chalet by the sea?
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl mt-12 px-4">
-                                {QUICK_PROMPTS.map((p, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => handleSubmit(undefined, p)}
-                                        className="px-8 py-5 bg-white border border-gray-100 hover:border-black rounded-xl text-center text-sm text-gray-600 transition-all hover:shadow-lg hover:-translate-y-1 group flex flex-col items-center justify-center gap-3 h-32"
-                                    >
-                                        <span className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                                            <ArrowRight size={12} />
-                                        </span>
-                                        <span className="font-medium tracking-wide uppercase text-xs">{p}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
+            {QUICK_PROMPTS.map((p, i) => (
+                <button
+                key={i}
+                onClick={() => handleSubmit(undefined, p.label)}
+                className="relative px-5 py-5 bg-gradient-to-tl from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e] hover:from-[#1a1a1a] hover:via-[#7f0f22] hover:to-[#a8172a] hover:shadow-lg hover:shadow-black/30 border border-white/5 rounded-2xl text-left transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-start gap-1.5 h-28 overflow-hidden"
+            >
+                <div className="absolute bottom-0 left-0 w-16 h-16 bg-black/20 rounded-tr-full" />
+                <span className="font-serif text-[13px] font-semibold text-white leading-snug tracking-wide">
+                    {p.label}
+                </span>
+                <span className="text-[10px] text-white/60 font-light leading-snug">
+                    {p.description}
+                </span>
+            </button>
+            ))}
+        </div>
+    </div>
+)}
 
                     {/* Messages */}
                     {messages.map((m, i) => (
@@ -370,7 +363,7 @@ export default function ChatInterface() {
                     <div className="h-4"></div>
                 </div>
             </div>
-
+            
             {/* Input Area */}
             <div className="bg-white/95 backdrop-blur-md p-4 md:p-6 border-t border-gray-100 z-20 pb-safe">
                 <form onSubmit={handleSubmit} className="relative max-w-3xl mx-auto flex gap-3 items-end">
