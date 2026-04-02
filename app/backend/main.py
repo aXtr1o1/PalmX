@@ -104,14 +104,14 @@ def _build_contact_cta_card(phone: Optional[str]) -> Optional[dict[str, Any]]:
 
     portal_url = "https://www.palmhillsdevelopments.com/en-us/interestedIn"
     whatsapp_url = f"https://wa.me/{normalized}"
-
+    sms_url = f"tel:{normalized}"
 
     return {
         "title": "Continue on WhatsApp",
         "cta": "Continue on WhatsApp",
         "actions": [
             {"label": "WhatsApp", "type": "link", "url": whatsapp_url},
-         
+            {"label": "Call", "type": "link", "url": sms_url},
             {"label": "Open Portal", "type": "link", "url": portal_url},
         ],
     }
