@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    
       <AppProvider>
         <html lang="en">
           <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-white text-foreground selection:bg-primary selection:text-white`}>
@@ -31,6 +31,6 @@ export default function RootLayout({
           </body>
         </html>
       </AppProvider>
-    </ClerkProvider>
+  
   );
 }
