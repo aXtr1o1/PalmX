@@ -14,7 +14,6 @@ class Project(BaseModel):
     starting_price_value: Optional[int] = None
     price_status: Optional[str] = None
     key_amenities: List[str] = []
-    # Store full raw row for reference if needed, or specific mapped fields
     raw_data: dict = {}
 
 # --- Router Models ---
@@ -42,28 +41,32 @@ class ChatResponse(BaseModel):
     message: str
     next_action: Optional[str] = None
     retrieved_projects: List[str] = []
-    mode: str = "concierge"                            # concierge | lead_capture | support
+    # --- NEW FIELDS FOR RECOMMENDATIONS ---
+    project_cards: Optional[List[Dict[str, Any]]] = None 
+    trim_intro: bool = False
+    # --------------------------------------
+    mode: str = "concierge"                            
     persona_state: str = "primary" 
     persona_stage: str = "qualification"
-    support_stage: str = "faq"                          # primary | secondary | support
-    tool_calls: Optional[List[Dict]] = None            # e.g., [{"tool": "save_lead", "args": {...}}]
-    context_summary: Optional[str] = None              # e.g., lead fields summary
-    kb_version_hash: Optional[str] = "v1.0"            # Version of KB used for context
+    support_stage: str = "faq"                          
+    tool_calls: Optional[List[Dict]] = None            
+    context_summary: Optional[str] = None              
+    kb_version_hash: Optional[str] = "v1.0"            
 
 # --- Lead Models ---
 class Lead(BaseModel):
     name: str
     phone: str
-    interest_projects: List[str] = Field(default_factory=list) # Renamed to match request if needed, but keeping list
+    interest_projects: List[str] = Field(default_factory=list) 
     preferred_region: Optional[str] = None
-    unit_type: Optional[str] = None # Apartment, Villa, etc.
+    unit_type: Optional[str] = None 
     budget_min: Optional[str] = None
     budget_max: Optional[str] = None
-    purpose: Optional[str] = None # Investment, Primary Home
-    timeline: Optional[str] = None # Immediate, 6 months
-    next_step: Optional[str] = None # Call, Visit
-    lead_summary: Optional[str] = None # Conversation summary
-    tags: List[str] = Field(default_factory=list) # e.g. "High Value", "Urgent"
-    temperature: Optional[str] = None # Hot, Warm, Cold
+    purpose: Optional[str] = None 
+    timeline: Optional[str] = None 
+    next_step: Optional[str] = None 
+    lead_summary: Optional[str] = None 
+    tags: List[str] = Field(default_factory=list) 
+    temperature: Optional[str] = None 
     kb_version_hash: Optional[str] = "v1.0"
     session_id: str
