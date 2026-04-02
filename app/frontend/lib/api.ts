@@ -1,6 +1,47 @@
 export interface ChatMessage {
-    role: 'user' | 'assistant' | 'system';
+    role: "user" | "assistant";
     content: string;
+    cta?: {
+      label: string;
+      action: "link" | "callback";
+      url?: string;
+    };
+    cta_card?: {
+      title: string;
+      price?: string;
+      location?: string;
+      image?: string;
+      cta?: string;
+      actions?: Array<{
+        label: string;
+        type: "link" | "callback";
+        url?: string;
+      }>;
+    };
+    // populated when persona_stage == "recommendation"
+    project_cards?: ProjectCard[];
+    trim_intro?: boolean;
+  }
+
+// NEW: Individual recommendation card shape (mirrors backend _build_project_cards)
+export interface ProjectCard {
+    id: string;
+    title: string;
+    price?: string;
+    location?: string;
+    type?: string;
+    status?: string;
+    amenities?: string[];
+    url?: string;
+}
+
+export interface CTACard {
+    title: string;
+    price?: string;
+    location?: string;
+    image?: string;
+    cta?: string;
+    link?: string;
 }
 
 export interface ChatResponse {
@@ -25,11 +66,8 @@ export interface Lead {
 }
 
 // Use relative paths so Next.js proxy/rewrites apply consistently.
-// (Chat UI uses `/api/health` already; keep chat endpoints aligned.)
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
-// If `NEXT_PUBLIC_BACKEND_URL` is set, we connect directly to the backend.
-// Otherwise we fall back to relative paths (works in dev when Next rewrites are enabled).
 const withBackend = (path: string) => {
     return backendUrl ? `${backendUrl}${path}` : path;
 };
@@ -49,7 +87,15 @@ export const api = {
         sessionId: string,
         messages: ChatMessage[],
         onToken: (token: string) => void,
-        onDone: (data: { retrieved_projects: string[]; mode: 'concierge' | 'lead_capture' }) => void
+        onDone: (data: { 
+            retrieved_projects: string[]; 
+            mode: 'concierge' | 'lead_capture';
+            cta?: ChatMessage["cta"];
+            cta_card?: ChatMessage["cta_card"];
+            project_cards?: ProjectCard[];
+            trim_intro?: boolean;
+            persona_stage?: string;
+          }) => void
     ) => {
         const res = await fetch(withBackend("/api/chat/stream"), {
             method: 'POST',
@@ -76,13 +122,17 @@ export const api = {
                 const seg = line.trim();
                 if (seg.startsWith('data:')) {
                     try {
-                        // Accept both `data: <json>` and `data:<json>` formats.
                         const jsonPart = seg.replace(/^data:\s*/, '');
                         const data = JSON.parse(jsonPart);
                         if (data.done) {
                             onDone({
                                 retrieved_projects: data.retrieved_projects || [],
-                                mode: data.mode || 'concierge'
+                                mode: data.mode || 'concierge',
+                                cta: data.cta,
+                                cta_card: data.cta_card,
+                                project_cards: data.project_cards,
+                                trim_intro: data.trim_intro,
+                                persona_stage: data.persona_stage,
                             });
                         } else if (data.token) {
                             onToken(data.token);
@@ -106,7 +156,6 @@ export const api = {
     },
 
     getLeads: async (password: string) => {
-        // Legacy endpoint shape (kept for compatibility).
         const res = await fetch(backendUrl ? `${backendUrl}/api/admin/leads` : "/admin-api/leads", {
             headers: { 'password': password }
         });

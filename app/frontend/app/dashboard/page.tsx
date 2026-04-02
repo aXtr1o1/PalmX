@@ -694,7 +694,7 @@ function DashboardContent() {
                         className="group flex flex-col gap-1.5 w-8 hover:opacity-70 transition-opacity p-2 -ml-2"
                     >
                         <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
-                        <span className="w-5 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
+                        <span className="w-5 h-0.5 bg-[#5A5A5A] group-hover:bg-primary transition-colors"></span>
                         <span className="w-8 h-0.5 bg-black group-hover:bg-primary transition-colors"></span>
                     </button>
                     <Link href="/" className="flex items-center gap-3 group">
