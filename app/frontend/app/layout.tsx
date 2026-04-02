@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider, SignedOut, SignInButton,SignedIn,UserButton } from '@clerk/nextjs'
+
 import { AppProvider } from "@/contexts/app-context";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
