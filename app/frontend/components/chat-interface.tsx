@@ -26,11 +26,11 @@ const QUICK_PROMPTS = [
 // ---------------------------------------------------------------------------
 function CardTile({ card, onSelect }: { card: ProjectCard; onSelect: (c: ProjectCard) => void }) {
     return (
-        <div className="relative rounded-2xl overflow-hidden w-full bg-gradient-to-tl from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e] shadow-lg shadow-black/20 border border-white/5">
+        <div className="relative rounded-2xl overflow-hidden w-full h-full bg-gradient-to-tl from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e] shadow-lg shadow-black/20 border border-white/5">
             {/* Decorative corner — same as user bubble & quick prompts */}
             <div className="absolute bottom-0 left-0 w-20 h-20 bg-black/20 rounded-tr-full pointer-events-none" />
 
-            <div className="relative z-10 p-4 flex flex-col gap-2">
+            <div className="relative z-10 p-4 flex flex-col gap-2 h-full">
 
                 {/* Type + Status row */}
                 <div className="flex items-center justify-between">
@@ -80,6 +80,8 @@ function CardTile({ card, onSelect }: { card: ProjectCard; onSelect: (c: Project
                         ))}
                     </div>
                 )}
+
+                <div className="flex-1" />
 
                 {/* Enquire Now */}
                 <button
@@ -157,7 +159,7 @@ function ProjectCardsSlideshow({
             {/* Scroll container — native scroll, 2 cards visible + peek of 3rd */}
             <div
                 ref={scrollContainerRef}
-                className="flex gap-3 overflow-x-auto pb-1"
+                className="flex items-stretch gap-3 overflow-x-auto pb-1"
                 style={{
                     scrollSnapType: "x mandatory",
                     WebkitOverflowScrolling: "touch",
