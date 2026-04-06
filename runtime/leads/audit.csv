@@ -536,3 +536,12 @@ I need to book anything that comes with it",lead_capture,[],[],v1.0,all
 2026-04-02T11:58:07.394921,0tyox,In new cairo budget of 20M ,lead_capture,"[""village_de_la_capitale"", ""casa"", ""bamboo_iii""]",[],v1.0,all
 2026-04-02T12:58:57.104953,0tyox,nlknl,list_projects,"[""st_88"", ""hacienda_heneish"", ""lakeyard""]",[],v1.0,all
 2026-04-02T13:22:13.782586,0tyox,Villa in Badya starting 10M,pricing,"[""badya"", ""hacienda_bay"", ""hacienda_blue""]",[],v1.0,all
+2026-04-06T11:01:31.351633,0tyox,hi looking for apartments ,list_projects,"[""new_capital_gardens"", ""palm_hills_new_alamein"", ""jirian_palm_hills""]",[],v1.0,all
+2026-04-06T11:02:02.043614,0tyox,"in new cairo, can you recommend me some options",list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-06T11:02:21.192011,0tyox,Tell me more about 97 Hills,project_query,"[""97_hills"", ""palm_hills_new_cairo"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-06T11:02:32.159660,0tyox,Tell me more about Palmet New Cairo,project_query,"[""palm_hills_new_cairo""]",[],v1.0,all
+2026-04-06T11:03:03.860102,0tyox,Tell me more about Palm Hills New Cairo,project_query,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-06T11:04:51.459313,0tyox,recommend me some apartments in new cairo ,list_projects,"[""palm_hills_new_cairo"", ""97_hills"", ""village_avenue""]",[],v1.0,all
+2026-04-06T11:05:05.231286,0tyox,Tell me more about Village Avenue,project_query,"[""village_avenue"", ""village_gate_mall"", ""the_village""]",[],v1.0,all
+2026-04-06T11:05:30.363001,0tyox,Tell me more about 97 Hills,project_query,"[""97_hills"", ""palm_hills_new_cairo"", ""jirian_palm_hills""]",[],v1.0,all
+2026-04-06T11:05:49.097098,0tyox,Tell me more about Palm Hills New Cairo,project_query,"[""palm_hills_new_cairo""]",[],v1.0,all
