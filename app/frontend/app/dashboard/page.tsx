@@ -464,7 +464,7 @@ function DashboardContent() {
 
     // Dashboard should not auto-fetch; user must explicitly click to load
     // unless query param `?autofetch=1` is present from the sidebar.
-    const [dashboardRequested, setDashboardRequested] = useState(() => autoFetch);
+    const [dashboardRequested, setDashboardRequested] = useState((true));
 
     // --------------------------------------------------
     // Fetch data
@@ -663,17 +663,7 @@ function DashboardContent() {
                         Loading dashboard
                     </p>
 
-                    {!autoFetch && (
-                        <button
-                            onClick={() => {
-                                setDashboardRequested(true);
-                                fetchAll(activeSheet, timeRange, true);
-                            }}
-                            className="mt-3 px-6 py-3 bg-[#0B0B0B] text-white rounded-full text-xs font-bold tracking-widest uppercase hover:bg-[#D22048] transition-colors"
-                        >
-                            Load Dashboard
-                        </button>
-                    )}
+
                 </div>
             </div>
         );
