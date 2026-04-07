@@ -19,20 +19,119 @@ const QUICK_PROMPTS = [
 ];
 
 // ---------------------------------------------------------------------------
-// CardTile — gradient style matching user bubbles & CTA card.
-// from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e], white text, decorative corner.
-// Single Enquire Now button only — triggers chat, no external links.
-// No outer onClick — only the button fires (prevents double-fire).
+// SuggestedActions — standard pill buttons shown after every bot message
+// EXCEPT when recommendation cards or CTA cards are present.
+// ---------------------------------------------------------------------------
+function SuggestedActions({
+    actions,
+    onSelect,
+}: {
+    actions: string[];
+    onSelect: (action: string) => void;
+}) {
+    if (!actions || actions.length === 0) return null;
+
+    return (
+        <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-gray-100">
+            {actions.map((action, i) => (
+                <button
+                    key={i}
+                    type="button"
+                    onClick={() => onSelect(action)}
+                    className="relative inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-tl from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e] border border-white/10 rounded-full text-white text-[10px] font-bold uppercase tracking-[0.15em] hover:shadow-md hover:shadow-black/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 overflow-hidden whitespace-nowrap"
+                >
+                    <span className="absolute bottom-0 left-0 w-6 h-6 bg-black/20 rounded-tr-full pointer-events-none" />
+                    <span className="relative z-10">{action}</span>
+                    <ArrowRight size={10} className="relative z-10 opacity-70 flex-shrink-0" />
+                </button>
+            ))}
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// BudgetSelectorWidget — +/- stepper shown during qualification stage
+// when budget has not yet been collected. LLM decides when to include it.
+// Only shown on the last assistant message. Disappears after confirm.
+// ---------------------------------------------------------------------------
+function BudgetSelectorWidget({
+    selector,
+    onConfirm,
+}: {
+    selector: { label: string; value: number; step: number; min: number; max: number };
+    onConfirm: (value: number) => void;
+}) {
+    const [value, setValue] = useState(selector.value);
+
+    const fmt = (n: number) => {
+        if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M EGP`;
+        if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K EGP`;
+        return `${n.toLocaleString()} EGP`;
+    };
+
+    const decrease = () => setValue(v => Math.max(selector.min, v - selector.step));
+    const increase = () => setValue(v => Math.min(selector.max, v + selector.step));
+
+    return (
+        <div className="mt-4 pt-3 border-t border-gray-100">
+            <p className="text-[9px] uppercase tracking-[0.2em] text-gray-400 mb-3">
+                {selector.label}
+            </p>
+            <div className="flex items-center gap-3">
+                <button
+                    type="button"
+                    onClick={decrease}
+                    disabled={value <= selector.min}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#D22048] hover:text-[#D22048] disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 font-bold text-sm"
+                >
+                    −
+                </button>
+                <div className="flex-1 text-center">
+                    <span className="font-serif text-[18px] font-semibold text-[#0B0B0B] tracking-tight">
+                        {fmt(value)}
+                    </span>
+                </div>
+                <button
+                    type="button"
+                    onClick={increase}
+                    disabled={value >= selector.max}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#D22048] hover:text-[#D22048] disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 font-bold text-sm"
+                >
+                    +
+                </button>
+            </div>
+            {/* Progress bar */}
+            <div className="mt-3 h-0.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                    className="h-full bg-[#D22048] rounded-full transition-all duration-200"
+                    style={{ width: `${((value - selector.min) / (selector.max - selector.min)) * 100}%` }}
+                />
+            </div>
+            <div className="flex justify-between mt-1">
+                <span className="text-[9px] text-gray-300">{fmt(selector.min)}</span>
+                <span className="text-[9px] text-gray-300">{fmt(selector.max)}</span>
+            </div>
+            <button
+                type="button"
+                onClick={() => onConfirm(value)}
+                className="mt-3 w-full relative inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-tl from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e] border border-white/10 rounded-full text-white text-[10px] font-bold uppercase tracking-[0.15em] hover:shadow-md hover:shadow-black/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 overflow-hidden"
+            >
+                <span className="absolute bottom-0 left-0 w-6 h-6 bg-black/20 rounded-tr-full pointer-events-none" />
+                <span className="relative z-10">Set Budget to {fmt(value)}</span>
+                <ArrowRight size={10} className="relative z-10 opacity-70" />
+            </button>
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// CardTile
 // ---------------------------------------------------------------------------
 function CardTile({ card, onSelect }: { card: ProjectCard; onSelect: (c: ProjectCard) => void }) {
     return (
         <div className="relative rounded-2xl overflow-hidden w-full h-full bg-gradient-to-tl from-[#0B0B0B] via-[#6b0a1e] to-[#c01e3e] shadow-lg shadow-black/20 border border-white/5">
-            {/* Decorative corner — same as user bubble & quick prompts */}
             <div className="absolute bottom-0 left-0 w-20 h-20 bg-black/20 rounded-tr-full pointer-events-none" />
-
             <div className="relative z-10 p-4 flex flex-col gap-2 h-full">
-
-                {/* Type + Status row */}
                 <div className="flex items-center justify-between">
                     {card.type && (
                         <span className="text-[9px] uppercase tracking-[0.2em] font-semibold text-white/50">
@@ -45,21 +144,15 @@ function CardTile({ card, onSelect }: { card: ProjectCard; onSelect: (c: Project
                         </span>
                     )}
                 </div>
-
-                {/* Title */}
                 <h4 className="font-serif text-[15px] font-semibold text-white leading-tight tracking-wide">
                     {card.title}
                 </h4>
-
-                {/* Location */}
                 {card.location && (
                     <div className="flex items-center gap-1 text-[11px] text-white/60">
                         <MapPin size={9} className="text-white/40 flex-shrink-0" />
                         <span className="truncate">{card.location}</span>
                     </div>
                 )}
-
-                {/* Price block */}
                 <div className="border-t border-white/10 pt-2">
                     <p className="text-[8px] uppercase tracking-[0.2em] text-white/40 mb-0.5">Starting From</p>
                     <p className={cn(
@@ -69,8 +162,6 @@ function CardTile({ card, onSelect }: { card: ProjectCard; onSelect: (c: Project
                         {card.price || "Pricing on request"}
                     </p>
                 </div>
-
-                {/* Amenity pills — max 2 to keep height compact */}
                 {card.amenities && card.amenities.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                         {card.amenities.slice(0, 2).map((a, i) => (
@@ -80,10 +171,7 @@ function CardTile({ card, onSelect }: { card: ProjectCard; onSelect: (c: Project
                         ))}
                     </div>
                 )}
-
                 <div className="flex-1" />
-
-                {/* Enquire Now */}
                 <button
                     type="button"
                     onClick={() => onSelect(card)}
@@ -98,10 +186,6 @@ function CardTile({ card, onSelect }: { card: ProjectCard; onSelect: (c: Project
 
 // ---------------------------------------------------------------------------
 // ProjectCardsSlideshow
-// - Shows 2 cards at a time with a peek of the next one
-// - Native horizontal scroll: trackpad, touch, and mouse all work
-// - Dot indicators sync via IntersectionObserver
-// - Prev/next buttons scroll by one card width
 // ---------------------------------------------------------------------------
 function ProjectCardsSlideshow({
     cards,
@@ -115,11 +199,9 @@ function ProjectCardsSlideshow({
 
     if (!cards || cards.length === 0) return null;
 
-    // Sync dot indicator with scroll position via IntersectionObserver
     useEffect(() => {
         const container = scrollContainerRef.current;
         if (!container) return;
-
         const items = container.querySelectorAll("[data-card-index]");
         const observer = new IntersectionObserver(
             (entries) => {
@@ -132,7 +214,6 @@ function ProjectCardsSlideshow({
             },
             { root: container, threshold: 0.6 }
         );
-
         items.forEach((item) => observer.observe(item));
         return () => observer.disconnect();
     }, [cards.length]);
@@ -144,22 +225,11 @@ function ProjectCardsSlideshow({
         if (item) item.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
     };
 
-    const prev = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        scrollTo(Math.max(0, activeIndex - 1));
-    };
-
-    const next = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        scrollTo(Math.min(cards.length - 1, activeIndex + 1));
-    };
-
     return (
         <div className="mt-5 w-full">
-            {/* Scroll container — native scroll, 2 cards visible + peek of 3rd */}
             <div
                 ref={scrollContainerRef}
-                className="flex items-stretch gap-3 overflow-x-auto pb-1"
+                className="flex gap-3 overflow-x-auto pb-1"
                 style={{
                     scrollSnapType: "x mandatory",
                     WebkitOverflowScrolling: "touch",
@@ -181,11 +251,8 @@ function ProjectCardsSlideshow({
                         <CardTile card={card} onSelect={onSelect} />
                     </div>
                 ))}
-                {/* Trailing spacer so last card doesn't snap flush to edge */}
                 <div style={{ flex: "0 0 8px", minWidth: "8px" }} />
             </div>
-
-            {/* Dot indicators only — no arrows */}
             {cards.length > 1 && (
                 <div className="flex justify-center gap-1.5 items-center mt-3">
                     {cards.map((_, i) => (
@@ -200,14 +267,12 @@ function ProjectCardsSlideshow({
                     ))}
                 </div>
             )}
-
             <p className="text-[9px] uppercase tracking-[0.2em] text-gray-300 mt-2">
                 Swipe or use arrows · Enquire to learn more
             </p>
         </div>
     );
 }
-
 
 
 export default function ChatInterface() {
@@ -221,7 +286,6 @@ export default function ChatInterface() {
 
     const scrollRef = useRef<HTMLDivElement>(null);
     const healthCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
-    // Prevents double-submit from rapid clicks or event bubbling
     const submittingRef = useRef(false);
 
     useEffect(() => {
@@ -259,8 +323,6 @@ export default function ChatInterface() {
         e?.preventDefault();
         const text = quickPrompt || input;
         if (!text.trim() || loading) return;
-
-        // Guard: ignore if already mid-submit
         if (submittingRef.current) return;
         submittingRef.current = true;
 
@@ -292,34 +354,30 @@ export default function ChatInterface() {
                         });
                     }
                 },
-                (data) => {
-                    // DEBUG — remove after cards confirmed working
-                    console.log("[onDone] full data:", JSON.stringify(data));
-                    console.log("[onDone] project_cards:", data.project_cards);
-                    setMode(data.mode);
-                    if (data.cta || data.cta_card || data.project_cards) {
-                        setMessages(prev => {
-                            const updated = [...prev];
-                            const last = updated[updated.length - 1];
-                            if (last?.role === "assistant") {
-                                // Trim intro to 2 sentences when cards are present
-                                let content = last.content;
-                                if (data.trim_intro && data.project_cards?.length) {
-                                    const sentences = content.match(/[^.!?]+[.!?]+/g) || [];
-                                    content = sentences.slice(0, 2).join(" ").trim() || content;
-                                }
-                                updated[updated.length - 1] = {
-                                    ...last,
-                                    content,
-                                    cta: data.cta,
-                                    cta_card: data.cta_card,
-                                    project_cards: data.project_cards,
-                                    trim_intro: data.trim_intro,
-                                };
+                (doneData) => {
+                    setMode(doneData.mode as 'concierge' | 'lead_capture');
+                    setMessages(prev => {
+                        const updated = [...prev];
+                        const last = updated[updated.length - 1];
+                        if (last?.role === "assistant") {
+                            let content = last.content;
+                            if (doneData.trim_intro && doneData.project_cards?.length) {
+                                const sentences = content.match(/[^.!?]+[.!?]+/g) || [];
+                                content = sentences.slice(0, 2).join(" ").trim() || content;
                             }
-                            return updated;
-                        });
-                    }
+                            updated[updated.length - 1] = {
+                                ...last,
+                                content,
+                                ...(doneData.cta && { cta: doneData.cta }),
+                                ...(doneData.cta_card && { cta_card: doneData.cta_card }),
+                                ...(doneData.project_cards?.length && { project_cards: doneData.project_cards }),
+                                trim_intro: doneData.trim_intro,
+                                suggested_actions: doneData.suggested_actions || [],
+                                budget_selector: doneData.budget_selector || null,
+                            };
+                        }
+                        return updated;
+                    });
                 }
             );
         } catch (err) {
@@ -327,7 +385,6 @@ export default function ChatInterface() {
             setMessages(prev => [...prev, { role: "assistant", content: "I'm having trouble connecting to PalmX. Please try again." }]);
         } finally {
             setLoading(false);
-            // Release guard after short delay to absorb any bubble duplicates
             setTimeout(() => { submittingRef.current = false; }, 400);
         }
     }, [input, loading, messages, sessionId]);
@@ -336,9 +393,10 @@ export default function ChatInterface() {
         handleSubmit(undefined, `Tell me more about ${card.title}`);
     }, [handleSubmit]);
 
-    // -------------------------------------------------------------------------
-    // Loading screen
-    // -------------------------------------------------------------------------
+    const handleActionSelect = useCallback((action: string) => {
+        handleSubmit(undefined, action);
+    }, [handleSubmit]);
+
     if (!systemReady) {
         return (
             <div className="flex flex-col h-screen w-full bg-white items-center justify-center">
@@ -356,9 +414,6 @@ export default function ChatInterface() {
         );
     }
 
-    // -------------------------------------------------------------------------
-    // Main UI
-    // -------------------------------------------------------------------------
     return (
         <div className="flex flex-col h-screen w-screen bg-white relative animate-in fade-in duration-700 font-sans text-foreground">
 
@@ -459,11 +514,12 @@ export default function ChatInterface() {
                                                 {m.content}
                                             </ReactMarkdown>
 
-                                            {/* Project cards — persists forever on this message */}
+                                            {/* Project recommendation cards */}
                                             {m.project_cards && m.project_cards.length > 0 && (
                                                 <ProjectCardsSlideshow cards={m.project_cards} onSelect={handleCardSelect} />
                                             )}
 
+                                            {/* CTA card */}
                                             {m.cta && (
                                                 <div className="mt-6">
                                                     <a href={m.cta.url || "#"} target="_blank" rel="noopener noreferrer"
@@ -491,6 +547,39 @@ export default function ChatInterface() {
                                                         )}
                                                     </div>
                                                 </div>
+                                            )}
+
+                                            {/*
+                                             * Suggested action buttons.
+                                             * Backend guarantees suggested_actions is [] when
+                                             * cta_card or project_cards are present.
+                                             */}
+                                            {!m.cta_card &&
+                                             !(m.project_cards && m.project_cards.length > 0) &&
+                                             m.suggested_actions && m.suggested_actions.length > 0 && (
+                                                <SuggestedActions
+                                                    actions={m.suggested_actions}
+                                                    onSelect={handleActionSelect}
+                                                />
+                                            )}
+
+                                            {/* Budget selector — only on last assistant message, only when present.
+                                             * Backend only sends this during qualification when budget is unknown.
+                                             * Disappears after user confirms by sending the budget message. */}
+                                            {!m.cta_card &&
+                                             !(m.project_cards && m.project_cards.length > 0) &&
+                                             m.budget_selector &&
+                                             i === messages.length - 1 && (
+                                                <BudgetSelectorWidget
+                                                    selector={m.budget_selector}
+                                                    onConfirm={(val) => {
+                                                        const fmt = (n: number) =>
+                                                            n >= 1_000_000
+                                                                ? `${(n / 1_000_000).toFixed(1)}M EGP`
+                                                                : `${(n / 1_000).toFixed(0)}K EGP`;
+                                                        handleSubmit(undefined, `My budget is ${fmt(val)}`);
+                                                    }}
+                                                />
                                             )}
                                         </div>
                                     )}
@@ -523,7 +612,7 @@ export default function ChatInterface() {
                     </div>
                 )}
 
-                <div className="bg-white/95 backdrop-blur-md w-screen p-4 md:p-6 border-t border-gray-100 pb-safe relative">
+                <div className="bg-white/95 backdrop-blur-md w-full p-4 md:p-6 border-t border-gray-100 pb-safe relative">
                     <form onSubmit={handleSubmit} className="relative max-w-3xl mx-auto flex gap-3 items-end">
                         <div className="relative flex-1 group">
                             <textarea

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { adminApi } from "@/lib/admin-api";
 
 interface AppState {
     systemReady: boolean;
@@ -67,6 +68,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
             localStorage.setItem("palmx_system_ready", "true");
         }
     }, [systemReady]);
+
+    useEffect(() => {
+        const loadInitialDashboard = async () => {
+            if (dashboardData) return;
+            setDashboardLoading(true);
+            try {
+                const [h, s, a, l, au] = await Promise.all([
+                    adminApi.health(),
+                    adminApi.sheets(),
+                    adminApi.analytics("leads.csv", "all"),
+                    adminApi.leads("leads.csv"),
+                    adminApi.audit(),
+                ]);
+                setDashboardData({
+                    analytics: a,
+                    leads: l,
+                    sheets: s,
+                    auditData: au,
+                    health: h,
+                });
+                setLastFetchTime(Date.now());
+            } catch (error) {
+                console.warn("Initial dashboard preload failed", error);
+            } finally {
+                setDashboardLoading(false);
+            }
+        };
+
+        loadInitialDashboard();
+    }, [dashboardData]);
 
     return (
         <AppContext.Provider

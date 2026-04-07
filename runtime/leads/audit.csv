@@ -545,3 +545,36 @@ I need to book anything that comes with it",lead_capture,[],[],v1.0,all
 2026-04-06T11:05:05.231286,0tyox,Tell me more about Village Avenue,project_query,"[""village_avenue"", ""village_gate_mall"", ""the_village""]",[],v1.0,all
 2026-04-06T11:05:30.363001,0tyox,Tell me more about 97 Hills,project_query,"[""97_hills"", ""palm_hills_new_cairo"", ""jirian_palm_hills""]",[],v1.0,all
 2026-04-06T11:05:49.097098,0tyox,Tell me more about Palm Hills New Cairo,project_query,"[""palm_hills_new_cairo""]",[],v1.0,all
+2026-04-06T17:05:38.889562,0tyox,hi ,support_contact,[],[],v1.0,all
+2026-04-06T17:30:35.967062,0tyox,hi ,support_contact,[],[],v1.0,all
+2026-04-06T17:42:10.734789,0tyox,im looking for an apartment ,list_projects,"[""new_capital_gardens"", ""palm_hills_new_alamein"", ""jirian_palm_hills""]",[],v1.0,all
+2026-04-06T17:42:26.922696,0tyox,hi ,lead_capture,"[""new_capital_gardens"", ""palm_hills_new_alamein"", ""jirian_palm_hills""]",[],v1.0,all
+2026-04-07T10:29:31.277935,0tyox,Hi,support_contact,[],[],v1.0,all
+2026-04-07T11:07:41.022795,0tyox,Hi,support_contact,[],[],v1.0,all
+2026-04-07T11:32:47.224715,0tyox,hi,support_contact,[],[],v1.0,all
+2026-04-07T11:51:23.179839,0tyox,how can i contact someone ,support_contact,[],[],v1.0,all
+2026-04-07T12:38:13.482892,0tyox,hi ,support_contact,[],[],v1.0,all
+2026-04-07T12:40:53.320488,0tyox,I am looking for an apartment ,list_projects,"[""village_de_la_capitale"", ""new_capital_gardens"", ""village_avenue""]",[],v1.0,all
+2026-04-07T12:43:25.807895,0tyox,new cairo and my budget is 14M ,lead_capture,"[""village_de_la_capitale"", ""new_capital_gardens"", ""village_avenue""]",[],v1.0,all
+2026-04-07T12:43:57.201884,0tyox,I would like to contact someone ,support_contact,"[""village_de_la_capitale"", ""new_capital_gardens"", ""village_avenue""]",[],v1.0,all
+2026-04-07T15:06:01.093170,0tyox,Hi,support_contact,[],[],v1.0,all
+2026-04-07T15:06:20.218908,0tyox,Ask about unit types,project_query,"[""st_88"", ""the_crown_extension"", ""jirian_palm_hills""]",[],v1.0,all
+2026-04-07T15:10:04.390276,0tyox,recommend me some apartments ,list_projects,"[""village_de_la_capitale"", ""new_capital_gardens"", ""village_avenue""]",[],v1.0,all
+2026-04-07T15:11:01.120140,0tyox,i would like to contact someone regarding this ,support_contact,"[""village_de_la_capitale"", ""new_capital_gardens"", ""village_avenue""]",[],v1.0,all
+2026-04-07T15:17:12.413290,0tyox,hi ,support_contact,[],[],v1.0,all
+2026-04-07T15:17:22.156226,0tyox,i would like to contact someone ,support_contact,[],[],v1.0,all
+2026-04-07T15:18:02.800191,0tyox,Ask about unit types,project_query,"[""st_88"", ""the_crown_extension"", ""jirian_palm_hills""]",[],v1.0,all
+2026-04-07T15:45:05.582028,0tyox,Apartments in New Cairo,list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-07T15:45:28.823372,0tyox,Explore Palm Hills New Cairo,project_query,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-07T15:45:47.344906,0tyox,Explore villa options,list_projects,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-07T15:46:01.997520,0tyox,Book a site visit,lead_capture,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-07T17:11:40.448205,0tyox,Apartments in New Cairo,list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-07T17:12:03.198138,0tyox,Explore Palm Hills New Cairo,project_query,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-07T17:59:00.363077,0tyox,Apartments in New Cairo,list_projects,"[""palm_hills_new_cairo"", ""97_hills"", ""village_avenue""]",[],v1.0,all
+2026-04-07T18:03:26.750561,0tyox,My budget is 6.0M EGP,lead_capture,"[""palm_hills_new_cairo"", ""97_hills"", ""village_avenue""]",[],v1.0,all
+2026-04-07T18:10:50.966877,0tyox,im looking for something with a different budget ,pricing,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-07T18:23:14.061726,0tyox,hi,support_contact,[],[],v1.0,all
+2026-04-07T18:24:38.268027,0tyox,looking for an apartment? ,list_projects,"[""new_capital_gardens"", ""jirian_palm_hills"", ""village_avenue""]",[],v1.0,all
+2026-04-07T18:27:26.664981,0tyox,Apartments in New Cairo,list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-07T18:27:58.264151,0tyox,My budget is 8.0M EGP,lead_capture,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-07T18:29:46.625151,0tyox,i do not like any of these options lets start again ,list_projects,"[""palm_hills_new_cairo"", ""97_hills""]",[],v1.0,all

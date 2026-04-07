@@ -1,3 +1,10 @@
+export interface BudgetSelector {
+    label: string;
+    value: number;
+    step: number;
+    min: number;
+    max: number;
+}
 export interface ChatMessage {
     role: "user" | "assistant";
     content: string;
@@ -18,12 +25,12 @@ export interface ChatMessage {
         url?: string;
       }>;
     };
-    // populated when persona_stage == "recommendation"
     project_cards?: ProjectCard[];
     trim_intro?: boolean;
+    suggested_actions?: string[];
+     budget_selector?: BudgetSelector | null;  // LLM-generated next-step button labels
   }
 
-// NEW: Individual recommendation card shape (mirrors backend _build_project_cards)
 export interface ProjectCard {
     id: string;
     title: string;
@@ -65,7 +72,6 @@ export interface Lead {
     session_id: string;
 }
 
-// Use relative paths so Next.js proxy/rewrites apply consistently.
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 const withBackend = (path: string) => {
@@ -89,12 +95,14 @@ export const api = {
         onToken: (token: string) => void,
         onDone: (data: { 
             retrieved_projects: string[]; 
-            mode: 'concierge' | 'lead_capture';
+            mode: 'concierge' | 'lead_capture' | 'support' | string;
             cta?: ChatMessage["cta"];
             cta_card?: ChatMessage["cta_card"];
             project_cards?: ProjectCard[];
             trim_intro?: boolean;
             persona_stage?: string;
+            suggested_actions?: string[];
+            budget_selector?: BudgetSelector | null;
           }) => void
     ) => {
         const res = await fetch(withBackend("/api/chat/stream"), {
@@ -123,19 +131,21 @@ export const api = {
                 if (seg.startsWith('data:')) {
                     try {
                         const jsonPart = seg.replace(/^data:\s*/, '');
-                        const data = JSON.parse(jsonPart);
-                        if (data.done) {
+                        const parsed = JSON.parse(jsonPart);
+                        if (parsed.done) {
                             onDone({
-                                retrieved_projects: data.retrieved_projects || [],
-                                mode: data.mode || 'concierge',
-                                cta: data.cta,
-                                cta_card: data.cta_card,
-                                project_cards: data.project_cards,
-                                trim_intro: data.trim_intro,
-                                persona_stage: data.persona_stage,
+                                retrieved_projects: parsed.retrieved_projects || [],
+                                mode: parsed.mode || 'concierge',
+                                cta: parsed.cta,
+                                cta_card: parsed.cta_card,
+                                project_cards: parsed.project_cards,
+                                trim_intro: parsed.trim_intro,
+                                persona_stage: parsed.persona_stage,
+                                suggested_actions: parsed.suggested_actions || [],
+                                budget_selector: parsed.budget_selector || null,
                             });
-                        } else if (data.token) {
-                            onToken(data.token);
+                        } else if (parsed.token) {
+                            onToken(parsed.token);
                         }
                     } catch (e) {
                         // Skip malformed lines
