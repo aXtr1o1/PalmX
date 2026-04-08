@@ -21,6 +21,7 @@ jobs:
       - name: Backend Service Init
         run: |
           git fetch
+          git switch staging
           git reset --hard origin/staging
           cd /var/app/PalmX
           python3 -m venv venv
