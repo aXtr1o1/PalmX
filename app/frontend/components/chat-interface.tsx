@@ -197,8 +197,6 @@ function ProjectCardsSlideshow({
     const [activeIndex, setActiveIndex] = useState(0);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-    if (!cards || cards.length === 0) return null;
-
     useEffect(() => {
         const container = scrollContainerRef.current;
         if (!container) return;
@@ -217,6 +215,8 @@ function ProjectCardsSlideshow({
         items.forEach((item) => observer.observe(item));
         return () => observer.disconnect();
     }, [cards.length]);
+
+    if (!cards || cards.length === 0) return null;
 
     const scrollTo = (index: number) => {
         const container = scrollContainerRef.current;
@@ -280,13 +280,16 @@ export default function ChatInterface() {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [sessionId, setSessionId] = useState("");
-    const [mode, setMode] = useState<'concierge' | 'lead_capture'>('concierge');
+    const [mode, setMode] = useState<'concierge' | 'lead_capture' | 'support'>('concierge');
     const { systemReady, bootProgress, setSystemReady, setBootProgress } = useApp();
     const [menuOpen, setMenuOpen] = useState(false);
 
     const scrollRef = useRef<HTMLDivElement>(null);
     const healthCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const submittingRef = useRef(false);
+    const messagesRef = useRef<ChatMessage[]>([]);
+    const lastSubmitTimeRef = useRef<number>(0);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
         if (systemReady) return;
@@ -319,20 +322,35 @@ export default function ChatInterface() {
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }, [messages, loading]);
 
-    const handleSubmit = useCallback(async (e?: React.FormEvent, quickPrompt?: string) => {
+    useEffect(() => { messagesRef.current = messages; }, [messages]);
+
+    const handleSubmit = useCallback(async (e?: React.FormEvent, quickPrompt?: string, isButton = false) => {
         e?.preventDefault();
         const text = quickPrompt || input;
-        if (!text.trim() || loading) return;
+        if (!text.trim()) return;
+        if (loading && !isButton) return;
         if (submittingRef.current) return;
+
+        if (isButton && abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
+        const isFormSubmit = !quickPrompt;
+        const now = Date.now();
+        if (isFormSubmit && now - lastSubmitTimeRef.current < 500) return;
+        if (isFormSubmit) lastSubmitTimeRef.current = now;
+
         submittingRef.current = true;
 
         const userMsg = { role: "user" as const, content: text };
+        const history = [...messagesRef.current, userMsg];
         setMessages(prev => [...prev, userMsg]);
         setInput("");
         setLoading(true);
 
         try {
-            const history = [...messages, userMsg];
             let firstToken = true;
 
             await api.chatStream(
@@ -355,46 +373,76 @@ export default function ChatInterface() {
                     }
                 },
                 (doneData) => {
-                    setMode(doneData.mode as 'concierge' | 'lead_capture');
+                    setLoading(false);
+                    if (doneData.mode === 'lead_capture') {
+                        setMode('lead_capture');
+                    } else {
+                        setMode('concierge');
+                    }
                     setMessages(prev => {
                         const updated = [...prev];
                         const last = updated[updated.length - 1];
-                        if (last?.role === "assistant") {
-                            let content = last.content;
-                            if (doneData.trim_intro && doneData.project_cards?.length) {
-                                const sentences = content.match(/[^.!?]+[.!?]+/g) || [];
-                                content = sentences.slice(0, 2).join(" ").trim() || content;
-                            }
-                            updated[updated.length - 1] = {
-                                ...last,
-                                content,
-                                ...(doneData.cta && { cta: doneData.cta }),
-                                ...(doneData.cta_card && { cta_card: doneData.cta_card }),
-                                ...(doneData.project_cards?.length && { project_cards: doneData.project_cards }),
-                                trim_intro: doneData.trim_intro,
+
+                        // ✅ KEY FIX: if no token arrived before done (empty remainder
+                        // after __PERSONA_JSON__ strip), no assistant message exists yet.
+                        // Create one now so the response is never silently lost.
+                        if (!last || last.role !== 'assistant') {
+                            const hasCards = Boolean(doneData.project_cards?.length);
+                            updated.push({
+                                role: 'assistant',
+                                content: '',
+                                cta: doneData.cta ?? undefined,
+                                cta_card: doneData.cta_card ?? undefined,
+                                project_cards: hasCards ? doneData.project_cards : undefined,
+                                trim_intro: false,
                                 suggested_actions: doneData.suggested_actions || [],
-                                budget_selector: doneData.budget_selector || null,
-                            };
+                                budget_selector: doneData.budget_selector ?? null,
+                            });
+                            console.log("Done (no prior token):", doneData);
+                            return updated;
                         }
+
+                        // Normal path — update existing assistant message
+                        let content = last.content;
+                        const hasCards = Boolean(doneData.project_cards?.length);
+                        if (doneData.trim_intro && hasCards) {
+                            const sentences = content.match(/[^.!?]*[.!?]+(?=\s|$)/g) || [];
+                            const trimmed = sentences.slice(0, 2).join(" ").trim();
+                            content = trimmed.length >= 20 ? trimmed : content;
+                        }
+                        updated[updated.length - 1] = {
+                            ...last,
+                            content,
+                            cta: doneData.cta ?? undefined,
+                            cta_card: doneData.cta_card ?? undefined,
+                            project_cards: hasCards ? doneData.project_cards : undefined,
+                            trim_intro: hasCards ? doneData.trim_intro : false,
+                            suggested_actions: doneData.suggested_actions || [],
+                            budget_selector: doneData.budget_selector ?? null,
+                        };
+                        console.log("Done data received:", doneData);
                         return updated;
                     });
-                }
+                },
+                controller.signal,
             );
-        } catch (err) {
-            console.error(err);
-            setMessages(prev => [...prev, { role: "assistant", content: "I'm having trouble connecting to PalmX. Please try again." }]);
+        } catch (err: any) {
+            if (err?.name !== 'AbortError') {
+                console.error(err);
+                setMessages(prev => [...prev, { role: "assistant", content: "I'm having trouble connecting to PalmX. Please try again." }]);
+            }
         } finally {
             setLoading(false);
-            setTimeout(() => { submittingRef.current = false; }, 400);
+            submittingRef.current = false;
         }
-    }, [input, loading, messages, sessionId]);
+    }, [input, loading, sessionId]);
 
     const handleCardSelect = useCallback((card: ProjectCard) => {
-        handleSubmit(undefined, `Tell me more about ${card.title}`);
+        handleSubmit(undefined, `Tell me more about ${card.title}`, true);
     }, [handleSubmit]);
 
     const handleActionSelect = useCallback((action: string) => {
-        handleSubmit(undefined, action);
+        handleSubmit(undefined, action, true);
     }, [handleSubmit]);
 
     if (!systemReady) {
@@ -495,6 +543,7 @@ export default function ChatInterface() {
                                         <div className="whitespace-pre-wrap font-light tracking-wide">{m.content}</div>
                                     ) : (
                                         <div className="font-light tracking-wide text-[15px]">
+                                            {(!m.trim_intro || !m.project_cards?.length || m.content.trim().length >= 20) && (
                                             <ReactMarkdown components={{
                                                 h1: ({ node, ...props }: any) => <h1 className="font-serif text-3xl text-[#5A5A5A] mt-8 mb-4 tracking-wide" {...props} />,
                                                 h2: ({ node, ...props }: any) => <h2 className="font-serif text-2xl text-[#5A5A5A] mt-8 mb-4 tracking-wide" {...props} />,
@@ -513,6 +562,7 @@ export default function ChatInterface() {
                                             }}>
                                                 {m.content}
                                             </ReactMarkdown>
+                                            )}
 
                                             {/* Project recommendation cards */}
                                             {m.project_cards && m.project_cards.length > 0 && (
@@ -621,7 +671,7 @@ export default function ChatInterface() {
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e as any); } }}
                                 autoComplete="off"
-                                placeholder={mode === 'concierge' ? "The journey to your dream starts here..." : "Please enter your details..."}
+                                placeholder={mode === 'lead_capture' ? "Please enter your details..." : "The journey to your dream starts here..."}
                                 className="w-full pl-5 pr-16 py-3.5 bg-[#F3F4F6] border-0 focus:ring-1 focus:ring-gray-200 rounded-[24px] focus:outline-none transition-all font-sans text-[15px] text-[#0B0B0B] placeholder:text-gray-400 resize-none overflow-hidden min-h-[52px] max-h-[160px] leading-relaxed"
                                 rows={1}
                                 style={{ height: 'auto', minHeight: '52px' }}
