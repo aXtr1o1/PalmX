@@ -876,3 +876,23 @@ I need to book anything that comes with it",lead_capture,[],[],v1.0,all
 2026-04-10T19:16:36.579032,0tyox,Between 10-20M EGP,list_projects,"[""the_crown"", ""the_crown_extension"", ""badya""]",[],v1.0,all
 2026-04-10T19:16:44.756916,0tyox,Book a site visit,lead_capture,"[""the_crown"", ""the_crown_extension"", ""badya""]",[],v1.0,all
 2026-04-10T19:17:17.549892,0tyox,praga 9799707980707,lead_capture,"[""the_crown"", ""the_crown_extension"", ""badya""]",[],v1.0,all
+2026-04-10T19:20:24.438887,0tyox,Apartments in New Cairo,list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:20:37.151617,0tyox,Show villa options,list_projects,"[""palm_hills_new_cairo"", ""97_hills"", ""the_village""]",[],v1.0,all
+2026-04-10T19:20:53.486792,0tyox,Tell me more about Palm Hills New Cairo,project_query,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-10T19:21:15.585773,0tyox,Compare projects,compare,"[""palmet_new_cairo"", ""palm_hills_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:21:29.277592,0tyox,Filter by location,list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:21:46.989458,0tyox,Explore apartments,list_projects,"[""palm_hills_new_cairo"", ""97_hills"", ""village_avenue""]",[],v1.0,all
+2026-04-10T19:21:54.925362,0tyox,Set my budget,lead_capture,"[""palm_hills_new_cairo"", ""97_hills"", ""village_avenue""]",[],v1.0,all
+2026-04-10T19:22:10.880523,0tyox,My budget is 12.0M EGP,lead_capture,"[""palm_hills_new_cairo"", ""97_hills"", ""village_avenue""]",[],v1.0,all
+2026-04-10T19:22:22.866499,0tyox,Choose preferred location,list_projects,"[""palm_hills_new_cairo"", ""97_hills"", ""the_village""]",[],v1.0,all
+2026-04-10T19:22:32.560071,0tyox,Set my budget,lead_capture,"[""palm_hills_new_cairo"", ""97_hills"", ""the_village""]",[],v1.0,all
+2026-04-10T19:22:59.207428,0tyox,Ready to move options,list_projects,"[""st_88"", ""lakeyard"", ""casa""]",[],v1.0,all
+2026-04-10T19:23:10.206420,0tyox,Tell me more about Lakeyard,project_query,"[""lakeyard"", ""badya"", ""village_gardens_katameya""]",[],v1.0,all
+2026-04-10T19:23:24.267089,0tyox,Check Hacienda Bay options,list_projects,"[""hacienda_bay"", ""hacienda_waters_2"", ""hacienda_white""]",[],v1.0,all
+2026-04-10T19:23:38.804222,0tyox,Explore apartments,list_projects,"[""hacienda_waters_2"", ""hacienda_white"", ""palm_hills_new_alamein""]",[],v1.0,all
+2026-04-10T19:24:04.766982,0tyox,Explore apartments,list_projects,"[""palm_hills_new_alamein"", ""hacienda_white"", ""hacienda_waters_2""]",[],v1.0,all
+2026-04-10T19:24:15.749324,0tyox,Set my budget,lead_capture,"[""palm_hills_new_alamein"", ""hacienda_white"", ""hacienda_waters_2""]",[],v1.0,all
+2026-04-10T19:24:29.876128,0tyox,Above 15M EGP,lead_capture,"[""palm_hills_new_alamein"", ""hacienda_white"", ""hacienda_waters_2""]",[],v1.0,all
+2026-04-10T19:24:39.200096,0tyox,Book a site visit,lead_capture,"[""palm_hills_new_alamein"", ""hacienda_white"", ""hacienda_waters_2""]",[],v1.0,all
+2026-04-10T19:24:52.645912,0tyox,Show matching projects,list_projects,"[""hacienda_white"", ""hacienda_waters_2"", ""hacienda_heneish""]",[],v1.0,all
+2026-04-10T19:25:02.922796,0tyox,Book a site visit,lead_capture,"[""hacienda_white"", ""hacienda_waters_2"", ""hacienda_heneish""]",[],v1.0,all
