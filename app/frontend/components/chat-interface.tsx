@@ -274,7 +274,11 @@ function ProjectCardsSlideshow({
     );
 }
 
-
+const DEFAULT_SUGGESTED_ACTIONS = [
+    "Show me similar options",
+    "What are payment plans?",
+    "Any ready to move units?",
+];
 export default function ChatInterface() {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState("");
@@ -418,7 +422,10 @@ export default function ChatInterface() {
                             cta_card: doneData.cta_card ?? undefined,
                             project_cards: hasCards ? doneData.project_cards : undefined,
                             trim_intro: hasCards ? doneData.trim_intro : false,
-                            suggested_actions: doneData.suggested_actions || [],
+                            suggested_actions:
+    doneData.suggested_actions && doneData.suggested_actions.length > 0
+        ? doneData.suggested_actions
+        : DEFAULT_SUGGESTED_ACTIONS,
                             budget_selector: doneData.budget_selector ?? null,
                         };
                         console.log("Done data received:", doneData);
