@@ -18,6 +18,8 @@ from app.backend.services.kb_service import kb_service
 from app.backend.routes.admin_routes import router as admin_router
 from app.backend.services.persona_llm import build_system_prompt
 import re
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PalmX-API")
@@ -81,13 +83,11 @@ def _normalize_phone_for_links(phone: Optional[str]) -> Optional[str]:
     return digits
 
 def _build_contact_cta_card(phone: Optional[str]) -> Optional[dict[str, Any]]:
-    normalized = _normalize_phone_for_links(phone)
-    if not normalized:
+    if not phone:
         return None
 
-    portal_url = "https://www.palmhillsdevelopments.com/en-us/interestedIn"
-    whatsapp_url = f"https://wa.me/{normalized}"
-    sms_url = f"tel:{normalized}"
+    whatsapp_url = f"https://wa.me/{phone}"
+    sms_url = f"tel:{phone}"
 
     return {
         "title": "Continue on WhatsApp",
@@ -95,12 +95,11 @@ def _build_contact_cta_card(phone: Optional[str]) -> Optional[dict[str, Any]]:
         "actions": [
             {"label": "WhatsApp", "type": "link", "url": whatsapp_url},
             {"label": "Call", "type": "link", "url": sms_url},
-            {"label": "Open Portal", "type": "link", "url": portal_url},
-        ],
+             ],
     }
 
 # ---------------------------------------------------------------------------
-# NEW: Build project_cards payload from retrieved docs
+# Build project_cards payload from retrieved docs
 # ---------------------------------------------------------------------------
 def _build_project_cards(projects: list) -> list[dict[str, Any]]:
     """
@@ -171,7 +170,7 @@ Use when the user is progressing toward a decision.
 - intent_escalation → Strong buying signals (ready, interested, serious).
 - cta → Push user toward action (book, sign up, proceed).
 - confirmation → Confirm selections, details, or decisions.
-- handoff → Transfer to human agent or external process.
+- handoff → Transfer to human agent or external process. Use when user asks to speak to someone, requests a callback, asks for a phone number, or wants direct contact.
 - fallback → Handle unknown, vague, or unsupported queries safely.
 
 SECONDARY PERSONA (User-type signals)
@@ -204,6 +203,7 @@ DECISION RULES
 6. If user shows buying intent → prioritize intent_escalation or cta.
 7. If conversation breaks or is invalid → fallback.
 8. Never leave any field empty; always return valid non-empty strings for every field.
+9. If the user asks for a phone number, wants to speak to someone, requests a callback, or asks for direct contact → use handoff stage.
 
 -------------------------
 INPUTS
@@ -295,24 +295,28 @@ def _get_persona_for_session(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Application startup: Ensuring RAG index is loaded...")
-    try:
-        rag_service._load_index()
 
-        if not rag_service.is_ready:
-            logger.warning("RAG index is not ready after loading attempt.")
-            rag_service.build_index_if_needed()
+
+    logger.info("Application startup: Loading RAG index...")
+
+    loop = asyncio.get_event_loop()
+
+    def load_rag():
+        try:
             rag_service._load_index()
+            if not rag_service.is_ready:
+                logger.warning("Index missing — building now...")
+                rag_service.build_index_if_needed()
+                rag_service._load_index()
+            if rag_service.is_ready:
+                logger.info("RAG index ready.")
+            else:
+                logger.error("RAG index failed to load.")
+        except Exception as e:
+            logger.error(f"Error during RAG index loading: {e}")
 
-        if not rag_service.is_ready:
-            rag_service._load_index()
-            logger.info(f"RAG service didnt load properly")
-        
-        if rag_service.is_ready:
-            logger.info("RAG index is ready.")
-
-    except Exception as e:
-        logger.error(f"Error during RAG index loading: {e}")
+    with ThreadPoolExecutor() as pool:
+        await loop.run_in_executor(pool, load_rag)
 
     yield
     logger.info("Application shutdown")
@@ -366,8 +370,6 @@ TOOLS = [
 
 # --- Endpoints ---
 
-# ... (Imports and helper functions remain the same) ...
-
 @app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     try:
@@ -397,7 +399,6 @@ async def chat_endpoint(request: ChatRequest):
 
         persona_cfg = decided_persona or current_cfg
         
-        # --- LOGIC FOR RECOMMENDATION STAGE ---
         RECOMMENDATION_STAGES = {"recommendation", "shortlist"}
         project_cards = None
         trim_intro = False
@@ -405,19 +406,16 @@ async def chat_endpoint(request: ChatRequest):
         if persona_cfg.persona_stage in RECOMMENDATION_STAGES and retrieved_docs:
             project_cards = _build_project_cards(retrieved_docs)
             trim_intro = True
-        # --------------------------------------
 
         full_system_msg = build_system_prompt(user_msg, history, persona_cfg) + f"\n\nCONTEXT:\n{context_text}"
         
         response_data = llm_service.answer_completion(full_system_msg, request.messages, tools=TOOLS)
-        
-        # ... (Remaining JSON parsing and Tool Call logic stays as is) ...
 
         return ChatResponse(
-            message=final_text,
+            message=response_data,
             retrieved_projects=[p.project_name for p in retrieved_docs],
-            project_cards=project_cards, # Send the cards
-            trim_intro=trim_intro,       # Signal the intro trim
+            project_cards=project_cards,
+            trim_intro=trim_intro,
             mode=persona_cfg.mode,
             persona_state=persona_cfg.persona_state,
             persona_stage=persona_cfg.persona_stage,
@@ -432,7 +430,6 @@ async def chat_endpoint(request: ChatRequest):
             mode="concierge"
         )
 
-# ... (Rest of main.py) ...
 
 @app.post("/chat/stream")
 async def chat_stream_endpoint(request: ChatRequest):
@@ -450,8 +447,6 @@ async def chat_stream_endpoint(request: ChatRequest):
             logger.info(f"the results are printed{results}")
             retrieved_docs = [r['project'] for r in results]
 
-        # If RAG returned nothing, retry with a broader query (no filters)
-        # This is the most common reason cards don't show — the query was too specific
         if not retrieved_docs and router_out.intent not in ("support_contact", "lead_capture"):
             logger.info(f"[RAG] No results for '{router_out.query_rewrite}' — retrying broad search")
             broad_results = rag_service.search(router_out.query_rewrite, k=3, filters={})
@@ -459,18 +454,15 @@ async def chat_stream_endpoint(request: ChatRequest):
                 retrieved_docs = [r['project'] for r in broad_results]
                 logger.info(f"[RAG] Broad search found {len(retrieved_docs)} docs")
             else:
-                # Last resort: search using raw user message
                 fallback_results = rag_service.search(user_msg, k=3, filters={})
                 if fallback_results:
                     retrieved_docs = [r['project'] for r in fallback_results]
                     logger.info(f"[RAG] Fallback search found {len(retrieved_docs)} docs")
 
-        # If still empty, reuse the last known docs for this session
         if not retrieved_docs and session_id in _DOCS_BY_SESSION:
             retrieved_docs = _DOCS_BY_SESSION[session_id]
             logger.info(f"[RAG] Reusing cached docs for session={session_id}: {[p.project_name for p in retrieved_docs]}")
 
-        # Cache non-empty docs for future turns
         if retrieved_docs:
             _DOCS_BY_SESSION[session_id] = retrieved_docs
 
@@ -496,7 +488,17 @@ async def chat_stream_endpoint(request: ChatRequest):
         full_system_msg += (
             "\n\nSTREAM_OUTPUT_RULES (STRICT):\n"
             "- First, output __PERSONA_JSON__ then a SINGLE valid JSON object then __END_PERSONA_JSON__.\n"
-            "- JSON keys must include: mode, persona_state, persona_stage, support_stage.\n"
+            "- JSON keys must include: mode, persona_state, persona_stage, support_stage, suggested_actions, budget_selector.\n"
+            "- suggested_actions-IMPORTANT: array of 2-4 SHORT strings (2-6 words each) representing the next logical steps the user can take.\n"
+            "- IMPORTANT suggested_actions must be specific and action-driven based on the conversation context and persona_stage.\n"
+            "- IMPORTANT suggested_actions is MANDATORY in every response — never return an empty array unless CTA or recommendation cards are active.\n"
+            "- Even for informational answers, always suggest 2–4 relevant next actions.\n"
+            "- Good examples: 'Set my budget', 'Show villas in West Cairo', 'Under 10M EGP', 'Book a site visit'\n"
+            "- Bad examples: 'Tell me more', 'Continue', 'Yes', 'Okay'\n"
+            "- budget_selector: either null OR an object with keys: label (string), value (number in EGP), step (number, e.g. 500000), min (number), max (number).\n"
+            "- Include budget_selector ONLY when persona_stage is 'qualification' AND budget has NOT yet been provided by the user in this conversation.\n"
+            "- Example budget_selector: {\"label\": \"Max Budget\", \"value\": 5000000, \"step\": 500000, \"min\": 1000000, \"max\": 30000000}\n"
+            "- Set budget_selector to null in ALL other cases — including when budget is already known, or stage is not qualification.\n"
             "- After __END_PERSONA_JSON__, output ONLY the user-visible assistant message text.\n"
         )
 
@@ -508,8 +510,10 @@ async def chat_stream_endpoint(request: ChatRequest):
 
             done_cta_card: Optional[dict[str, Any]] = None
             done_mode: Optional[str] = None
-            # Track whether the final persona stage is "recommendation"
             is_recommendation: bool = False
+            # Suggested actions and budget selector captured from stream marker
+            stream_suggested_actions: list = []
+            stream_budget_selector: Optional[dict] = None
 
             for chunk in llm_service.stream_answer_completion(
                 full_system_msg, request.messages, tools=TOOLS
@@ -522,8 +526,8 @@ async def chat_stream_endpoint(request: ChatRequest):
                             args = json.loads(tc["function"]["arguments"])
                             _save_lead_from_args(session_id, args)
                             confirm_msg = f"Thank you {args.get('name')}. Your details have been saved. A sales representative will contact you at {args.get('phone')} shortly."
-                            done_cta_card = _build_contact_cta_card(HOTLINE_NUMBER)
                             done_mode = "lead_capture"
+                            logger.info(f"data: {json.dumps({'token': confirm_msg})}\n\n")
                             yield f"data: {json.dumps({'token': confirm_msg})}\n\n"
                     continue
 
@@ -533,7 +537,8 @@ async def chat_stream_endpoint(request: ChatRequest):
 
                 pending += chunk
 
-                if len(pending) > 5000 and persona_start_marker not in pending:
+                if len(pending) > 10000 and persona_start_marker not in pending:
+                    logger.warning("[Stream] __PERSONA_JSON__ not found after 10000 chars — flushing.")
                     persona_extracted = True
                     yield f"data: {json.dumps({'token': pending})}\n\n"
                     pending = ""
@@ -566,19 +571,29 @@ async def chat_stream_endpoint(request: ChatRequest):
                         _get_persona_for_session(session_id, router_out.intent, model_persona=model_persona)
                         persona_extracted = True
                         done_mode = model_persona.mode
-                        # -------------------------------------------------------
-                        # NEW: detect recommendation stage so we can attach cards
-                        # -------------------------------------------------------
                         RECOMMENDATION_STAGES = {"recommendation", "shortlist"}
                         is_recommendation = (model_persona.persona_stage in RECOMMENDATION_STAGES)
+                        # Capture suggested actions from the stream marker JSON
+                        raw_actions = persona_data.get("suggested_actions", [])
+                        stream_suggested_actions = raw_actions if isinstance(raw_actions, list) else []
+                        stream_budget_selector = persona_data.get("budget_selector", None)
+                        if not isinstance(stream_budget_selector, dict):
+                            stream_budget_selector = None
+                        logger.info(f"[Actions] Captured from stream: {stream_suggested_actions}")
                 except Exception as e:
                     logger.error(f"Error parsing persona json in stream: {e}")
 
                 if remainder:
-                    yield f"data: {json.dumps({'token': remainder})}\n\n"
+                    remainder = remainder.lstrip("\n")
+                    logger.info(f"Remainder after extracting persona JSON: {remainder[:100]}...")
+                    if remainder:
+                        yield f"data: {json.dumps({'token': remainder})}\n\n"
 
             if not persona_extracted and pending:
+                logger.info("Stream ended but persona not extracted — emitting remaining pending content")
+                logger.info(f"Pending content: {pending}")
                 yield f"data: {json.dumps({'token': pending})}\n\n"
+
 
             if not persona_extracted:
                 decided = _decide_persona_via_model(
@@ -593,23 +608,29 @@ async def chat_stream_endpoint(request: ChatRequest):
                     RECOMMENDATION_STAGES = {"recommendation", "shortlist"}
                     is_recommendation = (decided.persona_stage in RECOMMENDATION_STAGES)
 
-            # -------------------------------------------------------
-            # Card trigger — clean two-source logic:
-            #
-            # Source A: __PERSONA_JSON__ marker inside the stream said recommendation/shortlist
-            # Source B: decided_persona (the dedicated pre-stream model call) said recommendation/shortlist
-            #
-            # decided_persona is the most reliable source — it is a separate
-            # structured JSON call made BEFORE the stream starts, so it never
-            # gets lost due to streaming/marker parsing issues.
-            #
-            # Hard block: if decided_persona said qualification or discovery,
-            # never show cards — the agent is still collecting preferences.
-            # -------------------------------------------------------
+                # Stage-default actions — guarantee buttons even if LLM skipped persona JSON
+                if not stream_suggested_actions:
+                    _stage = (decided.persona_stage if decided else persona_cfg.persona_stage)
+                    _defs = {
+                        "discovery":            ["Tell me your budget", "Show West Cairo options", "Explore North Coast", "New Cairo properties"],
+                        "qualification":        ["Set my budget", "Choose preferred location", "Select unit type", "Book a site visit"],
+                        "recommendation":       ["Book a site visit", "Request floor plans", "Check payment plans", "Compare projects"],
+                        "exploration":          ["Show villa options", "Explore apartments", "Filter by location", "Set my budget"],
+                        "objection":            ["View payment plans", "Compare alternatives", "Speak to an agent", "Book a visit"],
+                        "handoff":              ["Call Palm Hills", "WhatsApp enquiry", "Request callback", "Book site visit"],
+                        "faq":                  ["Ask another question", "Show matching projects", "Book a site visit", "Set my budget"],
+                        "detail_drilldown":     ["Request floor plans", "Check payment plans", "Book a site visit", "Compare projects"],
+                        "shortlist_refinement": ["Narrow by budget", "Filter by location", "Book a site visit", "Request brochure"],
+                    }
+                    stream_suggested_actions = _defs.get(_stage, ["Book a site visit", "Set my budget", "Show matching projects"])
+                    logger.info(f"[Actions] Stage-default actions for stage={_stage}: {stream_suggested_actions}")
+
+            # ---------------------------------------------------------------------------
+            # Card trigger
+            # ---------------------------------------------------------------------------
             RECOMMENDATION_STAGES = {"recommendation", "shortlist"}
             BLOCKING_STAGES = {"qualification", "discovery"}
 
-            # persona_cfg IS decided_persona (set at line: persona_cfg = decided_persona or current_cfg)
             pre_stream_stage = persona_cfg.persona_stage
             pre_stream_recommends = pre_stream_stage in RECOMMENDATION_STAGES
             is_blocked = pre_stream_stage in BLOCKING_STAGES
@@ -625,42 +646,60 @@ async def chat_stream_endpoint(request: ChatRequest):
                 f"blocked={is_blocked} docs={len(retrieved_docs)} → show={should_show_cards}"
             )
 
-            # Resolve the final persona stage from the most reliable source:
-            # 1. Stream marker parse (is_recommendation + stored session)
-            # 2. Pre-stream decided_persona (most reliable)
-            # 3. current_cfg fallback
+            # ---------------------------------------------------------------------------
+            # Resolve final persona stage
+            # ---------------------------------------------------------------------------
             final_persona = _get_persona_for_session(session_id, router_out.intent)
             final_stage = final_persona.persona_stage
+
+            # ---------------------------------------------------------------------------
+            # CTA card — only when persona_stage is handoff or support_contact
+            # ---------------------------------------------------------------------------
+            CTA_STAGES = {"handoff", "support_contact"}
+            should_show_cta = (
+                pre_stream_stage in CTA_STAGES
+                or final_stage in CTA_STAGES
+            )
+
+            logger.info(
+                f"[CTA] pre_stream_stage={pre_stream_stage} final_stage={final_stage} → show={should_show_cta}"
+            )
+
+            # ---------------------------------------------------------------------------
+            # Suggested actions — suppressed when CTA card or recommendation cards show
+            # Otherwise always send what the LLM generated
+            # ---------------------------------------------------------------------------
+            SUPPRESS_ACTION_STAGES = CTA_STAGES | RECOMMENDATION_STAGES
+            should_show_actions = (
+                not should_show_cta
+                and not should_show_cards
+                and final_stage not in SUPPRESS_ACTION_STAGES
+            )
+            logger.info(f"[Actions] pre_stream_stage={pre_stream_stage} final_stage={final_stage} "
+                        f"show_cta={should_show_cta} show_cards={should_show_cards} → show_actions={should_show_actions}")
+            suggested_actions = stream_suggested_actions if should_show_actions else []
+            budget_selector = stream_budget_selector if should_show_actions else None
+            logger.info(f"[Actions] final_stage={final_stage} show={should_show_actions} actions={suggested_actions} budget_selector={budget_selector is not None}")
 
             payload: dict[str, Any] = {
                 "done": True,
                 "retrieved_projects": [p.project_name for p in retrieved_docs],
                 "mode": done_mode or persona_cfg.mode,
                 "persona_stage": final_stage,
+                "suggested_actions": suggested_actions,
+                "budget_selector": budget_selector,
             }
 
             if should_show_cards:
                 payload["project_cards"] = _build_project_cards(retrieved_docs)
                 payload["trim_intro"] = True
                 logger.info(f"[Cards] Attaching {len(payload['project_cards'])} cards")
-            
-            try:
-                logger.info(f"Before CTA card building")
-                val = _get_persona_for_session(session_id, router_out.intent, model_persona=persona_cfg)
-                if router_out.intent in ("support_contact", "handoff") or val.persona_stage in ("handoff", "support_contact"):
-                    logger.info(f"Building cta card for {router_out.intent}")
-                    payload["cta_card"] = _build_contact_cta_card(HOTLINE_NUMBER)
-            except Exception as e:
-                if router_out.intent in ("support_contact", "handoff") or persona_cfg.mode in ("handoff", "support_contact"):
-                    logger.info(f"Building cta card for {router_out.intent}")
-                    payload["cta_card"] = _build_contact_cta_card(HOTLINE_NUMBER)
-                else:
-                    logger.error(f"Error building cta card: {e}")
-                    payload["cta_card"] = None
+
+            payload["cta_card"] = _build_contact_cta_card(HOTLINE_NUMBER) if should_show_cta else None
 
             if done_cta_card:
                 payload["cta_card"] = done_cta_card
-
+            logger.info(f" Json payload: {payload}")
             yield f"data: {json.dumps(payload)}\n\n"
             
             leads_service.log_audit(

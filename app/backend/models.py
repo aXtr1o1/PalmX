@@ -52,7 +52,7 @@ class ChatResponse(BaseModel):
     tool_calls: Optional[List[Dict]] = None            
     context_summary: Optional[str] = None              
     kb_version_hash: Optional[str] = "v1.0"            
-
+    suggested_actions: Optional[List[str]] = None
 # --- Lead Models ---
 class Lead(BaseModel):
     name: str
