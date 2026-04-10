@@ -837,3 +837,42 @@ I need to book anything that comes with it",lead_capture,[],[],v1.0,all
 2026-04-10T18:50:22.753458,0tyox,Villa in Badya starting 10M,pricing,"[""badya"", ""hacienda_bay"", ""hacienda_blue""]",[],v1.0,all
 2026-04-10T18:50:34.521039,0tyox,Explore Badya villas,list_projects,"[""badya"", ""hacienda_bay"", ""jirian_palm_hills""]",[],v1.0,all
 2026-04-10T18:51:22.568748,0tyox,Tell me more about Hacienda Bay,project_query,"[""hacienda_bay"", ""hacienda_blue"", ""hacienda_waters_2""]",[],v1.0,all
+2026-04-10T19:01:18.827661,0tyox,Villa in Badya starting 10M,pricing,"[""badya"", ""hacienda_bay"", ""hacienda_blue""]",[],v1.0,all
+2026-04-10T19:04:56.158621,0tyox,Apartments in New Cairo,list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:06:07.559621,0tyox,Apartments in New Cairo,list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:06:31.094521,0tyox,Tell me more about Palm Hills New Cairo,project_query,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-10T19:06:44.236439,0tyox,Check payment plans,pricing,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-10T19:08:13.069565,0tyox,Ready to move options,list_projects,"[""st_88"", ""lakeyard"", ""casa""]",[],v1.0,all
+2026-04-10T19:08:37.687143,0tyox,Tell me more about Lakeyard,project_query,"[""lakeyard"", ""hacienda_waters_2"", ""hacienda_white""]",[],v1.0,all
+2026-04-10T19:08:56.123396,0tyox,Check North Coast projects,list_projects,"[""hacienda_white"", ""lakeyard"", ""hacienda_waters_2""]",[],v1.0,all
+2026-04-10T19:09:16.234907,0tyox,Compare North Coast projects,compare,"[""hacienda_white"", ""hacienda_waters_2"", ""hacienda_west""]",[],v1.0,all
+2026-04-10T19:09:31.372408,0tyox,Filter by location,list_projects,"[""hacienda_white"", ""lakeyard"", ""hacienda_waters_2""]",[],v1.0,all
+2026-04-10T19:09:39.667361,0tyox,Set my budget,lead_capture,"[""hacienda_white"", ""lakeyard"", ""hacienda_waters_2""]",[],v1.0,all
+2026-04-10T19:09:55.388840,0tyox,My budget is 5.0M EGP,lead_capture,"[""hacienda_white"", ""lakeyard"", ""hacienda_waters_2""]",[],v1.0,all
+2026-04-10T19:10:08.519905,0tyox,Choose preferred location,project_query,"[""hacienda_waters_2"", ""hacienda_west"", ""hacienda_heneish""]",[],v1.0,all
+2026-04-10T19:10:23.025225,0tyox,Select unit type,project_query,"[""hacienda_waters_2"", ""hacienda_waters"", ""hacienda_west""]",[],v1.0,all
+2026-04-10T19:10:51.118043,0tyox,Book a site visit,lead_capture,"[""hacienda_waters_2"", ""hacienda_waters"", ""hacienda_west""]",[],v1.0,all
+2026-04-10T19:11:02.746821,0tyox,Show matching projects,list_projects,"[""hacienda_white"", ""lakeyard"", ""hacienda_waters_2""]",[],v1.0,all
+2026-04-10T19:11:16.996209,0tyox,Tell me more about Lakeyard,project_query,"[""lakeyard""]",[],v1.0,all
+2026-04-10T19:11:39.486868,0tyox,Apartments in New Cairo,list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:12:06.129787,0tyox,Tell me more about Palmet New Cairo,project_query,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-10T19:12:15.206571,0tyox,Book a site visit,lead_capture,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-10T19:12:39.332487,0tyox,Set my budget,lead_capture,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-10T19:12:51.051725,0tyox,My budget is 10.5M EGP,lead_capture,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-10T19:13:06.174326,0tyox,Book a site visit,lead_capture,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-10T19:13:21.456384,0tyox,Apartments in New Cairo,list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:13:38.153688,0tyox,Learn about amenities,project_query,"[""palm_hills_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:13:45.465703,0tyox,Set my budget,lead_capture,"[""palm_hills_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:14:01.563395,0tyox,My budget is 13.0M EGP,lead_capture,"[""palm_hills_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:14:22.301453,0tyox,Tell me more about 97 Hills,project_query,"[""97_hills"", ""palm_hills_new_cairo"", ""jirian_palm_hills""]",[],v1.0,all
+2026-04-10T19:14:33.961026,0tyox,Set my budget,lead_capture,"[""97_hills"", ""palm_hills_new_cairo"", ""jirian_palm_hills""]",[],v1.0,all
+2026-04-10T19:14:51.058243,0tyox,Explore New Cairo apartments,list_projects,"[""palm_hills_new_cairo"", ""palmet_new_cairo"", ""97_hills""]",[],v1.0,all
+2026-04-10T19:15:04.637136,0tyox,Tell me more about Palm Hills New Cairo,project_query,"[""palm_hills_new_cairo"", ""palm_hills_katameya_1"", ""palm_hills_katameya_2""]",[],v1.0,all
+2026-04-10T19:15:15.165708,0tyox,Payment plans for The Crown,pricing,"[""the_crown"", ""the_crown_extension"", ""crown_central""]",[],v1.0,all
+2026-04-10T19:15:31.615384,0tyox,Explore The Crown villas,project_query,"[""the_crown"", ""the_crown_extension"", ""village_de_la_capitale""]",[],v1.0,all
+2026-04-10T19:15:59.785587,0tyox,Tell me more about The Crown,project_query,"[""the_crown"", ""the_crown_extension"", ""jirian_palm_hills""]",[],v1.0,all
+2026-04-10T19:16:10.530587,0tyox,Filter by location,project_query,"[""jirian_palm_hills"", ""the_crown""]",[],v1.0,all
+2026-04-10T19:16:19.742997,0tyox,Set my budget,lead_capture,"[""jirian_palm_hills"", ""the_crown""]",[],v1.0,all
+2026-04-10T19:16:36.579032,0tyox,Between 10-20M EGP,list_projects,"[""the_crown"", ""the_crown_extension"", ""badya""]",[],v1.0,all
+2026-04-10T19:16:44.756916,0tyox,Book a site visit,lead_capture,"[""the_crown"", ""the_crown_extension"", ""badya""]",[],v1.0,all
+2026-04-10T19:17:17.549892,0tyox,praga 9799707980707,lead_capture,"[""the_crown"", ""the_crown_extension"", ""badya""]",[],v1.0,all

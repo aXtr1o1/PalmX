@@ -142,28 +142,26 @@ def _decide_persona_via_model(
     current_cfg: ChatResponse,
 ) -> Optional[ChatResponse]:
     history_text = "\n".join([f"{m.role}: {m.content}" for m in history[-12:]])
-    logger.info(f"Deciding persona for session={session_id} intent={intent} user_message='{user_message[:50]}...' ")
-
     prompt = f"""
-   You are an intelligent Persona-State Selector for PalmX.
- 
+    You are an intelligent Persona-State Selector for PalmX.
+
 Your job is to analyze the conversation context and select the MOST appropriate persona configuration.
- 
+
 You must return STRICT JSON ONLY with:
- 
+
   "mode": "concierge | lead_capture | support",
   "persona_state": "primary | secondary | support",
   "persona_stage": "discovery | qualification | recommendation | exploration | objection | intent_escalation | cta | confirmation | handoff | fallback",
   "support_stage": "faq | comparison | detail_drilldown | shortlist_refinement | re_engagement"
- 
- 
+
+
 -------------------------
 PERSONA DEFINITIONS
 -------------------------
- 
+
 PRIMARY PERSONA (Default user journey flow)
 Use when the user is progressing toward a decision.
- 
+
 - discovery → User intent is unclear; ask ONE sharp question to clarify. (For the first 3 conversation, use this stage only if the user doesnot specify their intent or request.)
 - qualification → Collect key details (budget, preferences, constraints).
 - recommendation → Suggest best-fit options based on known inputs.
@@ -174,29 +172,29 @@ Use when the user is progressing toward a decision.
 - confirmation → Confirm selections, details, or decisions.
 - handoff → Transfer to human agent or external process. Use when user asks to speak to someone, requests a callback, asks for a phone number, or wants direct contact.
 - fallback → Handle unknown, vague, or unsupported queries safely.
- 
+
 SECONDARY PERSONA (User-type signals)
 Use ONLY when explicitly indicated.
- 
+
 - investor → Focus on ROI, returns, pricing value.
 - end_user → Personal usage intent.
 - overseas → User is remote or international.
 - urgency → Immediate need or time pressure.
 - personalization → Wants highly tailored/custom responses.
- 
+
 SUPPORT PERSONA (Information assistance mode)
 Use when user is NOT progressing toward conversion but seeking info.
- 
+
 - faq → Direct factual question.
 - comparison → Comparing multiple options.
 - detail_drilldown → Deep dive into one option.
 - shortlist_refinement → Narrowing choices.
 - re_engagement → Revive inactive or disengaged user.
- 
+
 -------------------------
 DECISION RULES
 -------------------------
- 
+
 1. Default to PRIMARY persona unless clear signals suggest otherwise.
 2. Use SECONDARY persona_state ONLY if a strong user trait is detected.
 3. Use SUPPORT mode ONLY if the user is asking informational or comparison queries.
@@ -206,29 +204,29 @@ DECISION RULES
 7. If conversation breaks or is invalid → fallback.
 8. Never leave any field empty; always return valid non-empty strings for every field.
 9. If the user asks for a phone number, wants to speak to someone, requests a callback, or asks for direct contact → use handoff stage.
- 
+
 -------------------------
 INPUTS
 -------------------------
- 
+
 Current backend intent: {intent}
- 
+
 Current persona:
 - mode: {current_cfg.mode}
 - persona_state: {current_cfg.persona_state}
 - persona_stage: {current_cfg.persona_stage}
 - support_stage: {current_cfg.support_stage}
- 
+
 Conversation history:
 {history_text}
- 
+
 Latest user message:
 {user_message}
- 
+
 -------------------------
 OUTPUT FORMAT (STRICT)
 -------------------------
- 
+
 Return ONLY valid JSON. No explanation. No text outside JSON.
 """
     try:
@@ -251,11 +249,8 @@ Return ONLY valid JSON. No explanation. No text outside JSON.
             support_stage=_safe_stage(data.get("support_stage"), current_cfg.support_stage),
         )
         _get_persona_for_session(session_id, intent, model_persona=model_persona)
-        logger.info(f"Model-decided persona for session={session_id}: {model_persona}")
-
         return model_persona
     except Exception as e:
-
         logger.error(f"Persona fallback model decision failed: {e}")
         return None
 
@@ -492,10 +487,6 @@ async def chat_stream_endpoint(request: ChatRequest):
         full_system_msg = build_system_prompt(user_msg, history, persona_cfg) + f"\n\nCONTEXT:\n{context_text}"
         full_system_msg += (
             "\n\nSTREAM_OUTPUT_RULES (STRICT):\n"
-            # ✅ Fix 5b: make __PERSONA_JSON__ the FIRST thing emitted, before any prose.
-            # This ensures the marker always arrives well within the 10000-char buffer window.
-            "- YOUR VERY FIRST OUTPUT must be __PERSONA_JSON__ immediately followed by the JSON object, then __END_PERSONA_JSON__.\n"
-            "- Do NOT write any greeting, acknowledgement, or text before __PERSONA_JSON__. The marker must be character 1 of your response.\n"
             "- First, output __PERSONA_JSON__ then a SINGLE valid JSON object then __END_PERSONA_JSON__.\n"
             "- JSON keys must include: mode, persona_state, persona_stage, support_stage, suggested_actions, budget_selector.\n"
             "- suggested_actions-IMPORTANT: array of 2-4 SHORT strings (2-6 words each) representing the next logical steps the user can take.\n"
@@ -510,45 +501,6 @@ async def chat_stream_endpoint(request: ChatRequest):
             "- Set budget_selector to null in ALL other cases — including when budget is already known, or stage is not qualification.\n"
             "- After __END_PERSONA_JSON__, output ONLY the user-visible assistant message text.\n"
         )
-        def _extract_actions_from_text(text: str):
-            """
-            Detects patterns like:
-              **Suggested Actions**:
-              1. "Do something"
-              2. "Do another thing"
-            or bare numbered lists at the end of the response.
-            Strips the section from visible text and returns extracted actions.
-            """
-            import re as _re
- 
-            # Match a "Suggested Actions" section header followed by numbered/bulleted items
-            section_pattern = _re.compile(
-                r'(?:\n|^)[-*#\s]*(?:\*{1,2})?Suggested Actions(?:\*{1,2})?[:\s]*\n' 
-                r'((?:(?:\d+\.|-|\*)\s*.+\n?)+)',
-                _re.IGNORECASE | _re.MULTILINE,
-            )
- 
-            actions = []
-            clean = text
- 
-            m = section_pattern.search(text)
-            if m:
-                block = m.group(1)
-                # Extract each quoted or unquoted item
-                # Extract each list item and strip surrounding quotes cleanly
-                raw_items = _re.findall(r'(?:\d+\.|[-*])\s*(.+)', block)
-                actions = []
-                for item in raw_items:
-                    item = item.strip().strip('"\'')
-                    if 3 <= len(item) <= 80:
-                        actions.append(item)
-                # Remove the entire section from visible text
-                clean = text[:m.start()].rstrip()
-                logger.info(f"[Actions] Fallback extracted {len(actions)} actions from text body")
-            else:
-                logger.info("[Actions] Fallback: no action section found in pending text")
- 
-            return clean, actions
 
         def generate():
             pending = ""
@@ -586,14 +538,7 @@ async def chat_stream_endpoint(request: ChatRequest):
                 pending += chunk
 
                 if len(pending) > 10000 and persona_start_marker not in pending:
-                    # ✅ Fix 5a: raised threshold from 5000 → 10000 to give the LLM more
-                    # room to emit __PERSONA_JSON__ before we give up and flush as raw text.
-                    # If we hit this, suggested_actions and budget_selector will be missing
-                    # from the final payload — log a warning so it's visible in traces.
-                    logger.warning(
-                        "[Stream] __PERSONA_JSON__ not found after 10000 chars — flushing as raw text. "
-                        "suggested_actions and budget_selector will be empty for this response."
-                    )
+                    logger.warning("[Stream] __PERSONA_JSON__ not found after 10000 chars — flushing.")
                     persona_extracted = True
                     yield f"data: {json.dumps({'token': pending})}\n\n"
                     pending = ""
@@ -639,32 +584,16 @@ async def chat_stream_endpoint(request: ChatRequest):
                     logger.error(f"Error parsing persona json in stream: {e}")
 
                 if remainder:
-                    # ✅ Fix 5c: strip leading newlines — when __PERSONA_JSON__ is emitted
-                    # first (char 1 of response), the remainder often starts with \n
-                    # which renders as a blank line before the assistant's visible text.
                     remainder = remainder.lstrip("\n")
-                    remainder, extra_actions = _extract_actions_from_text(remainder)
-                    if extra_actions and not stream_suggested_actions:
-                        stream_suggested_actions = extra_actions
-                        logger.info(f"[Actions] Remainder fallback actions: {stream_suggested_actions}")
                     logger.info(f"Remainder after extracting persona JSON: {remainder[:100]}...")
                     if remainder:
                         yield f"data: {json.dumps({'token': remainder})}\n\n"
-                    
 
             if not persona_extracted and pending:
                 logger.info("Stream ended but persona not extracted — emitting remaining pending content")
                 logger.info(f"Pending content: {pending}")
+                yield f"data: {json.dumps({'token': pending})}\n\n"
 
-                clean_text, fallback_actions = _extract_actions_from_text(pending)
-                if fallback_actions and not stream_suggested_actions:
-                    stream_suggested_actions = fallback_actions
-                    logger.info(f"[Actions] Fallback actions set: {stream_suggested_actions}")
-                    yield f"data: {json.dumps({'token': clean_text})}\n\n"
-                else:
-                    yield f"data: {json.dumps({'token': pending})}\n\n"
-
-                
 
             if not persona_extracted:
                 decided = _decide_persona_via_model(
@@ -678,26 +607,24 @@ async def chat_stream_endpoint(request: ChatRequest):
                     done_mode = decided.mode
                     RECOMMENDATION_STAGES = {"recommendation", "shortlist"}
                     is_recommendation = (decided.persona_stage in RECOMMENDATION_STAGES)
-                
+
+                # Stage-default actions — guarantee buttons even if LLM skipped persona JSON
                 if not stream_suggested_actions:
-                    stage = (decided.persona_stage if decided else persona_cfg.persona_stage)
-                    _stage_default_actions: dict[str, list] = {
-                        "discovery":        ["Tell me your budget", "Show West Cairo options", "Explore North Coast", "New Cairo properties"],
-                        "qualification":    ["Set my budget", "Choose preferred location", "Select unit type", "Book a site visit"],
-                        "recommendation":   ["Book a site visit", "Request floor plans", "Check payment plans", "Compare projects"],
-                        "exploration":      ["Show villa options", "Explore apartments", "Filter by location", "Set my budget"],
-                        "objection":        ["View payment plans", "Compare alternatives", "Speak to an agent", "Book a visit"],
-                        "handoff":          ["Call Palm Hills", "WhatsApp enquiry", "Request callback", "Book site visit"],
-                        "faq":              ["Ask another question", "Show matching projects", "Book a site visit", "Set my budget"],
-                        "detail_drilldown": ["Request floor plans", "Check payment plans", "Book a site visit", "Compare projects"],
+                    _stage = (decided.persona_stage if decided else persona_cfg.persona_stage)
+                    _defs = {
+                        "discovery":            ["Tell me your budget", "Show West Cairo options", "Explore North Coast", "New Cairo properties"],
+                        "qualification":        ["Set my budget", "Choose preferred location", "Select unit type", "Book a site visit"],
+                        "recommendation":       ["Book a site visit", "Request floor plans", "Check payment plans", "Compare projects"],
+                        "exploration":          ["Show villa options", "Explore apartments", "Filter by location", "Set my budget"],
+                        "objection":            ["View payment plans", "Compare alternatives", "Speak to an agent", "Book a visit"],
+                        "handoff":              ["Call Palm Hills", "WhatsApp enquiry", "Request callback", "Book site visit"],
+                        "faq":                  ["Ask another question", "Show matching projects", "Book a site visit", "Set my budget"],
+                        "detail_drilldown":     ["Request floor plans", "Check payment plans", "Book a site visit", "Compare projects"],
                         "shortlist_refinement": ["Narrow by budget", "Filter by location", "Book a site visit", "Request brochure"],
                     }
-                    stream_suggested_actions = _stage_default_actions.get(stage, ["Book a site visit", "Set my budget", "Show matching projects"])
-                    logger.info(f"[Actions] Stage-default actions used for stage={stage}: {stream_suggested_actions}")
-                elif decided.persona_stage == "cta":
-                    stream_suggested_actions = _stage_default_actions.get("cta", ["Book a site visit", "Contact a Sales agent","Request a callback"])
-                    
-                    logger.info(f"[Actions] Cleared suggested actions due to CTA stage")
+                    stream_suggested_actions = _defs.get(_stage, ["Book a site visit", "Set my budget", "Show matching projects"])
+                    logger.info(f"[Actions] Stage-default actions for stage={_stage}: {stream_suggested_actions}")
+
             # ---------------------------------------------------------------------------
             # Card trigger
             # ---------------------------------------------------------------------------

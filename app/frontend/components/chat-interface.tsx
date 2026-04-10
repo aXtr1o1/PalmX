@@ -388,14 +388,15 @@ export default function ChatInterface() {
                         // Create one now so the response is never silently lost.
                         if (!last || last.role !== 'assistant') {
                             const hasCards = Boolean(doneData.project_cards?.length);
+                            const fallbackContent = hasCards ? "Here are some options that match your preferences:" : "I am having trouble with processing your request. Could you please rephrase that?";
                             updated.push({
                                 role: 'assistant',
-                                content: '',
+                                content: fallbackContent,
                                 cta: doneData.cta ?? undefined,
                                 cta_card: doneData.cta_card ?? undefined,
                                 project_cards: hasCards ? doneData.project_cards : undefined,
                                 trim_intro: false,
-                                suggested_actions: doneData.suggested_actions || [],
+                                suggested_actions: doneData.suggested_actions || ["Tell me more", "Show me similar options"],
                                 budget_selector: doneData.budget_selector ?? null,
                             });
                             console.log("Done (no prior token):", doneData);
