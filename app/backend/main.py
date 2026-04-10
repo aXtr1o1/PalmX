@@ -412,7 +412,7 @@ async def chat_endpoint(request: ChatRequest):
         response_data = llm_service.answer_completion(full_system_msg, request.messages, tools=TOOLS)
 
         return ChatResponse(
-            message=final_text,
+            message=response_data,
             retrieved_projects=[p.project_name for p in retrieved_docs],
             project_cards=project_cards,
             trim_intro=trim_intro,
@@ -489,8 +489,10 @@ async def chat_stream_endpoint(request: ChatRequest):
             "\n\nSTREAM_OUTPUT_RULES (STRICT):\n"
             "- First, output __PERSONA_JSON__ then a SINGLE valid JSON object then __END_PERSONA_JSON__.\n"
             "- JSON keys must include: mode, persona_state, persona_stage, support_stage, suggested_actions, budget_selector.\n"
-            "- suggested_actions: array of 2-4 SHORT strings (2-6 words each) representing the next logical steps the user can take.\n"
-            "- suggested_actions must be specific and action-driven based on the conversation context and persona_stage.\n"
+            "- suggested_actions-IMPORTANT: array of 2-4 SHORT strings (2-6 words each) representing the next logical steps the user can take.\n"
+            "- IMPORTANT suggested_actions must be specific and action-driven based on the conversation context and persona_stage.\n"
+            "- IMPORTANT suggested_actions is MANDATORY in every response — never return an empty array unless CTA or recommendation cards are active.\n"
+            "- Even for informational answers, always suggest 2–4 relevant next actions.\n"
             "- Good examples: 'Set my budget', 'Show villas in West Cairo', 'Under 10M EGP', 'Book a site visit'\n"
             "- Bad examples: 'Tell me more', 'Continue', 'Yes', 'Okay'\n"
             "- budget_selector: either null OR an object with keys: label (string), value (number in EGP), step (number, e.g. 500000), min (number), max (number).\n"
@@ -525,6 +527,7 @@ async def chat_stream_endpoint(request: ChatRequest):
                             _save_lead_from_args(session_id, args)
                             confirm_msg = f"Thank you {args.get('name')}. Your details have been saved. A sales representative will contact you at {args.get('phone')} shortly."
                             done_mode = "lead_capture"
+                            logger.info(f"data: {json.dumps({'token': confirm_msg})}\n\n")
                             yield f"data: {json.dumps({'token': confirm_msg})}\n\n"
                     continue
 
@@ -534,7 +537,8 @@ async def chat_stream_endpoint(request: ChatRequest):
 
                 pending += chunk
 
-                if len(pending) > 5000 and persona_start_marker not in pending:
+                if len(pending) > 10000 and persona_start_marker not in pending:
+                    logger.warning("[Stream] __PERSONA_JSON__ not found after 10000 chars — flushing.")
                     persona_extracted = True
                     yield f"data: {json.dumps({'token': pending})}\n\n"
                     pending = ""
@@ -580,10 +584,16 @@ async def chat_stream_endpoint(request: ChatRequest):
                     logger.error(f"Error parsing persona json in stream: {e}")
 
                 if remainder:
-                    yield f"data: {json.dumps({'token': remainder})}\n\n"
+                    remainder = remainder.lstrip("\n")
+                    logger.info(f"Remainder after extracting persona JSON: {remainder[:100]}...")
+                    if remainder:
+                        yield f"data: {json.dumps({'token': remainder})}\n\n"
 
             if not persona_extracted and pending:
+                logger.info("Stream ended but persona not extracted — emitting remaining pending content")
+                logger.info(f"Pending content: {pending}")
                 yield f"data: {json.dumps({'token': pending})}\n\n"
+
 
             if not persona_extracted:
                 decided = _decide_persona_via_model(
@@ -597,6 +607,23 @@ async def chat_stream_endpoint(request: ChatRequest):
                     done_mode = decided.mode
                     RECOMMENDATION_STAGES = {"recommendation", "shortlist"}
                     is_recommendation = (decided.persona_stage in RECOMMENDATION_STAGES)
+
+                # Stage-default actions — guarantee buttons even if LLM skipped persona JSON
+                if not stream_suggested_actions:
+                    _stage = (decided.persona_stage if decided else persona_cfg.persona_stage)
+                    _defs = {
+                        "discovery":            ["Tell me your budget", "Show West Cairo options", "Explore North Coast", "New Cairo properties"],
+                        "qualification":        ["Set my budget", "Choose preferred location", "Select unit type", "Book a site visit"],
+                        "recommendation":       ["Book a site visit", "Request floor plans", "Check payment plans", "Compare projects"],
+                        "exploration":          ["Show villa options", "Explore apartments", "Filter by location", "Set my budget"],
+                        "objection":            ["View payment plans", "Compare alternatives", "Speak to an agent", "Book a visit"],
+                        "handoff":              ["Call Palm Hills", "WhatsApp enquiry", "Request callback", "Book site visit"],
+                        "faq":                  ["Ask another question", "Show matching projects", "Book a site visit", "Set my budget"],
+                        "detail_drilldown":     ["Request floor plans", "Check payment plans", "Book a site visit", "Compare projects"],
+                        "shortlist_refinement": ["Narrow by budget", "Filter by location", "Book a site visit", "Request brochure"],
+                    }
+                    stream_suggested_actions = _defs.get(_stage, ["Book a site visit", "Set my budget", "Show matching projects"])
+                    logger.info(f"[Actions] Stage-default actions for stage={_stage}: {stream_suggested_actions}")
 
             # ---------------------------------------------------------------------------
             # Card trigger
@@ -648,6 +675,8 @@ async def chat_stream_endpoint(request: ChatRequest):
                 and not should_show_cards
                 and final_stage not in SUPPRESS_ACTION_STAGES
             )
+            logger.info(f"[Actions] pre_stream_stage={pre_stream_stage} final_stage={final_stage} "
+                        f"show_cta={should_show_cta} show_cards={should_show_cards} → show_actions={should_show_actions}")
             suggested_actions = stream_suggested_actions if should_show_actions else []
             budget_selector = stream_budget_selector if should_show_actions else None
             logger.info(f"[Actions] final_stage={final_stage} show={should_show_actions} actions={suggested_actions} budget_selector={budget_selector is not None}")
@@ -670,7 +699,7 @@ async def chat_stream_endpoint(request: ChatRequest):
 
             if done_cta_card:
                 payload["cta_card"] = done_cta_card
-
+            logger.info(f" Json payload: {payload}")
             yield f"data: {json.dumps(payload)}\n\n"
             
             leads_service.log_audit(

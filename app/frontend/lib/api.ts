@@ -103,12 +103,14 @@ export const api = {
             persona_stage?: string;
             suggested_actions?: string[];
             budget_selector?: BudgetSelector | null;
-          }) => void
+          }) => void,
+        signal?: AbortSignal,
     ) => {
         const res = await fetch(withBackend("/api/chat/stream"), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ session_id: sessionId, messages, locale: 'en' }),
+            signal,
         });
         if (!res.ok) throw new Error('Stream request failed');
 
@@ -123,15 +125,17 @@ export const api = {
             if (done) break;
 
             buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\n\n');
-            buffer = lines.pop() || '';
+            // Split on \n not \n\n — JSON payloads can contain \n\n internally
+            const lines = buffer.split('\n');
+            buffer = lines.pop() ?? '';
 
             for (const line of lines) {
                 const seg = line.trim();
-                if (seg.startsWith('data:')) {
-                    try {
-                        const jsonPart = seg.replace(/^data:\s*/, '');
-                        const parsed = JSON.parse(jsonPart);
+                if (!seg.startsWith('data:')) continue;
+                try {
+                    const jsonPart = seg.slice(5).trim();
+                    if (!jsonPart) continue;
+                    const parsed = JSON.parse(jsonPart);
                         if (parsed.done) {
                             onDone({
                                 retrieved_projects: parsed.retrieved_projects || [],
@@ -147,9 +151,8 @@ export const api = {
                         } else if (parsed.token) {
                             onToken(parsed.token);
                         }
-                    } catch (e) {
-                        // Skip malformed lines
-                    }
+                } catch (e) {
+                    // Skip malformed lines
                 }
             }
         }
